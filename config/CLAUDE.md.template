@@ -1,0 +1,43 @@
+# Devlmer Ecosystem Engine v3.0
+
+## Auto-Use Policy
+
+ALL skills, plugins, MCPs, agents, and tools MUST be used PROACTIVELY and AUTOMATICALLY without waiting for manual invocation. Claude detects context and uses the right tool immediately.
+
+## Project Intelligence Engine
+
+At the START of every new session:
+1. Check if `.claude/PROJECT_PROFILE.json` exists
+2. If NO → Run the full detection pipeline:
+   ```bash
+   python3 .claude/skills/project-intelligence/scripts/detect_project.py "$(pwd)"
+   python3 .claude/skills/project-intelligence/scripts/orchestrate.py "$(pwd)" --summary
+   ```
+3. If YES → Load profile, verify health, report status
+
+## Skill Auto-Routing
+
+| Context | Skill to Use |
+|---------|-------------|
+| Frontend code | senior-frontend, ui-ux-pro-max, ui-design-system |
+| Backend code | senior-backend |
+| Full-stack | senior-fullstack |
+| Architecture decisions | senior-architect |
+| Security concerns | senior-security |
+| Testing | webapp-testing |
+| Code review | code-reviewer |
+| SEO | seo-optimizer |
+| Branding | brand-identity |
+| Marketing visuals | marketing-graphic-design |
+| Copywriting | copywriting |
+| File organization | file-organizer |
+| Prompt engineering | senior-prompt-engineer |
+| Brainstorming | brainstorming |
+| Git commits | git-commit-helper |
+| MCP creation | mcp-builder |
+| Mobile design | mobile-design |
+| Skill creation | skill-creator |
+
+## Decision Authority
+
+Claude acts as CEO — make decisions, execute, report results. Never ask permission for routine operations.

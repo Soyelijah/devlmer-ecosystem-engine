@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devlmer Ecosystem Engine v3.0 - Intelligent Ecosystems for Every Project</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0052FF;
+            --primary-cyan: #00D4AA;
+            --dark-bg: #0a0e27;
+            --dark-secondary: #111933;
+            --dark-tertiary: #1a1f3a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --border-light: rgba(255, 255, 255, 0.1);
+            --border-lighter: rgba(255, 255, 255, 0.05);
+            --glow-blue: rgba(0, 82, 255, 0.2);
+            --glow-cyan: rgba(0, 212, 170, 0.2);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #0f1229 50%, var(--dark-secondary) 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ==================== UTILITIES ==================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 60px;
+        }
+
+        /* ==================== HEADER & NAV ==================== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 14, 39, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-lighter);
+            padding: 15px 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-cyan);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-cyan));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .cta-nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .cta-nav {
+                flex-direction: column;
+            }
+        }
+
+        /* ==================== HERO SECTION ==================== */
+        .hero {
+            padding: 200px 0 100px;
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.05) 0%, rgba(0, 212, 170, 0.03) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .install-command {
+            background: rgba(0, 82, 255, 0.1);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 40px auto;
+            max-width: 600px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.95rem;
+            color: var(--primary-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .install-command:hover {
+            background: rgba(0, 82, 255, 0.15);
+            border-color: var(--primary-cyan);
+            box-shadow: 0 0 30px var(--glow-blue);
+        }
+
+        .install-command-text {
+            flex: 1;
+        }
+
+        .copy-btn {
+            background: var(--primary-blue);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-cyan);
+            box-shadow: 0 0 20px var(--glow-cyan);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.6s backwards;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), #003d99);
+            color: white;
+            box-shadow: 0 10px 40px rgba(0, 82, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(0, 82, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-cyan);
+            border: 1.5px solid var(--primary-cyan);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 212, 170, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px var(--glow-cyan);
+        }
+
+        /* ==================== ANIMATED BACKGROUND ==================== */
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.3;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            mix-blend-mode: multiply;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .blob-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary-blue);
+            top: -50px;
+            left: -50px;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 250px;
+            height: 250px;
+            background: var(--primary-cyan);
+            bottom: 100px;
+            right: -50px;
+            animation-delay: 5s;
+        }
+
+        .blob-3 {
+            width: 200px;
+            height: 200px;
+            background: var(--primary-blue);
+            bottom: 300px;
+            left: 50px;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(30px, -50px); }
+            66% { transform: translate(-20px, 20px); }
+        }
+
+        /* ==================== WHAT IS DEVLMER ==================== */
+        .what-is {
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.03) 0%, rgba(0, 212, 170, 0.02) 100%);
+        }
+
+        .what-is-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .what-is-text h3 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+        }
+
+        .what-is-text p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+        }
+
+        .what-is-text ul {
+            list-style: none;
+        }
+
+        .what-is-text li {
+            padding: 12px 0;
+            padding-left: 30px;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .what-is-text li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary-cyan);
+            font-weight: 800;
+        }
+
+        .terminal-mockup {
+            background: rgba(10, 20, 50, 0.8);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--primary-cyan);
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 82, 255, 0.2);
+        }
+
+        .terminal-line {
+            margin: 10px 0;
+            opacity: 0;
+            animation: typeIn 0.5s ease-out forwards;
+            color: var(--primary-cyan);
+        }
+
+        .terminal-line:nth-child(1) { animation-delay: 0.2s; }
+        .terminal-line:nth-child(2) { animation-delay: 0.5s; }
+        .terminal-line:nth-child(3) { animation-delay: 0.8s; }
+        .terminal-line:nth-child(4) { animation-delay: 1.1s; }
+        .terminal-line:nth-child(5) { animation-delay: 1.4s; }
+        .terminal-line:nth-child(6) { animation-delay: 1.7s; }
+        .terminal-line:nth-child(7) { animation-delay: 2s; }
+
+        @keyframes typeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .what-is-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        /* ==================== HOW IT WORKS ==================== */
+        .how-works {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.02) 0%, rgba(0, 82, 255, 0.02) 100%);
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(135deg, transparent 30%, rgba(0, 212, 170, 0.1) 50%, transparent 70%);
+            animation: shine 3s infinite;
+            opacity: 0;
+        }
+
+        .step-card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes shine {
+            0% { transform: translate(-100%, -100%); }
+            100% { transform: translate(100%, 100%); }
+        }
+
+        .step-card:hover {
+            border-color: var(--primary-cyan);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 212, 170, 0.15);
+        }
+
+        .step-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .step-number {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .step-card h4 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .step-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* ==================== STATS SECTION ==================== */
+        .stats {
+            background: linear-gradient(135deg, var(--dark-secondary) 0%, var(--dark-tertiary) 100%);
+            border-top: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            counter-increment: stats;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+
+        /* ==================== SKILLS GRID ==================== */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 60px;
+        }
+
+        .skill-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-cyan));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .skill-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .skill-card:hover {
+            border-color: var(--primary-cyan);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 212, 170, 0.2);
+            background: rgba(0, 212, 170, 0.05);
+        }
+
+        .skill-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .skill-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .skill-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ==================== DOMAINS GRID ==================== */
+        .domains-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 60px;
+        }
+
+        .domain-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .domain-card:hover {
+            border-color: var(--primary-blue);
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 82, 255, 0.2);
+        }
+
+        .domain-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            color: var(--primary-cyan);
+        }
+
+        .domain-name {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* ==================== ARCHITECTURE ==================== */
+        .architecture {
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.03) 0%, rgba(0, 212, 170, 0.02) 100%);
+        }
+
+        .arch-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 60px;
+            position: relative;
+        }
+
+        .arch-step {
+            background: rgba(0, 82, 255, 0.1);
+            border: 1px solid var(--primary-blue);
+            border-radius: 12px;
+            padding: 35px 25px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .arch-step:nth-child(odd) {
+            background: rgba(0, 212, 170, 0.1);
+            border-color: var(--primary-cyan);
+        }
+
+        .arch-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .arch-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .arch-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .arch-arrow {
+            position: absolute;
+            top: 50%;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
+            z-index: 1;
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            .arch-arrow {
+                display: block;
+            }
+
+            .arch-arrow:nth-of-type(1) {
+                right: -42px;
+            }
+
+            .arch-arrow:nth-of-type(2) {
+                right: -42px;
+            }
+
+            .arch-arrow:nth-of-type(3) {
+                right: -42px;
+            }
+        }
+
+        /* ==================== INSTALLATION ==================== */
+        .installation {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.02) 0%, rgba(0, 82, 255, 0.02) 100%);
+        }
+
+        .install-steps {
+            margin-top: 60px;
+        }
+
+        .install-step {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 3px solid var(--primary-cyan);
+            border-radius: 8px;
+        }
+
+        .install-step-num {
+            font-size: 0.85rem;
+            color: var(--primary-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .install-step h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .code-block {
+            background: rgba(10, 20, 50, 0.8);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--primary-cyan);
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        /* ==================== BENEFITS ==================== */
+        .benefits {
+            background: linear-gradient(135deg, var(--dark-secondary) 0%, var(--dark-tertiary) 100%);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .benefit-card:hover {
+            border-color: var(--primary-cyan);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0, 212, 170, 0.15);
+            background: rgba(0, 212, 170, 0.05);
+        }
+
+        .benefit-icon {
+            font-size: 2rem;
+            color: var(--primary-cyan);
+            margin-bottom: 15px;
+        }
+
+        .benefit-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+        }
+
+        .benefit-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* ==================== AUDIENCE ==================== */
+        .audience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .audience-card {
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.1), rgba(0, 212, 170, 0.05));
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 35px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .audience-card:hover {
+            border-color: var(--primary-cyan);
+            transform: scale(1.05);
+            box-shadow: 0 20px 50px rgba(0, 212, 170, 0.2);
+        }
+
+        .audience-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .audience-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .audience-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* ==================== PROBLEMS & SOLUTIONS ==================== */
+        .problems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .problem-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .problem-card:hover {
+            border-color: var(--primary-blue);
+            box-shadow: 0 15px 40px rgba(0, 82, 255, 0.2);
+        }
+
+        .problem-label {
+            font-size: 0.85rem;
+            color: #ff6b6b;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .problem-text {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .solution-label {
+            font-size: 0.85rem;
+            color: var(--primary-cyan);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .solution-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ==================== TECH STACK ==================== */
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 60px;
+        }
+
+        .tech-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            padding: 10px 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tech-badge:hover {
+            border-color: var(--primary-cyan);
+            background: rgba(0, 212, 170, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .tech-badge i {
+            color: var(--primary-cyan);
+        }
+
+        /* ==================== FOOTER ==================== */
+        footer {
+            background: rgba(0, 0, 0, 0.5);
+            border-top: 1px solid var(--border-light);
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        footer p {
+            margin-bottom: 15px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+
+        .footer-links a {
+            color: var(--primary-cyan);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        /* ==================== SCROLL REVEAL ANIMATIONS ==================== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .reveal {
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .section {
+                padding: 50px 0;
+            }
+
+            .hero {
+                padding: 120px 0 60px;
+            }
+
+            .steps-grid,
+            .skills-grid,
+            .domains-grid,
+            .benefits-grid,
+            .audience-grid,
+            .problems-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .terminal-mockup {
+                font-size: 0.8rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 0.9rem;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        /* ==================== ACCESSIBILITY ==================== */
+        :focus-visible {
+            outline: 2px solid var(--primary-cyan);
+            outline-offset: 2px;
+        }
+
+        /* ==================== SCROLL SMOOTH ==================== */
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== HEADER ==================== -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-bolt"></i> Devlmer
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#qué-es">¿Qué es?</a></li>
+                    <li><a href="#cómo-funciona">Cómo Funciona</a></li>
+                    <li><a href="#skills">Skills</a></li>
+                    <li><a href="#por-qué">Por Qué</a></li>
+                </ul>
+                <div class="cta-nav">
+                    <button class="btn btn-secondary" onclick="document.querySelector('.install-command').click()">
+                        <i class="fas fa-download"></i> Instalar
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero">
+        <div class="animated-bg">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Devlmer Ecosystem Engine</h1>
+                <p class="hero-subtitle">Intelligent ecosystems for every project</p>
+
+                <div class="install-command" onclick="copyToClipboard('bash install.sh /your/project')">
+                    <span class="install-command-text">bash install.sh /your/project</span>
+                    <button class="copy-btn">
+                        <i class="fas fa-copy"></i> Copiar
+                    </button>
+                </div>
+
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="scrollToSection('installation')">
+                        <i class="fas fa-rocket"></i> Instalar Ahora
+                    </button>
+                    <a href="https://github.com/Memory-Bank/devlmer-ecosystem-engine" target="_blank" class="btn btn-secondary">
+                        <i class="fab fa-github"></i> Ver en GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ¿QUÉ ES DEVLMER? ==================== -->
+    <section class="section what-is" id="qué-es">
+        <div class="container">
+            <h2 class="section-title">¿Qué es Devlmer?</h2>
+            <p class="section-subtitle">La solución inteligente para ecosistemas profesionales automáticos</p>
+
+            <div class="what-is-content">
+                <div class="what-is-text">
+                    <h3>Automatización Completa del Ecosistema</h3>
+                    <p>Devlmer detecta automáticamente el tipo de proyecto en el que estás trabajando y genera un ecosistema profesional completo en segundos. Olvídate de configuraciones manuales y disfruta de herramientas listas para producción.</p>
+                    <ul>
+                        <li>Detecta automáticamente tu stack tecnológico</li>
+                        <li>Instala skills profesionales específicas</li>
+                        <li>Configura MCPs personalizados</li>
+                        <li>Integra agents inteligentes</li>
+                        <li>Genera blueprints de mejores prácticas</li>
+                        <li>Sincroniza con GitHub automáticamente</li>
+                    </ul>
+                </div>
+
+                <div class="terminal-mockup">
+                    <div class="terminal-line">$ bash install.sh /mi-proyecto</div>
+                    <div class="terminal-line">[*] Detectando stack...</div>
+                    <div class="terminal-line">[✓] Detectado: React 19 + FastAPI + PostgreSQL</div>
+                    <div class="terminal-line">[*] Instalando skills (21/21)...</div>
+                    <div class="terminal-line">[*] Configurando MCPs...</div>
+                    <div class="terminal-line">[✓] Ecosistema listo en 12s</div>
+                    <div class="terminal-line">[✓] URL GitHub: github.com/tu-usuario/mi-proyecto</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CÓMO FUNCIONA ==================== -->
+    <section class="section how-works" id="cómo-funciona">
+        <div class="container">
+            <h2 class="section-title">Cómo Funciona</h2>
+            <p class="section-subtitle">Cuatro pasos simples para un ecosistema profesional completo</p>
+
+            <div class="steps-grid">
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-terminal"></i>
+                    </div>
+                    <h4>Ejecuta el Instalador</h4>
+                    <p>Descarga y ejecuta un único comando bash que iniciará todo el proceso automático.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-magnifying-glass"></i>
+                    </div>
+                    <h4>Detección Automática</h4>
+                    <p>El fingerprinter analiza tu proyecto y detecta tecnologías, frameworks y patrones.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h4>Instalación Completa</h4>
+                    <p>Se instalan automáticamente skills, MCPs y agents diseñados específicamente para tu stack.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4>¡Todo Funciona!</h4>
+                    <p>Accede a tu ecosistema profesional completo. Listo para producción inmediatamente.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ESTADÍSTICAS ==================== -->
+    <section class="section stats" id="estadísticas">
+        <div class="container">
+            <h2 class="section-title">Por Números</h2>
+
+            <div class="stats-grid">
+                <div class="stat-item reveal">
+                    <div class="stat-number">130+</div>
+                    <div class="stat-label">Technology Signatures</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">22</div>
+                    <div class="stat-label">Business Domains</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">21</div>
+                    <div class="stat-label">Professional Skills</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">1</div>
+                    <div class="stat-label">Command Installation</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SKILLS INCLUIDOS ==================== -->
+    <section class="section" id="skills">
+        <div class="container">
+            <h2 class="section-title">21 Skills Profesionales Incluidos</h2>
+            <p class="section-subtitle">Herramientas enterprise en cada dominio del desarrollo</p>
+
+            <div class="skills-grid">
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-palette"></i></div>
+                    <h4 class="skill-name">Brand Identity</h4>
+                    <p class="skill-desc">Gestión completa de identidad visual y consistency de marca.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-pen-fancy"></i></div>
+                    <h4 class="skill-name">Marketing Copy</h4>
+                    <p class="skill-desc">Copywriting profesional y estrategia de contenido persuasivo.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-search"></i></div>
+                    <h4 class="skill-name">SEO Optimizer</h4>
+                    <p class="skill-desc">Optimización completa para motores de búsqueda y ranking.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-folder-tree"></i></div>
+                    <h4 class="skill-name">File Organizer</h4>
+                    <p class="skill-desc">Gestión inteligente de estructura de archivos y carpetas.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-code"></i></div>
+                    <h4 class="skill-name">Senior Frontend</h4>
+                    <p class="skill-desc">Desarrollo React/Vue/Angular con mejores prácticas.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-server"></i></div>
+                    <h4 class="skill-name">Senior Backend</h4>
+                    <p class="skill-desc">Arquitectura de servidores, APIs y bases de datos.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-layer-group"></i></div>
+                    <h4 class="skill-name">Senior Fullstack</h4>
+                    <p class="skill-desc">Desarrollo completo del stack con integración perfecta.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-building"></i></div>
+                    <h4 class="skill-name">Senior Architect</h4>
+                    <p class="skill-desc">Diseño de sistemas, escalabilidad y evolución tecnológica.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-shield"></i></div>
+                    <h4 class="skill-name">Senior Security</h4>
+                    <p class="skill-desc">Auditoría, penetración y hardening de aplicaciones.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-brain"></i></div>
+                    <h4 class="skill-name">Prompt Engineer</h4>
+                    <p class="skill-desc">Optimización de prompts y AI workflows avanzados.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-binoculars"></i></div>
+                    <h4 class="skill-name">Code Reviewer</h4>
+                    <p class="skill-desc">Revisión automática, análisis y sugerencias de mejora.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+                    <h4 class="skill-name">Skill Creator</h4>
+                    <p class="skill-desc">Generación y mantenimiento de skills personalizadas.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-flask"></i></div>
+                    <h4 class="skill-name">WebApp Testing</h4>
+                    <p class="skill-desc">Testing automático, E2E y coverage completo.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-cube"></i></div>
+                    <h4 class="skill-name">MCP Builder</h4>
+                    <p class="skill-desc">Construcción de Model Context Protocols personalizados.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-mobile"></i></div>
+                    <h4 class="skill-name">Mobile Design</h4>
+                    <p class="skill-desc">Diseño responsive y experiencia móvil premium.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-sparkles"></i></div>
+                    <h4 class="skill-name">UI/UX Pro Max</h4>
+                    <p class="skill-desc">Diseño de interfaz y experiencia de usuario avanzado.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-swatchbook"></i></div>
+                    <h4 class="skill-name">Design System</h4>
+                    <p class="skill-desc">Creación y mantenimiento de sistemas de diseño.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-lightbulb"></i></div>
+                    <h4 class="skill-name">Brainstorming</h4>
+                    <p class="skill-desc">Ideación, estrategia y validación de conceptos.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-git-alt"></i></div>
+                    <h4 class="skill-name">Git Commit Helper</h4>
+                    <p class="skill-desc">Mensajes de commit automáticos y semantically correct.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-book-open"></i></div>
+                    <h4 class="skill-name">Copywriting</h4>
+                    <p class="skill-desc">Redacción profesional para toda clase de contenido.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4 class="skill-name">Project Intelligence</h4>
+                    <p class="skill-desc">Análisis de métricas, KPIs y health del proyecto.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== DOMINIOS SOPORTADOS ==================== -->
+    <section class="section" style="background: linear-gradient(135deg, rgba(0, 212, 170, 0.02) 0%, rgba(0, 82, 255, 0.02) 100%);">
+        <div class="container">
+            <h2 class="section-title">22 Dominios Empresariales Soportados</h2>
+            <p class="section-subtitle">Ecosistema especializado para cada industria</p>
+
+            <div class="domains-grid">
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-university"></i></div>
+                    <div class="domain-name">FinTech</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-comments"></i></div>
+                    <div class="domain-name">ChatBot</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-robot"></i></div>
+                    <div class="domain-name">AI Agent</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="domain-name">E-Commerce</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-cloud"></i></div>
+                    <div class="domain-name">SaaS</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-store"></i></div>
+                    <div class="domain-name">Marketplace</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-newspaper"></i></div>
+                    <div class="domain-name">Content Platform</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-mobile-screen"></i></div>
+                    <div class="domain-name">Mobile App</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-chart-bar"></i></div>
+                    <div class="domain-name">Analytics</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-tools"></i></div>
+                    <div class="domain-name">DevTools</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-microchip"></i></div>
+                    <div class="domain-name">IoT</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-hospital"></i></div>
+                    <div class="domain-name">HealthTech</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-book"></i></div>
+                    <div class="domain-name">EdTech</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-users"></i></div>
+                    <div class="domain-name">HR Platform</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-home"></i></div>
+                    <div class="domain-name">Real Estate</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-plug"></i></div>
+                    <div class="domain-name">API Platform</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-gamepad"></i></div>
+                    <div class="domain-name">Gaming</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-truck"></i></div>
+                    <div class="domain-name">Logistics</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-gavel"></i></div>
+                    <div class="domain-name">Legal Tech</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-megaphone"></i></div>
+                    <div class="domain-name">Marketing</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-cube"></i></div>
+                    <div class="domain-name">Web3</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-share-nodes"></i></div>
+                    <div class="domain-name">Social</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ARQUITECTURA ==================== -->
+    <section class="section architecture">
+        <div class="container">
+            <h2 class="section-title">Arquitectura Inteligente</h2>
+            <p class="section-subtitle">Pipeline automático de detección e instalación</p>
+
+            <div class="arch-container">
+                <div class="arch-step reveal">
+                    <div class="arch-icon"><i class="fas fa-fingerprint"></i></div>
+                    <div class="arch-title">Fingerprinter</div>
+                    <div class="arch-desc">Analiza tu proyecto detectando tecnologías y patrones</div>
+                </div>
+                <div class="arch-arrow"></div>
+
+                <div class="arch-step reveal">
+                    <div class="arch-icon"><i class="fas fa-wires"></i></div>
+                    <div class="arch-title">Orchestrator</div>
+                    <div class="arch-desc">Coordina el flujo de instalación y configuración</div>
+                </div>
+                <div class="arch-arrow"></div>
+
+                <div class="arch-step reveal">
+                    <div class="arch-icon"><i class="fas fa-diagram-project"></i></div>
+                    <div class="arch-title">Blueprint Matching</div>
+                    <div class="arch-desc">Selecciona blueprints optimizados para tu dominio</div>
+                </div>
+                <div class="arch-arrow"></div>
+
+                <div class="arch-step reveal">
+                    <div class="arch-icon"><i class="fas fa-rocket"></i></div>
+                    <div class="arch-title">Auto-Install</div>
+                    <div class="arch-desc">Instala skills, MCPs y agents automáticamente</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== INSTALACIÓN ==================== -->
+    <section class="section installation" id="installation">
+        <div class="container">
+            <h2 class="section-title">Cómo Instalar</h2>
+            <p class="section-subtitle">Tres sencillos pasos para tu ecosistema profesional</p>
+
+            <div class="install-steps">
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 1 — Clona el Repositorio</div>
+                    <h4>Descarga el instalador oficial</h4>
+                    <div class="code-block">git clone https://github.com/Memory-Bank/devlmer-ecosystem-engine.git
+cd devlmer-ecosystem-engine</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 2 — Ejecuta el Instalador</div>
+                    <h4>Inicia la detección automática y configuración</h4>
+                    <div class="code-block">bash install.sh /path/to/your/project</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 3 — ¡Disfruta tu Ecosistema!</div>
+                    <h4>Todo está configurado y listo para usar</h4>
+                    <div class="code-block">cd /your/project
+# Tus skills, MCPs y agents ya están disponibles
+# Comienza a desarrollar con ecosistema profesional</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== BENEFICIOS ==================== -->
+    <section class="section benefits" id="por-qué">
+        <div class="container">
+            <h2 class="section-title">¿Por Qué Devlmer?</h2>
+            <p class="section-subtitle">Ventajas que transforman tu forma de desarrollar</p>
+
+            <div class="benefits-grid">
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-bolt"></i></div>
+                    <h4>Ahorra Horas</h4>
+                    <p>No perderás tiempo en configuraciones manuales. Todo se instala automáticamente en segundos.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-crown"></i></div>
+                    <h4>Ecosistema Enterprise</h4>
+                    <p>Acceso a herramientas de nivel profesional sin necesidad de inversión en infraestructura.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-star"></i></div>
+                    <h4>Mejores Prácticas</h4>
+                    <p>Todos nuestros skills incluyen patrones de arquitectura y mejores prácticas integradas.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-brain"></i></div>
+                    <h4>Detección Inteligente</h4>
+                    <p>Se adapta automáticamente a tu stack tecnológico y dominio empresarial específico.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-code-branch"></i></div>
+                    <h4>GitHub Integration</h4>
+                    <p>Backup automático, sincronización y control de versiones de tu ecosistema.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-refresh"></i></div>
+                    <h4>Actualización Continua</h4>
+                    <p>Nuevos skills y MCPs se añaden regularmente. Tu ecosistema crece contigo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== QUIÉN SE BENEFICIA ==================== -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">¿A Quién Ayuda Devlmer?</h2>
+            <p class="section-subtitle">Diseñado para profesionales en todos los roles</p>
+
+            <div class="audience-grid">
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-code"></i></div>
+                    <h4>Desarrolladores</h4>
+                    <p>Acceso a ecosistema automático, code review, testing y análisis de seguridad integrados.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-palette"></i></div>
+                    <h4>Diseñadores</h4>
+                    <p>UI/UX skills, design systems, mobile design y herramientas de prototipado profesional.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-megaphone"></i></div>
+                    <h4>Marketing</h4>
+                    <p>SEO, copywriting, brand management y herramientas de análisis de contenido.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4>CEOs y Managers</h4>
+                    <p>Productividad, task management, analytics y reportes de project intelligence.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-briefcase"></i></div>
+                    <h4>Freelancers</h4>
+                    <p>Herramientas profesionales sin inversión enterprise. Escala con tus proyectos.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-rocket"></i></div>
+                    <h4>Startups</h4>
+                    <p>Infraestructura completa desde el día uno. Focus en producto, no en setup.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PROBLEMAS RESUELTOS ==================== -->
+    <section class="section" style="background: linear-gradient(135deg, rgba(0, 82, 255, 0.03) 0%, rgba(0, 212, 170, 0.02) 100%);">
+        <div class="container">
+            <h2 class="section-title">Problemas Que Resuelve</h2>
+            <p class="section-subtitle">Soluciones reales para desafíos comunes</p>
+
+            <div class="problems-grid">
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Configuro todo manualmente cada proyecto"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Auto-detection + auto-install en un comando. Todo configurado en segundos.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"No sé qué herramientas necesito para este proyecto"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Blueprint matching inteligente según dominio y stack tecnológico.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Mis equipos usan diferentes tools y standards"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Ecosistema estandarizado para toda tu organización. Consistencia garantizada.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Pierdo demasiado tiempo en setup y configuración"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Un comando y listo. Comienza a desarrollar en minutos, no días.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Falta consistencia en calidad de código entre proyectos"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Skills con mejores prácticas integradas. Calidad garantizada por diseño.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Cambiar de proyecto significa reaprender nuevas herramientas"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Interfaz consistente. Ecosistema familiar en cada proyecto nuevo.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TECNOLOGÍAS ==================== -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Construido con Tecnologías Premium</h2>
+            <p class="section-subtitle">Stack profesional y confiable</p>
+
+            <div class="tech-stack">
+                <div class="tech-badge">
+                    <i class="fab fa-python"></i> Python
+                </div>
+                <div class="tech-badge">
+                    <i class="fas fa-terminal"></i> Bash
+                </div>
+                <div class="tech-badge">
+                    <i class="fab fa-node-js"></i> Node.js
+                </div>
+                <div class="tech-badge">
+                    <i class="fas fa-code"></i> Claude Code
+                </div>
+                <div class="tech-badge">
+                    <i class="fas fa-cube"></i> MCP Protocol
+                </div>
+                <div class="tech-badge">
+                    <i class="fab fa-github"></i> GitHub
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer>
+        <div class="container">
+            <p>
+                <strong>Devlmer Ecosystem Engine v3.0</strong>
+            </p>
+            <p>
+                Created with <i class="fas fa-heart" style="color: #ff6b6b;"></i> by Pierre Solier
+            </p>
+            <div class="footer-links">
+                <a href="https://github.com/Memory-Bank/devlmer-ecosystem-engine" target="_blank">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+                <a href="https://github.com/Memory-Bank" target="_blank">
+                    <i class="fab fa-github"></i> Organization
+                </a>
+                <a href="LICENSE">MIT License</a>
+                <span>© 2026 All Rights Reserved</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // ==================== INTERSECTION OBSERVER FOR SCROLL REVEALS ====================
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => {
+            el.style.opacity = '0';
+            observer.observe(el);
+        });
+
+        // ==================== COPY TO CLIPBOARD ====================
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target.closest('.copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        // ==================== SCROLL TO SECTION ====================
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // ==================== SMOOTH SCROLL FOR NAV LINKS ====================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // ==================== NAVBAR HIDE ON SCROLL DOWN ====================
+        let lastScrollTop = 0;
+        const header = document.querySelector('header');
+
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > 100) {
+                header.style.borderBottomColor = 'rgba(0, 212, 170, 0.1)';
+            } else {
+                header.style.borderBottomColor = 'rgba(255, 255, 255, 0.05)';
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        });
+
+        // ==================== ANIMATED COUNTER ====================
+        const stats = document.querySelectorAll('.stat-number');
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const element = entry.target;
+                    const text = element.textContent;
+                    const number = parseInt(text.match(/\d+/)[0]);
+                    const duration = 2000;
+                    const steps = 60;
+                    const stepValue = number / steps;
+                    let current = 0;
+                    const timer = setInterval(() => {
+                        current += stepValue;
+                        if (current >= number) {
+                            element.textContent = text;
+                            clearInterval(timer);
+                            counterObserver.unobserve(element);
+                        } else {
+                            element.textContent = Math.floor(current) + text.replace(/\d+/, '');
+                        }
+                    }, duration / steps);
+                }
+            });
+        }, observerOptions);
+
+        stats.forEach(stat => counterObserver.observe(stat));
+
+        // ==================== MOBILE MENU (OPTIONAL) ====================
+        // Smooth scrolling is built-in via CSS, no additional mobile menu needed
+        // The page is fully responsive with Flexbox and CSS Grid
+    </script>
+</body>
+</html>
