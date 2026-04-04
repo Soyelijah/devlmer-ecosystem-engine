@@ -2,7 +2,7 @@
 # Devlmer Ecosystem Engine v3.0
 ## Installation & User Guide (Spanish)
 
-[![Version 3.0](https://img.shields.io/badge/version-3.0-blue.svg)](https://github.com/Memory-Bank/devlmer-ecosystem-engine)
+[![Version 3.0](https://img.shields.io/badge/version-3.0-blue.svg)](https://github.com/Soyelijah/devlmer-ecosystem-engine)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![21+ Skills](https://img.shields.io/badge/bundled%20skills-21%2B-orange.svg)]()
 [![Enterprise Grade](https://img.shields.io/badge/quality-enterprise%20grade-purple.svg)]()
@@ -87,7 +87,7 @@ Antes de instalar DEE, necesitas tener instalado en tu computadora:
 Si ya tienes todos los requisitos instalados, instala DEE con un solo comando:
 
 ```bash
-git clone https://github.com/Memory-Bank/devlmer-ecosystem-engine.git
+git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git
 cd devlmer-ecosystem-engine
 bash install.sh /ruta/a/tu/proyecto
 ```
@@ -135,7 +135,7 @@ Deberías ver una ventana con texto blanco sobre fondo oscuro.
 Copia y pega esta línea exacta en tu terminal (presiona Enter al final):
 
 ```bash
-git clone https://github.com/Memory-Bank/devlmer-ecosystem-engine.git
+git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git
 ```
 
 Verás un mensaje como:
@@ -971,10 +971,10 @@ bash install.sh /ruta/tu/proyecto
 ### Soporte
 
 **Documentación:**
-- Visita https://github.com/Memory-Bank/devlmer-ecosystem-engine
+- Visita https://github.com/Soyelijah/devlmer-ecosystem-engine
 
 **Reportar problemas:**
-- GitHub Issues: https://github.com/Memory-Bank/devlmer-ecosystem-engine/issues
+- GitHub Issues: https://github.com/Soyelijah/devlmer-ecosystem-engine/issues
 
 **Comunidad:**
 - Slack: [Enlace a Slack de comunidad]
@@ -1138,7 +1138,7 @@ Si todos los elementos tienen check, estás listo para empezar.
 
 **Última actualización:** Abril 2026
 **Versión actual:** DEE v3.0 by Devlmer
-**Repositorio:** https://github.com/Memory-Bank/devlmer-ecosystem-engine
+**Repositorio:** https://github.com/Soyelijah/devlmer-ecosystem-engine
 **Lema:** Intelligent ecosystems for every project
 
 ---
