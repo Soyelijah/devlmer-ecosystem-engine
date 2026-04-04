@@ -1,0 +1,42 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🧠 DYSA ECOSYSTEM ENGINE v3.0 — Scanning project...' && if [ -f .claude/PROJECT_PROFILE.json ]; then echo '✅ Project profile found:' && python3 -c \"import json; p=json.load(open('.claude/PROJECT_PROFILE.json')); print(f'  Domain: {p.get(\\\"blueprint\\\",p.get(\\\"domain\\\",\\\"unknown\\\"))} | Skills: {len(p.get(\\\"activated_skills\\\",[]))} | MCPs: {len(p.get(\\\"installed_mcps\\\",[]))} | Agents: {len(p.get(\\\"agents\\\",[]))}')\" 2>/dev/null || echo '⚠️ Profile exists but could not be read'; else echo '🆕 No project profile found — FULL ECOSYSTEM SCAN REQUIRED'; echo '   → Read .claude/skills/project-intelligence/SKILL.md and run detection pipeline'; fi"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '✅ File modification — auto-verify protocol active'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "EDITED_FILE=\"$CLAUDE_FILE_PATH\"; if echo \"$EDITED_FILE\" | grep -qE '\\.py$'; then python3 -m py_compile \"$EDITED_FILE\" 2>&1 && echo '✅ Python syntax OK' || echo '❌ Python syntax error — fix immediately'; elif echo \"$EDITED_FILE\" | grep -qE '\\.(tsx?|jsx?)$'; then echo '⚡ TypeScript/JSX edited — verify with build'; elif echo \"$EDITED_FILE\" | grep -qE '\\.(html|css|scss)$'; then echo '🎨 Frontend asset edited — verify rendering'; fi"
+          }
+        ]
+      }
+    ]
+  },
+  "preferences": {
+    "auto_use_tools": true,
+    "proactive_mode": true,
+    "project_intelligence": true
+  }
+}
