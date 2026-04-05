@@ -32,19 +32,168 @@
 set -uo pipefail
 
 # ============================================================================
-# COLOR DEFINITIONS
+# CROSS-PLATFORM COMPATIBILITY LAYER
+# ============================================================================
+# Supports: macOS (Bash 3.2+, zsh 5+), Linux (all distros), WSL, Git Bash
+# This section MUST run before anything else to set up portable primitives.
+
+# --- Platform Detection ---
+DEE_OS="unknown"
+DEE_ARCH="unknown"
+DEE_PKG_MGR="none"
+DEE_GNU_TOOLS=0
+
+case "$(uname -s 2>/dev/null || echo unknown)" in
+    Darwin*)
+        DEE_OS="macos"
+        DEE_ARCH="$(uname -m 2>/dev/null || echo unknown)"
+        if command -v brew >/dev/null 2>&1; then
+            DEE_PKG_MGR="brew"
+        elif command -v port >/dev/null 2>&1; then
+            DEE_PKG_MGR="macports"
+        fi
+        # Check for GNU coreutils (installed via brew)
+        if command -v gtimeout >/dev/null 2>&1; then
+            DEE_GNU_TOOLS=1
+        fi
+        ;;
+    Linux*)
+        DEE_OS="linux"
+        DEE_ARCH="$(uname -m 2>/dev/null || echo unknown)"
+        DEE_GNU_TOOLS=1
+        if command -v apt-get >/dev/null 2>&1; then
+            DEE_PKG_MGR="apt"
+        elif command -v dnf >/dev/null 2>&1; then
+            DEE_PKG_MGR="dnf"
+        elif command -v yum >/dev/null 2>&1; then
+            DEE_PKG_MGR="yum"
+        elif command -v pacman >/dev/null 2>&1; then
+            DEE_PKG_MGR="pacman"
+        elif command -v apk >/dev/null 2>&1; then
+            DEE_PKG_MGR="apk"
+        elif command -v zypper >/dev/null 2>&1; then
+            DEE_PKG_MGR="zypper"
+        fi
+        ;;
+    MINGW*|MSYS*|CYGWIN*)
+        DEE_OS="windows"
+        DEE_ARCH="$(uname -m 2>/dev/null || echo x86_64)"
+        if command -v choco >/dev/null 2>&1; then
+            DEE_PKG_MGR="choco"
+        elif command -v scoop >/dev/null 2>&1; then
+            DEE_PKG_MGR="scoop"
+        elif command -v winget >/dev/null 2>&1; then
+            DEE_PKG_MGR="winget"
+        fi
+        ;;
+    FreeBSD*)
+        DEE_OS="freebsd"
+        DEE_PKG_MGR="pkg"
+        ;;
+esac
+
+# --- Portable Install Command Generator ---
+# Usage: install_cmd "package-name"
+# Returns the correct install command for the user's platform
+install_cmd() {
+    local pkg="$1"
+    case "${DEE_PKG_MGR}" in
+        brew)       echo "brew install ${pkg}" ;;
+        macports)   echo "sudo port install ${pkg}" ;;
+        apt)        echo "sudo apt-get install -y ${pkg}" ;;
+        dnf)        echo "sudo dnf install -y ${pkg}" ;;
+        yum)        echo "sudo yum install -y ${pkg}" ;;
+        pacman)     echo "sudo pacman -S --noconfirm ${pkg}" ;;
+        apk)        echo "sudo apk add ${pkg}" ;;
+        zypper)     echo "sudo zypper install -y ${pkg}" ;;
+        choco)      echo "choco install ${pkg}" ;;
+        scoop)      echo "scoop install ${pkg}" ;;
+        winget)     echo "winget install ${pkg}" ;;
+        pkg)        echo "sudo pkg install ${pkg}" ;;
+        *)          echo "(install ${pkg} using your system package manager)" ;;
+    esac
+}
+
+# --- Portable cp with conflict resolution ---
+# macOS BSD cp does NOT support --remove-destination
+# This function handles all edge cases across platforms
+portable_cp() {
+    local src="$1"
+    local dest="$2"
+
+    if [ ${DEE_GNU_TOOLS} -eq 1 ]; then
+        # GNU cp: use --remove-destination for maximum reliability
+        cp -r --remove-destination "${src}" "${dest}" 2>/dev/null && return 0
+    fi
+
+    # Portable fallback: works on macOS BSD, GNU, and everything else
+    # Strategy: remove target first (if exists), then copy fresh
+    local target_name
+    target_name="$(basename "${src}")"
+    local target_path="${dest}/${target_name}"
+
+    if [ -e "${target_path}" ] || [ -L "${target_path}" ]; then
+        # mv-swap: rename old → .bak, copy new, cleanup
+        mv "${target_path}" "${target_path}.bak.$$" 2>/dev/null || true
+    fi
+
+    if cp -R "${src}" "${dest}" 2>/dev/null; then
+        # Cleanup backup
+        rm -rf "${target_path}.bak.$$" 2>/dev/null || true
+        return 0
+    else
+        # Restore backup if copy failed
+        if [ -e "${target_path}.bak.$$" ]; then
+            mv "${target_path}.bak.$$" "${target_path}" 2>/dev/null || true
+        fi
+        return 1
+    fi
+}
+
+# --- Color Support Detection ---
+# Some terminals (dumb terminals, CI/CD pipes, Windows cmd.exe) don't support ANSI
+DEE_COLOR=1
+if [ -z "${TERM:-}" ] || [ "${TERM:-dumb}" = "dumb" ]; then
+    DEE_COLOR=0
+elif [ ! -t 1 ]; then
+    # stdout is not a terminal (piped or redirected)
+    DEE_COLOR=0
+fi
+# Allow force via env var
+if [ "${DEE_FORCE_COLOR:-0}" = "1" ]; then
+    DEE_COLOR=1
+fi
+if [ "${NO_COLOR:-}" != "" ]; then
+    DEE_COLOR=0
+fi
+
+# ============================================================================
+# COLOR DEFINITIONS (conditional on terminal support)
 # ============================================================================
 
-readonly RED='\033[0;31m'
-readonly GREEN='\033[0;32m'
-readonly YELLOW='\033[1;33m'
-readonly BLUE='\033[0;34m'
-readonly CYAN='\033[0;36m'
-readonly MAGENTA='\033[0;35m'
-readonly WHITE='\033[1;37m'
-readonly RESET='\033[0m'
-readonly BOLD='\033[1m'
-readonly DIM='\033[2m'
+if [ ${DEE_COLOR} -eq 1 ]; then
+    readonly RED='\033[0;31m'
+    readonly GREEN='\033[0;32m'
+    readonly YELLOW='\033[1;33m'
+    readonly BLUE='\033[0;34m'
+    readonly CYAN='\033[0;36m'
+    readonly MAGENTA='\033[0;35m'
+    readonly WHITE='\033[1;37m'
+    readonly RESET='\033[0m'
+    readonly BOLD='\033[1m'
+    readonly DIM='\033[2m'
+else
+    readonly RED=''
+    readonly GREEN=''
+    readonly YELLOW=''
+    readonly BLUE=''
+    readonly CYAN=''
+    readonly MAGENTA=''
+    readonly WHITE=''
+    readonly RESET=''
+    readonly BOLD=''
+    readonly DIM=''
+fi
 
 # Progress indicators
 readonly CHECK="${GREEN}✓${RESET}"
@@ -57,7 +206,14 @@ readonly ARROW="${CYAN}→${RESET}"
 # GLOBAL VARIABLES
 # ============================================================================
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Portable SCRIPT_DIR detection (works in Bash 3.2+, zsh, and sh)
+if [ -n "${BASH_SOURCE[0]:-}" ]; then
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+elif [ -n "${ZSH_VERSION:-}" ]; then
+    SCRIPT_DIR="$(cd "$(dirname "${(%):-%x}")" && pwd)"
+else
+    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+fi
 TARGET_DIR=""
 MODE="full"  # full, skills-only, scan-only
 VERBOSE=0
@@ -115,12 +271,17 @@ mkdir -p "${HOME}/.devlmer" 2>/dev/null || true
 } >> "${LOG_FILE}" 2>/dev/null || true
 
 # Tee all output to log file (preserves terminal output AND writes to file)
-# Process substitution with exec works on Bash 3.2+ when not in strict POSIX mode
-if exec > >(tee -a "${LOG_FILE}") 2>&1; then
-    : # Success — all output now goes to both terminal and log
-else
-    # Fallback: just log what we can
-    log_verbose "Note: Could not set up dual output. Log file may be incomplete."
+# Process substitution >(tee ...) requires Bash; not available in POSIX sh
+# We detect support before using it to avoid errors on incompatible shells
+DEE_LOG_TEE=0
+if [ -n "${BASH_VERSION:-}" ]; then
+    # Bash supports process substitution; safe on 3.2+
+    eval 'exec > >(tee -a "${LOG_FILE}") 2>&1' 2>/dev/null && DEE_LOG_TEE=1
+fi
+if [ ${DEE_LOG_TEE} -eq 0 ]; then
+    # Fallback: log to file only via explicit writes in log functions
+    # Terminal output still works normally
+    :
 fi
 
 log_header() {
@@ -210,17 +371,20 @@ safe_read_secret() {
     fi
 }
 
-# Run a command with timeout (portable — works on Bash 3.2+)
+# Run a command with timeout (portable — works on Bash 3.2+, zsh, macOS, Linux, WSL)
 # Usage: run_with_timeout SECONDS command [args...]
 run_with_timeout() {
     local timeout_secs="$1"
     shift
 
-    if command -v timeout &> /dev/null; then
-        # GNU coreutils timeout (Linux, Homebrew on macOS)
+    if command -v timeout >/dev/null 2>&1; then
+        # GNU coreutils timeout (Linux, Homebrew coreutils on macOS)
         timeout "${timeout_secs}" "$@"
+    elif command -v gtimeout >/dev/null 2>&1; then
+        # macOS with Homebrew GNU coreutils (prefixed with 'g')
+        gtimeout "${timeout_secs}" "$@"
     else
-        # Portable fallback for macOS without coreutils
+        # Portable fallback for macOS/BSD without coreutils
         "$@" &
         local cmd_pid=$!
         (
@@ -343,13 +507,8 @@ EOF
 # ============================================================================
 
 detect_platform() {
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        echo "linux"
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        echo "macos"
-    else
-        echo "unknown"
-    fi
+    # Uses DEE_OS from compatibility layer (already detected via uname -s)
+    echo "${DEE_OS}"
 }
 
 check_dependencies() {
@@ -358,58 +517,80 @@ check_dependencies() {
     local missing=0
     local missing_list=""
 
-    # Bash version — informational only (script is Bash 3.2+ compatible)
-    log_verbose "Bash: ${BASH_VERSION}"
-    if [[ ${BASH_VERSINFO[0]} -lt 3 ]]; then
-        log_error "Bash 3.0+ required (found ${BASH_VERSION})"
-        missing_list="${missing_list}\n  ${CROSS} bash 3.0+ — current: ${BASH_VERSION}"
-        missing=1
+    # Platform info
+    log_verbose "Platform: ${DEE_OS} (${DEE_ARCH})"
+    log_verbose "Package manager: ${DEE_PKG_MGR}"
+    log_verbose "GNU tools: $([ ${DEE_GNU_TOOLS} -eq 1 ] && echo 'yes' || echo 'no (BSD)')"
+    if [ -n "${BASH_VERSION:-}" ]; then
+        log_verbose "Shell: Bash ${BASH_VERSION}"
+    elif [ -n "${ZSH_VERSION:-}" ]; then
+        log_verbose "Shell: zsh ${ZSH_VERSION}"
+    else
+        log_verbose "Shell: $(basename "${SHELL:-sh}")"
     fi
 
     # Check git
-    if ! command -v git &> /dev/null; then
-        local git_install="brew install git"
-        [[ "$(uname)" == "Linux" ]] && git_install="sudo apt-get install git"
-        log_warning "git not found — install with: ${git_install}"
-        missing_list="${missing_list}\n  ${CROSS} git — install: ${git_install}"
+    if ! command -v git >/dev/null 2>&1; then
+        local git_pkg="git"
+        log_warning "git not found — install with: $(install_cmd ${git_pkg})"
+        missing_list="${missing_list}\n  ${CROSS} git — install: $(install_cmd ${git_pkg})"
         missing=1
     else
         log_verbose "Git: $(git --version 2>/dev/null | head -1)"
     fi
 
     # Check node/npm
-    if ! command -v node &> /dev/null; then
-        local node_install="brew install node"
-        [[ "$(uname)" == "Linux" ]] && node_install="sudo apt-get install nodejs npm"
-        log_warning "Node.js not found — install with: ${node_install}"
-        missing_list="${missing_list}\n  ${CROSS} node — install: ${node_install}"
+    if ! command -v node >/dev/null 2>&1; then
+        local node_pkg="node"
+        [ "${DEE_PKG_MGR}" = "apt" ] && node_pkg="nodejs"
+        log_warning "Node.js not found — install with: $(install_cmd ${node_pkg})"
+        missing_list="${missing_list}\n  ${CROSS} node — install: $(install_cmd ${node_pkg})"
         missing=1
     else
         log_verbose "Node.js: $(node --version)"
     fi
 
-    if ! command -v npm &> /dev/null; then
-        log_warning "npm not found — usually comes with Node.js"
-        missing_list="${missing_list}\n  ${CROSS} npm — install Node.js (includes npm)"
+    if ! command -v npm >/dev/null 2>&1; then
+        local npm_pkg="npm"
+        [ "${DEE_PKG_MGR}" = "apt" ] && npm_pkg="npm"
+        log_warning "npm not found — install with: $(install_cmd ${npm_pkg})"
+        missing_list="${missing_list}\n  ${CROSS} npm — install: $(install_cmd ${npm_pkg})"
         missing=1
     fi
 
-    # Check python
-    if ! command -v python3 &> /dev/null; then
-        local py_install="brew install python3"
-        [[ "$(uname)" == "Linux" ]] && py_install="sudo apt-get install python3 python3-pip"
-        log_warning "Python 3 not found — install with: ${py_install}"
-        missing_list="${missing_list}\n  ${CROSS} python3 — install: ${py_install}"
-        missing=1
+    # Check python (try python3 first, then python)
+    if ! command -v python3 >/dev/null 2>&1; then
+        if command -v python >/dev/null 2>&1; then
+            # Some systems (Arch, Windows) have 'python' instead of 'python3'
+            local py_ver
+            py_ver="$(python --version 2>&1 | grep -oE '[0-9]+' | head -1)"
+            if [ "${py_ver:-0}" -ge 3 ]; then
+                log_verbose "Python 3 found as 'python': $(python --version 2>&1)"
+                # Create alias for rest of script
+                python3() { python "$@"; }
+            else
+                local py_pkg="python3"
+                [ "${DEE_PKG_MGR}" = "pacman" ] && py_pkg="python"
+                [ "${DEE_PKG_MGR}" = "brew" ] && py_pkg="python@3"
+                log_warning "Python 3 not found — install with: $(install_cmd ${py_pkg})"
+                missing_list="${missing_list}\n  ${CROSS} python3 — install: $(install_cmd ${py_pkg})"
+                missing=1
+            fi
+        else
+            local py_pkg="python3"
+            [ "${DEE_PKG_MGR}" = "pacman" ] && py_pkg="python"
+            [ "${DEE_PKG_MGR}" = "brew" ] && py_pkg="python@3"
+            log_warning "Python 3 not found — install with: $(install_cmd ${py_pkg})"
+            missing_list="${missing_list}\n  ${CROSS} python3 — install: $(install_cmd ${py_pkg})"
+            missing=1
+        fi
     else
-        log_verbose "Python 3: $(python3 --version)"
+        log_verbose "Python 3: $(python3 --version 2>&1)"
     fi
 
     # Check optional tools
-    if ! command -v jq &> /dev/null; then
-        local jq_install="brew install jq"
-        [[ "$(uname)" == "Linux" ]] && jq_install="sudo apt-get install jq"
-        log_verbose "jq not found (optional) — install: ${jq_install}"
+    if ! command -v jq >/dev/null 2>&1; then
+        log_verbose "jq not found (optional) — install: $(install_cmd jq)"
     fi
 
     if [[ ${missing} -eq 1 ]]; then
@@ -457,7 +638,7 @@ setup_directories() {
 # ============================================================================
 
 check_github_cli() {
-    if command -v gh &> /dev/null; then
+    if command -v gh >/dev/null 2>&1; then
         return 0
     else
         return 1
@@ -466,7 +647,7 @@ check_github_cli() {
 
 github_status() {
     if check_github_cli; then
-        if run_with_timeout 15 gh auth status &> /dev/null; then
+        if run_with_timeout 15 gh auth status >/dev/null 2>&1; then
             return 0
         else
             return 1
@@ -496,7 +677,7 @@ get_github_auth_interactive() {
 
         if [[ "${gh_reply}" =~ ^[Yy]$ ]]; then
             log_step "Attempting GitHub authentication (60s timeout)..."
-            if run_with_timeout 60 gh auth login --web &> /dev/null; then
+            if run_with_timeout 60 gh auth login --web >/dev/null 2>&1; then
                 log_success "GitHub authentication successful"
                 GITHUB_AUTHENTICATED=1
                 return 0
@@ -572,7 +753,7 @@ offer_github_features() {
 
     # Initialize git if needed
     if [[ ! -d "${TARGET_DIR}/.git" ]]; then
-        if git -C "${TARGET_DIR}" init &> /dev/null; then
+        if git -C "${TARGET_DIR}" init >/dev/null 2>&1; then
             log_verbose "Git repository initialized in ${TARGET_DIR}"
         else
             log_warning "Failed to initialize git repository"
@@ -583,17 +764,17 @@ offer_github_features() {
     fi
 
     # Configure git user if not already set (for commits)
-    if ! git -C "${TARGET_DIR}" config user.email &> /dev/null; then
-        git -C "${TARGET_DIR}" config user.email "devlmer-ecosystem@local" &> /dev/null || true
+    if ! git -C "${TARGET_DIR}" config user.email >/dev/null 2>&1; then
+        git -C "${TARGET_DIR}" config user.email "devlmer-ecosystem@local" >/dev/null 2>&1 || true
     fi
-    if ! git -C "${TARGET_DIR}" config user.name &> /dev/null; then
-        git -C "${TARGET_DIR}" config user.name "Devlmer Ecosystem" &> /dev/null || true
+    if ! git -C "${TARGET_DIR}" config user.name >/dev/null 2>&1; then
+        git -C "${TARGET_DIR}" config user.name "Devlmer Ecosystem" >/dev/null 2>&1 || true
     fi
 
     # Add and commit .claude directory if it exists
     if [[ -d "${TARGET_DIR}/.claude" ]]; then
         if git -C "${TARGET_DIR}" add .claude/ 2>/dev/null; then
-            if git -C "${TARGET_DIR}" commit -m "Devlmer: ecosystem configured" &> /dev/null; then
+            if git -C "${TARGET_DIR}" commit -m "Devlmer: ecosystem configured" >/dev/null 2>&1; then
                 log_success "Ecosystem config committed to git"
             else
                 log_verbose "No changes to commit (or commit failed)"
@@ -604,7 +785,7 @@ offer_github_features() {
     fi
 
     # Check for remote and offer to push
-    if git -C "${TARGET_DIR}" remote get-url origin &> /dev/null; then
+    if git -C "${TARGET_DIR}" remote get-url origin >/dev/null 2>&1; then
         log_step "A git remote 'origin' is configured."
         local push_reply=""
         safe_read push_reply "Would you like to push ecosystem backup to origin? [y/N]" 30 "N"
@@ -729,7 +910,7 @@ EOF
     fi
 
     # Add nano-banana-mcp to existing mcpServers section (if python is available)
-    if command -v python3 &> /dev/null; then
+    if command -v python3 >/dev/null 2>&1; then
         python3 << PYTHON_SCRIPT
 import json
 import sys
@@ -812,17 +993,14 @@ copy_bundled_skills() {
                 log_verbose "Cleared file conflict: ${skill_name}"
             fi
 
-            # Copy with escalating fallback strategies
-            if cp -r --remove-destination "${skill}" "${TARGET_DIR}/.claude/skills/" 2>/dev/null; then
+            # Copy using portable_cp (handles macOS BSD + GNU + mv-swap fallback)
+            if portable_cp "${skill}" "${TARGET_DIR}/.claude/skills/"; then
                 skill_count=$((skill_count + 1))
                 log_verbose "Copied skill: ${skill_name}"
-            elif cp -rf "${skill}" "${TARGET_DIR}/.claude/skills/" 2>/dev/null; then
-                skill_count=$((skill_count + 1))
-                log_verbose "Copied skill (force): ${skill_name}"
-            elif cp -r "${skill}" "${TARGET_DIR}/.claude/skills/${skill_name}.new" 2>/dev/null \
-                 && mv "${target_path}" "${target_path}.old.$(date +%s)" 2>/dev/null \
+            elif cp -R "${skill}" "${TARGET_DIR}/.claude/skills/${skill_name}.new" 2>/dev/null \
+                 && mv "${target_path}" "${target_path}.old.$$" 2>/dev/null \
                  && mv "${TARGET_DIR}/.claude/skills/${skill_name}.new" "${target_path}" 2>/dev/null; then
-                # Last resort: copy to temp name, mv old out, mv new in
+                # Last resort mv-swap: copy to temp name, mv old out, mv new in
                 skill_count=$((skill_count + 1))
                 log_verbose "Copied skill (mv-swap): ${skill_name}"
             else
@@ -846,7 +1024,7 @@ install_external_skill() {
 
     log_step "Installing external skill: ${skill_name}"
 
-    if command -v npx &> /dev/null; then
+    if command -v npx >/dev/null 2>&1; then
         if npx -y skills add "${skill_url}" --skill "${skill_name}" --yes 2>/dev/null; then
             EXTERNAL_SKILLS_INSTALLED=$((EXTERNAL_SKILLS_INSTALLED + 1))
             log_success "Installed: ${skill_name}"
@@ -865,7 +1043,7 @@ install_external_skill() {
 install_copywriting_skill() {
     log_step "Installing copywriting skill..."
 
-    if command -v npx &> /dev/null; then
+    if command -v npx >/dev/null 2>&1; then
         if npx -y skills add https://github.com/coreyhaines31/marketingskills --skill copywriting --yes 2>/dev/null; then
             EXTERNAL_SKILLS_INSTALLED=$((EXTERNAL_SKILLS_INSTALLED + 1))
             log_success "Installed: copywriting skill"
@@ -902,7 +1080,7 @@ install_external_skills() {
         "creative-design/mobile-design"
     )
 
-    if ! command -v npx &> /dev/null; then
+    if ! command -v npx >/dev/null 2>&1; then
         log_warning "npm/npx not found. Skipping external skill installations."
         log_info "Install Node.js to enable external skill installations."
         return 0
@@ -938,7 +1116,7 @@ install_mcp() {
 
     log_step "Installing MCP: ${mcp_name}"
 
-    if command -v npx &> /dev/null; then
+    if command -v npx >/dev/null 2>&1; then
         if npx -y @anthropic/create-mcp "${mcp_repo}" 2>/dev/null; then
             MCPS_INSTALLED=$((MCPS_INSTALLED + 1))
             log_success "Installed MCP: ${mcp_name}"
@@ -957,13 +1135,13 @@ install_mcp() {
 install_mcps() {
     log_section "INSTALLING & CONFIGURING MCPS (MODEL CONTEXT PROTOCOLS)"
 
-    if ! command -v npx &> /dev/null; then
+    if ! command -v npx >/dev/null 2>&1; then
         log_warning "npm/npx not found. Skipping MCP installations."
         log_info "Install Node.js to enable MCP installations."
         return 0
     fi
 
-    if ! command -v python3 &> /dev/null; then
+    if ! command -v python3 >/dev/null 2>&1; then
         log_warning "Python 3 not available. Skipping MCP installations."
         return 0
     fi
@@ -1342,7 +1520,7 @@ configure_agents() {
     mkdir -p "${TARGET_DIR}/.claude/agents"
 
     # Use Python to extract and configure agents
-    if command -v python3 &> /dev/null; then
+    if command -v python3 >/dev/null 2>&1; then
         profile_path="${profile_path}" TARGET_DIR="${TARGET_DIR}" python3 << 'CONFIGURE_AGENTS_BLOCK'
 import json
 import os
@@ -1444,7 +1622,7 @@ copy_blueprints() {
         return 0
     fi
 
-    cp -r "${blueprints_dir}"/* "${TARGET_DIR}/.claude/config/" 2>/dev/null || true
+    cp -R "${blueprints_dir}"/* "${TARGET_DIR}/.claude/config/" 2>/dev/null || true
     CONFIG_FILES_CREATED=$((CONFIG_FILES_CREATED + 1))
     log_success "Blueprints copied to .claude/config/"
 }
@@ -1459,7 +1637,7 @@ copy_scripts() {
         return 0
     fi
 
-    cp -r "${scripts_dir}"/* "${TARGET_DIR}/.claude/" 2>/dev/null || true
+    cp -R "${scripts_dir}"/* "${TARGET_DIR}/.claude/" 2>/dev/null || true
     SCRIPTS_COPIED=$((SCRIPTS_COPIED + 1))
     log_success "Project intelligence scripts copied"
     log_verbose "Scripts copied from: ${scripts_dir}"
@@ -1639,7 +1817,7 @@ create_settings_json() {
     # If settings.json already exists (e.g., from install_mcps), merge instead of overwrite
     if [[ -f "${settings_file}" ]]; then
         log_info "settings.json already exists — merging Devlmer config..."
-        if command -v python3 &> /dev/null; then
+        if command -v python3 >/dev/null 2>&1; then
             TARGET_DIR="${TARGET_DIR}" python3 << 'MERGE_SETTINGS'
 import json, os
 target_dir = os.environ.get('TARGET_DIR', '')
@@ -1733,7 +1911,7 @@ run_project_fingerprinter() {
         return 0
     fi
 
-    if ! command -v python3 &> /dev/null; then
+    if ! command -v python3 >/dev/null 2>&1; then
         log_warning "Python 3 not found, skipping fingerprinting"
         return 0
     fi
@@ -1758,7 +1936,7 @@ run_orchestrator() {
         return 0
     fi
 
-    if ! command -v python3 &> /dev/null; then
+    if ! command -v python3 >/dev/null 2>&1; then
         log_warning "Python 3 not found, skipping orchestration"
         return 0
     fi
@@ -1929,7 +2107,10 @@ show_summary() {
     echo -e "${BOLD}Installation Details:${RESET}"
     echo -e "  ${CYAN}Target directory:${RESET} ${TARGET_DIR}"
     echo -e "  ${CYAN}Mode:${RESET} ${MODE}"
-    echo -e "  ${CYAN}Platform:${RESET} $(detect_platform)"
+    echo -e "  ${CYAN}Platform:${RESET} ${DEE_OS} (${DEE_ARCH})"
+    echo -e "  ${CYAN}Package manager:${RESET} ${DEE_PKG_MGR}"
+    echo -e "  ${CYAN}Shell:${RESET} ${BASH_VERSION:-${ZSH_VERSION:-unknown}}"
+    echo -e "  ${CYAN}GNU tools:${RESET} $([ ${DEE_GNU_TOOLS} -eq 1 ] && echo 'yes' || echo 'no (BSD)')"
     echo -e "  ${CYAN}Duration:${RESET} ${duration}"
 
     echo ""
@@ -2142,20 +2323,23 @@ main() {
 
 # Global timeout handler — ensures script never hangs beyond 5 minutes
 GLOBAL_TIMEOUT=300  # 5 minutes
-trap 'echo ""; log_error "Installation timed out after ${GLOBAL_TIMEOUT}s. Check ${LOG_FILE} for details."; exit 124' ALRM 2>/dev/null || true
 
-# Set global alarm (portable: works on Bash 3.2+)
+# Use SIGTERM (15) instead of SIGALRM (14) for maximum portability
+# SIGALRM is not reliably trappable on all systems (macOS Bash 3.2, Git Bash)
+trap 'echo ""; log_error "Installation timed out after ${GLOBAL_TIMEOUT}s. Check ${LOG_FILE} for details."; exit 124' TERM 2>/dev/null || true
+
+# Set global watchdog (portable: works on Bash 3.2+, zsh, Git Bash)
 (
     sleep ${GLOBAL_TIMEOUT}
-    # Send SIGALRM to parent process
-    kill -ALRM $$ 2>/dev/null || kill -TERM $$ 2>/dev/null
+    # Send SIGTERM (15) to parent process group
+    kill -15 $$ 2>/dev/null || kill $$ 2>/dev/null
 ) &
 GLOBAL_WATCHDOG_PID=$!
 
 # Cleanup watchdog on normal exit
 cleanup_watchdog() {
-    kill ${GLOBAL_WATCHDOG_PID} 2>/dev/null || true
-    wait ${GLOBAL_WATCHDOG_PID} 2>/dev/null || true
+    kill "${GLOBAL_WATCHDOG_PID}" 2>/dev/null || true
+    wait "${GLOBAL_WATCHDOG_PID}" 2>/dev/null || true
 }
 trap cleanup_watchdog EXIT
 
