@@ -19,13 +19,17 @@
 #   ./install.sh --scan-only
 #   ./install.sh --github-token <token>
 #   ./install.sh --gemini-key <key>
+#   ./install.sh --non-interactive (or --yes / -y)
 #
-# Version: 3.0
-# Last Updated: 2026-04-04
+# Compatibility: Bash 3.2+ (macOS default), Bash 4+, zsh 5+
+# Version: 3.1
+# Last Updated: 2026-04-05
 #
 ################################################################################
 
-set -euo pipefail
+# NOTE: We use -u (undefined vars) and -o pipefail, but NOT -e (exit on error)
+# because run_step() handles errors gracefully and continues installation.
+set -uo pipefail
 
 # ============================================================================
 # COLOR DEFINITIONS
@@ -79,12 +83,45 @@ AGENTS_FAILED=0
 CONFIG_FILES_CREATED=0
 SCRIPTS_COPIED=0
 
+# Non-interactive mode
+NON_INTERACTIVE=0
+
+# Installation step tracking (for error resilience)
+STEP_ERRORS=""
+STEP_COUNT=0
+STEP_FAILURES=0
+
 # Track timing
 INSTALL_START_TIME=$(date +%s)
+
+# Log file
+LOG_FILE="${HOME}/.devlmer/install.log"
 
 # ============================================================================
 # UTILITY FUNCTIONS
 # ============================================================================
+
+# Ensure log directory exists early
+mkdir -p "${HOME}/.devlmer" 2>/dev/null || true
+
+# Initialize log file with session header
+{
+    echo ""
+    echo "================================================================"
+    echo "=== DEE v3.1 Install — $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
+    echo "=== Bash: ${BASH_VERSION} | OS: $(uname -s) $(uname -r) ==="
+    echo "=== Args: $* ==="
+    echo "================================================================"
+} >> "${LOG_FILE}" 2>/dev/null || true
+
+# Tee all output to log file (preserves terminal output AND writes to file)
+# Process substitution with exec works on Bash 3.2+ when not in strict POSIX mode
+if exec > >(tee -a "${LOG_FILE}") 2>&1; then
+    : # Success — all output now goes to both terminal and log
+else
+    # Fallback: just log what we can
+    log_verbose "Note: Could not set up dual output. Log file may be incomplete."
+fi
 
 log_header() {
     echo -e "${BOLD}${CYAN}>>> ${1}${RESET}"
@@ -113,6 +150,107 @@ log_step() {
 log_verbose() {
     if [[ ${VERBOSE} -eq 1 ]]; then
         echo -e "    ${WHITE}${1}${RESET}"
+    fi
+}
+
+# Check if running in an interactive terminal with a real TTY
+is_interactive() {
+    if [[ ${NON_INTERACTIVE} -eq 1 ]]; then
+        return 1
+    fi
+    if [[ -t 0 ]]; then
+        return 0
+    fi
+    return 1
+}
+
+# Safe read with timeout — NEVER hangs. Returns 1 if timeout/non-interactive.
+# Usage: safe_read VARNAME "prompt" [timeout_seconds] [default_value]
+safe_read() {
+    local varname="$1"
+    local prompt_text="$2"
+    local timeout="${3:-30}"
+    local default_val="${4:-}"
+
+    if ! is_interactive; then
+        eval "${varname}=\"${default_val}\""
+        log_verbose "Non-interactive mode: using default '${default_val}' for prompt"
+        return 1
+    fi
+
+    if read -t "${timeout}" -r -p "${prompt_text} " "${varname}" 2>/dev/null; then
+        return 0
+    else
+        eval "${varname}=\"${default_val}\""
+        echo ""
+        log_warning "Input timeout (${timeout}s) — using default"
+        return 1
+    fi
+}
+
+# Safe read for secrets (silent) with timeout
+safe_read_secret() {
+    local varname="$1"
+    local prompt_text="$2"
+    local timeout="${3:-30}"
+
+    if ! is_interactive; then
+        eval "${varname}=\"\""
+        return 1
+    fi
+
+    if read -t "${timeout}" -s -r -p "${prompt_text} " "${varname}" 2>/dev/null; then
+        echo ""
+        return 0
+    else
+        eval "${varname}=\"\""
+        echo ""
+        log_warning "Input timeout (${timeout}s) — skipping"
+        return 1
+    fi
+}
+
+# Run a command with timeout (portable — works on Bash 3.2+)
+# Usage: run_with_timeout SECONDS command [args...]
+run_with_timeout() {
+    local timeout_secs="$1"
+    shift
+
+    if command -v timeout &> /dev/null; then
+        # GNU coreutils timeout (Linux, Homebrew on macOS)
+        timeout "${timeout_secs}" "$@"
+    else
+        # Portable fallback for macOS without coreutils
+        "$@" &
+        local cmd_pid=$!
+        (
+            sleep "${timeout_secs}"
+            kill "${cmd_pid}" 2>/dev/null
+        ) &
+        local watchdog_pid=$!
+        wait "${cmd_pid}" 2>/dev/null
+        local exit_code=$?
+        kill "${watchdog_pid}" 2>/dev/null 2>&1
+        wait "${watchdog_pid}" 2>/dev/null 2>&1
+        return ${exit_code}
+    fi
+}
+
+# Run an installation step with error resilience
+# Usage: run_step "step_name" command [args...]
+run_step() {
+    local step_name="$1"
+    shift
+    STEP_COUNT=$((STEP_COUNT + 1))
+
+    if "$@"; then
+        return 0
+    else
+        local exit_code=$?
+        STEP_FAILURES=$((STEP_FAILURES + 1))
+        STEP_ERRORS="${STEP_ERRORS}\n  ${CROSS} ${step_name} (exit code ${exit_code})"
+        log_warning "Step '${step_name}' failed (exit ${exit_code}) — continuing installation"
+        return 0  # Don't abort the whole install
     fi
 }
 
@@ -178,8 +316,10 @@ ${BOLD}OPTIONS:${RESET}
     --no-external       Skip external skill installations (from npm)
     --no-mcp            Skip MCP (Model Context Protocol) installations
     --no-github         Skip GitHub authentication (do not offer repo sync/backup)
-    --github-token      Provide GitHub Personal Access Token (non-interactive)
-    --gemini-key        Provide Gemini API key for Nano-Banana MCP (non-interactive)
+    --non-interactive   Skip ALL interactive prompts (use defaults)
+    --yes, -y           Alias for --non-interactive
+    --github-token      Provide GitHub Personal Access Token
+    --gemini-key        Provide Gemini API key for Nano-Banana MCP
 
 ${BOLD}EXAMPLES:${RESET}
     ./install.sh /path/to/project
@@ -187,6 +327,8 @@ ${BOLD}EXAMPLES:${RESET}
     ./install.sh ~ --scan-only --verbose
     ./install.sh . --github-token ghp_xxxxxxxxxxxx
     ./install.sh . --gemini-key AIzaSy...
+    ./install.sh . --non-interactive --no-github
+    ./install.sh . --yes --no-external
 
 ${BOLD}ENVIRONMENT:${RESET}
     Works on macOS 11+ and Linux (Ubuntu 18+, CentOS 7+)
@@ -214,31 +356,67 @@ check_dependencies() {
     log_step "Verifying dependencies..."
 
     local missing=0
+    local missing_list=""
 
-    # Check bash version
-    if [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
-        log_error "Bash 4.0+ required (found ${BASH_VERSION})"
+    # Bash version — informational only (script is Bash 3.2+ compatible)
+    log_verbose "Bash: ${BASH_VERSION}"
+    if [[ ${BASH_VERSINFO[0]} -lt 3 ]]; then
+        log_error "Bash 3.0+ required (found ${BASH_VERSION})"
+        missing_list="${missing_list}\n  ${CROSS} bash 3.0+ — current: ${BASH_VERSION}"
         missing=1
+    fi
+
+    # Check git
+    if ! command -v git &> /dev/null; then
+        local git_install="brew install git"
+        [[ "$(uname)" == "Linux" ]] && git_install="sudo apt-get install git"
+        log_warning "git not found — install with: ${git_install}"
+        missing_list="${missing_list}\n  ${CROSS} git — install: ${git_install}"
+        missing=1
+    else
+        log_verbose "Git: $(git --version 2>/dev/null | head -1)"
     fi
 
     # Check node/npm
     if ! command -v node &> /dev/null; then
-        log_warning "Node.js not found (required for skill installations)"
+        local node_install="brew install node"
+        [[ "$(uname)" == "Linux" ]] && node_install="sudo apt-get install nodejs npm"
+        log_warning "Node.js not found — install with: ${node_install}"
+        missing_list="${missing_list}\n  ${CROSS} node — install: ${node_install}"
         missing=1
     else
         log_verbose "Node.js: $(node --version)"
     fi
 
+    if ! command -v npm &> /dev/null; then
+        log_warning "npm not found — usually comes with Node.js"
+        missing_list="${missing_list}\n  ${CROSS} npm — install Node.js (includes npm)"
+        missing=1
+    fi
+
     # Check python
     if ! command -v python3 &> /dev/null; then
-        log_warning "Python 3 not found (required for project scanning)"
+        local py_install="brew install python3"
+        [[ "$(uname)" == "Linux" ]] && py_install="sudo apt-get install python3 python3-pip"
+        log_warning "Python 3 not found — install with: ${py_install}"
+        missing_list="${missing_list}\n  ${CROSS} python3 — install: ${py_install}"
         missing=1
     else
         log_verbose "Python 3: $(python3 --version)"
     fi
 
+    # Check optional tools
+    if ! command -v jq &> /dev/null; then
+        local jq_install="brew install jq"
+        [[ "$(uname)" == "Linux" ]] && jq_install="sudo apt-get install jq"
+        log_verbose "jq not found (optional) — install: ${jq_install}"
+    fi
+
     if [[ ${missing} -eq 1 ]]; then
-        log_warning "Some optional dependencies are missing. Install may be incomplete."
+        log_warning "Missing dependencies detected:"
+        echo -e "${missing_list}"
+        echo ""
+        log_warning "Installation will continue, but some features may not work."
     else
         log_success "All dependencies verified"
     fi
@@ -288,7 +466,7 @@ check_github_cli() {
 
 github_status() {
     if check_github_cli; then
-        if gh auth status &> /dev/null; then
+        if run_with_timeout 15 gh auth status &> /dev/null; then
             return 0
         else
             return 1
@@ -310,15 +488,20 @@ get_github_auth_interactive() {
     if check_github_cli; then
         log_info "GitHub CLI found but not authenticated"
         log_step "Would you like to authenticate with GitHub? (recommended for repo sync)"
-        read -p "Authenticate with GitHub? [y/N] " -r
+        local gh_reply=""
+        if ! safe_read gh_reply "Authenticate with GitHub? [y/N]" 30 "N"; then
+            log_info "GitHub authentication skipped (non-interactive/timeout)"
+            return 0
+        fi
 
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            if gh auth login --web &> /dev/null; then
+        if [[ "${gh_reply}" =~ ^[Yy]$ ]]; then
+            log_step "Attempting GitHub authentication (60s timeout)..."
+            if run_with_timeout 60 gh auth login --web &> /dev/null; then
                 log_success "GitHub authentication successful"
                 GITHUB_AUTHENTICATED=1
                 return 0
             else
-                log_warning "GitHub authentication failed"
+                log_warning "GitHub authentication failed or timed out"
                 return 1
             fi
         else
@@ -327,16 +510,19 @@ get_github_auth_interactive() {
         fi
     else
         log_info "GitHub CLI not found, attempting Personal Access Token setup..."
-        log_step "Do you have a GitHub Personal Access Token? [y/N]"
-        read -p "Enter PAT? [y/N] " -r
+        local pat_reply=""
+        if ! safe_read pat_reply "Do you have a GitHub PAT? [y/N]" 30 "N"; then
+            log_info "Proceeding without GitHub authentication (non-interactive)"
+            return 0
+        fi
 
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            read -sp "Enter your GitHub Personal Access Token: " GITHUB_PAT
-            echo ""
-            if [[ -n "${GITHUB_PAT}" ]]; then
-                GITHUB_AUTHENTICATED=1
-                log_success "GitHub PAT configured"
-                return 0
+        if [[ "${pat_reply}" =~ ^[Yy]$ ]]; then
+            if safe_read_secret GITHUB_PAT "Enter your GitHub Personal Access Token:" 60; then
+                if [[ -n "${GITHUB_PAT}" ]]; then
+                    GITHUB_AUTHENTICATED=1
+                    log_success "GitHub PAT configured"
+                    return 0
+                fi
             fi
         fi
 
@@ -420,15 +606,16 @@ offer_github_features() {
     # Check for remote and offer to push
     if git -C "${TARGET_DIR}" remote get-url origin &> /dev/null; then
         log_step "A git remote 'origin' is configured."
-        read -p "Would you like to push ecosystem backup to origin? [y/N] " -r
+        local push_reply=""
+        safe_read push_reply "Would you like to push ecosystem backup to origin? [y/N]" 30 "N"
 
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
+        if [[ "${push_reply}" =~ ^[Yy]$ ]]; then
             # Create branch if needed, but don't force
             local branch_name=".devlmer-backup-$(date +%s)"
             log_step "Creating backup branch: ${branch_name}"
 
             if git -C "${TARGET_DIR}" checkout -b "${branch_name}" 2>/dev/null; then
-                if git -C "${TARGET_DIR}" push -u origin "${branch_name}" 2>/dev/null; then
+                if run_with_timeout 60 git -C "${TARGET_DIR}" push -u origin "${branch_name}" 2>/dev/null; then
                     log_success "Configuration backed up to branch: ${branch_name}"
                 else
                     log_warning "Failed to push to origin (check permissions and credentials)"
@@ -480,8 +667,7 @@ setup_nano_banana_mcp() {
     # Get or prompt for Gemini API key
     if [[ -z "${GEMINI_KEY}" ]]; then
         log_step "Nano-Banana-MCP requires a Gemini API key"
-        read -sp "Enter your Gemini API key (or press Enter to skip): " GEMINI_KEY
-        echo ""
+        safe_read_secret GEMINI_KEY "Enter your Gemini API key (or press Enter to skip):" 30
     fi
 
     if [[ -n "${GEMINI_KEY}" ]]; then
@@ -1634,6 +1820,10 @@ parse_arguments() {
                 NO_GITHUB=1
                 shift
                 ;;
+            --non-interactive|--yes|-y)
+                NON_INTERACTIVE=1
+                shift
+                ;;
             --github-token)
                 GITHUB_TOKEN="$2"
                 GITHUB_AUTHENTICATED=1
@@ -1788,11 +1978,12 @@ offer_setup_wizard() {
     echo -e "  ${CYAN}1${RESET}) ${BOLD}Configurar ahora${RESET} — Asistente paso a paso (recomendado)"
     echo -e "  ${CYAN}2${RESET}) ${BOLD}Después${RESET} — Ejecuta: ${DIM}bash setup-wizard.sh ${TARGET_DIR}${RESET}"
     echo ""
-    read -r -p "  ¿Configurar API keys ahora? [1/2]: " wizard_choice
+    local wizard_choice=""
+    safe_read wizard_choice "  ¿Configurar API keys ahora? [1/2]:" 30 "2"
 
     if [[ "$wizard_choice" == "1" ]]; then
         if [[ -f "$wizard_path" ]]; then
-            bash "$wizard_path" "${TARGET_DIR}"
+            run_with_timeout 120 bash "$wizard_path" "${TARGET_DIR}"
         else
             log_warning "Setup wizard not found at ${wizard_path}"
             echo -e "  Puedes configurar manualmente: ${CYAN}${TARGET_DIR}/.claude/mcp-env-setup.sh${RESET}"
@@ -1845,13 +2036,13 @@ main() {
         if [[ -n "${GITHUB_TOKEN}" ]]; then
             GITHUB_AUTHENTICATED=1
             log_success "GitHub token provided via command line"
-            save_github_auth
-            offer_github_features
-        elif [[ -t 0 ]]; then
+            run_step "Save GitHub auth" save_github_auth
+            run_step "GitHub features" offer_github_features
+        elif is_interactive; then
             # Interactive terminal — ask user
-            get_github_auth_interactive
-            save_github_auth
-            offer_github_features
+            run_step "GitHub auth interactive" get_github_auth_interactive
+            run_step "Save GitHub auth" save_github_auth
+            run_step "GitHub features" offer_github_features
         else
             log_info "Non-interactive mode — skipping GitHub auth (use --github-token to provide)"
         fi
@@ -1863,20 +2054,20 @@ main() {
 
     # Nano-Banana-MCP setup
     if [[ "${MODE}" != "scan-only" ]] && [[ -z "${NO_MCP:-}" ]]; then
-        setup_nano_banana_mcp
+        run_step "Nano-Banana-MCP setup" setup_nano_banana_mcp
         echo ""
     fi
 
     # Bundled skills installation (all modes except scan-only)
     if [[ "${MODE}" != "scan-only" ]]; then
         log_section "INSTALLING BUNDLED SKILLS"
-        copy_bundled_skills
+        run_step "Bundled skills" copy_bundled_skills
         echo ""
     fi
 
     # External skills installation (full and skills-only modes)
     if [[ "${MODE}" != "scan-only" ]] && [[ -z "${NO_EXTERNAL:-}" ]]; then
-        install_external_skills
+        run_step "External skills" install_external_skills
         echo ""
     fi
 
@@ -1886,12 +2077,12 @@ main() {
     if [[ "${MODE}" != "skills-only" ]]; then
         log_section "CONFIGURATION & SETUP"
 
-        copy_blueprints
-        copy_scripts
-        setup_hooks
-        generate_slash_commands
-        create_global_claude_md
-        create_settings_json
+        run_step "Blueprints" copy_blueprints
+        run_step "Scripts" copy_scripts
+        run_step "Hooks" setup_hooks
+        run_step "Slash commands" generate_slash_commands
+        run_step "CLAUDE.md" create_global_claude_md
+        run_step "settings.json" create_settings_json
 
         echo ""
     fi
@@ -1902,8 +2093,8 @@ main() {
     if [[ "${MODE}" != "skills-only" ]]; then
         log_section "PROJECT INTELLIGENCE"
 
-        run_project_fingerprinter
-        run_orchestrator
+        run_step "Project fingerprinter" run_project_fingerprinter
+        run_step "Orchestrator" run_orchestrator
 
         echo ""
     fi
@@ -1912,21 +2103,34 @@ main() {
     # Runs AFTER orchestrator (which creates the profile with MCPs)
     # and AFTER create_settings_json (which creates the base settings file)
     if [[ "${MODE}" != "scan-only" ]] && [[ -z "${NO_MCP:-}" ]]; then
-        install_mcps
+        run_step "MCP installation" install_mcps
         echo ""
     fi
 
     # Agent configuration (requires PROJECT_PROFILE.json from orchestrator)
     if [[ "${MODE}" != "skills-only" ]]; then
-        configure_agents
+        run_step "Agent configuration" configure_agents
         echo ""
     fi
 
     # Show summary
     show_summary
 
+    # Show step failure report if any
+    if [[ ${STEP_FAILURES} -gt 0 ]]; then
+        echo ""
+        log_section "STEP FAILURE REPORT"
+        log_warning "${STEP_FAILURES} of ${STEP_COUNT} steps had issues:"
+        echo -e "${STEP_ERRORS}"
+        echo ""
+        log_info "Most features should still work. Check ${LOG_FILE} for details."
+    fi
+
     # Product info
     show_product_info
+
+    # Log completion
+    log_info "Full install log saved to: ${LOG_FILE}"
 
     # Offer Setup Wizard for API keys
     offer_setup_wizard
@@ -1935,6 +2139,25 @@ main() {
 # ============================================================================
 # ENTRY POINT
 # ============================================================================
+
+# Global timeout handler — ensures script never hangs beyond 5 minutes
+GLOBAL_TIMEOUT=300  # 5 minutes
+trap 'echo ""; log_error "Installation timed out after ${GLOBAL_TIMEOUT}s. Check ${LOG_FILE} for details."; exit 124' ALRM 2>/dev/null || true
+
+# Set global alarm (portable: works on Bash 3.2+)
+(
+    sleep ${GLOBAL_TIMEOUT}
+    # Send SIGALRM to parent process
+    kill -ALRM $$ 2>/dev/null || kill -TERM $$ 2>/dev/null
+) &
+GLOBAL_WATCHDOG_PID=$!
+
+# Cleanup watchdog on normal exit
+cleanup_watchdog() {
+    kill ${GLOBAL_WATCHDOG_PID} 2>/dev/null || true
+    wait ${GLOBAL_WATCHDOG_PID} 2>/dev/null || true
+}
+trap cleanup_watchdog EXIT
 
 # Handle early exit flags
 if [[ $# -eq 0 ]] || [[ "$1" == "--help" ]]; then
