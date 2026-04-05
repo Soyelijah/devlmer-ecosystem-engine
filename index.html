@@ -753,6 +753,70 @@
             margin-top: 10px;
         }
 
+        /* ==================== EXPERIENCE IN CLAUDE CODE ==================== */
+        .experience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .terminal-card {
+            background: rgba(10, 14, 39, 0.9);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .terminal-card:hover {
+            border-color: var(--primary-cyan);
+            box-shadow: 0 10px 40px rgba(0, 212, 170, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27c93f; }
+
+        .terminal-title {
+            margin-left: 10px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-family: 'Monaco', monospace;
+        }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .terminal-body .cmd { color: var(--primary-cyan); }
+        .terminal-body .comment { color: #6a7a8a; }
+        .terminal-body .success { color: #27c93f; }
+        .terminal-body .highlight { color: #ffbd2e; }
+        .terminal-body .label { color: var(--primary-blue); font-weight: 600; }
+        .terminal-body .dim { color: #4a5a6a; }
+
         /* ==================== BENEFITS ==================== */
         .benefits {
             background: linear-gradient(135deg, var(--dark-secondary) 0%, var(--dark-tertiary) 100%);
@@ -1161,7 +1225,7 @@
     <section class="section how-works" id="cómo-funciona">
         <div class="container">
             <h2 class="section-title">Cómo Funciona</h2>
-            <p class="section-subtitle">Cuatro pasos simples para un ecosistema profesional completo</p>
+            <p class="section-subtitle">Seis pasos automáticos para un ecosistema profesional completo</p>
 
             <div class="steps-grid">
                 <div class="step-card reveal">
@@ -1170,7 +1234,7 @@
                         <i class="fas fa-terminal"></i>
                     </div>
                     <h4>Ejecuta el Instalador</h4>
-                    <p>Descarga y ejecuta un único comando bash que iniciará todo el proceso automático.</p>
+                    <p>Un único comando <code>bash install.sh</code> que inicia todo el proceso automático de detección e instalación.</p>
                 </div>
 
                 <div class="step-card reveal">
@@ -1179,7 +1243,7 @@
                         <i class="fas fa-magnifying-glass"></i>
                     </div>
                     <h4>Detección Automática</h4>
-                    <p>El fingerprinter analiza tu proyecto y detecta tecnologías, frameworks y patrones.</p>
+                    <p>El fingerprinter analiza tu proyecto y detecta tecnologías, frameworks, dominio empresarial y nivel de madurez.</p>
                 </div>
 
                 <div class="step-card reveal">
@@ -1188,16 +1252,34 @@
                         <i class="fas fa-puzzle-piece"></i>
                     </div>
                     <h4>Instalación Completa</h4>
-                    <p>Se instalan automáticamente 21+ skills, se configuran MCPs y se crean agents especializados para tu stack.</p>
+                    <p>Se instalan 21+ skills, se configuran MCPs personalizados, se crean agents especializados y slash commands.</p>
                 </div>
 
                 <div class="step-card reveal">
                     <div class="step-number">Paso 4</div>
                     <div class="step-icon">
-                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-key"></i>
                     </div>
-                    <h4>¡Todo Funciona!</h4>
-                    <p>Accede a tu ecosistema profesional completo. Listo para empezar a trabajar inmediatamente.</p>
+                    <h4>Setup Wizard</h4>
+                    <p>Un asistente guiado paso a paso te ayuda a configurar tus API keys con explicaciones claras de cada servicio.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 5</div>
+                    <div class="step-icon">
+                        <i class="fas fa-forward-fast"></i>
+                    </div>
+                    <h4>Slash Commands Listos</h4>
+                    <p>Cada skill se registra como un <code>/comando</code> en Claude Code. Escribe <code>/</code> y elige tu skill al instante.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 6</div>
+                    <div class="step-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h4>¡Todo Visible en Claude Code!</h4>
+                    <p>Tus skills aparecen en <code>/skills</code>, MCPs en <code>/mcp</code>, y plugins en <code>/plugin</code>. Todo integrado nativamente.</p>
                 </div>
             </div>
         </div>
@@ -1220,8 +1302,18 @@
                 </div>
 
                 <div class="stat-item reveal">
-                    <div class="stat-number">21</div>
+                    <div class="stat-number">21+</div>
                     <div class="stat-label">Professional Skills</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">21</div>
+                    <div class="stat-label">Slash Commands</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">32</div>
+                    <div class="stat-label">MCP Servers</div>
                 </div>
 
                 <div class="stat-item reveal">
@@ -1235,8 +1327,8 @@
     <!-- ==================== SKILLS INCLUIDOS ==================== -->
     <section class="section" id="skills">
         <div class="container">
-            <h2 class="section-title">21 Skills Profesionales Incluidos</h2>
-            <p class="section-subtitle">Herramientas enterprise en cada dominio del desarrollo</p>
+            <h2 class="section-title">21 Skills Profesionales + Slash Commands</h2>
+            <p class="section-subtitle">Cada skill se instala como <code style="color: var(--primary-cyan); background: rgba(0, 212, 170, 0.1); padding: 2px 8px; border-radius: 4px;">/slash-command</code> en Claude Code</p>
 
             <div class="skills-grid">
                 <div class="skill-card reveal">
@@ -1508,7 +1600,7 @@
     <section class="section installation" id="installation">
         <div class="container">
             <h2 class="section-title">Cómo Instalar</h2>
-            <p class="section-subtitle">Tres sencillos pasos para tu ecosistema profesional</p>
+            <p class="section-subtitle">Flujo completo: de cero a ecosistema profesional en minutos</p>
 
             <div class="install-steps">
                 <div class="install-step reveal">
@@ -1520,16 +1612,133 @@ cd devlmer-ecosystem-engine</div>
 
                 <div class="install-step reveal">
                     <div class="install-step-num">Paso 2 — Ejecuta el Instalador</div>
-                    <h4>Inicia la detección automática y configuración</h4>
+                    <h4>Inicia la detección automática, instalación de skills, MCPs, agents y slash commands</h4>
                     <div class="code-block">bash install.sh /path/to/your/project</div>
                 </div>
 
                 <div class="install-step reveal">
-                    <div class="install-step-num">Paso 3 — ¡Disfruta tu Ecosistema!</div>
-                    <h4>Todo está configurado y listo para usar</h4>
-                    <div class="code-block">cd /your/project
-# Tus skills, MCPs y agents ya están disponibles
-# Comienza a desarrollar con ecosistema profesional</div>
+                    <div class="install-step-num">Paso 3 — Setup Wizard (API Keys)</div>
+                    <h4>Un asistente interactivo te guía para configurar tus credenciales</h4>
+                    <div class="code-block"># El wizard aparece al final de la instalación automáticamente
+# Modo guiado: te explica cada servicio y dónde encontrar la key
+# Modo esenciales: solo Supabase, Stripe y GitHub (lo mínimo)
+# Puedes correrlo después: bash setup-wizard.sh /tu/proyecto</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 4 — Abre Claude Code</div>
+                    <h4>Tus skills aparecen como <code>/slash-commands</code> nativos</h4>
+                    <div class="code-block">cd /your/project && claude
+# Escribe / para ver todos tus skills instalados:
+#   /senior-architect  /code-reviewer  /copywriting
+#   /senior-security   /mobile-design  /brainstorming ...
+# Escribe /skills para ver la lista completa
+# Escribe /mcp para ver los MCPs conectados
+# Escribe /plugin para ver los plugins activos</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 5 — ¡Desarrolla con Superpoderes!</div>
+                    <h4>Claude ahora tiene contexto profundo de tu proyecto y herramientas especializadas</h4>
+                    <div class="code-block"># Claude lee tu CLAUDE.md y PROJECT_PROFILE.json automáticamente
+# Activa skills según el contexto de lo que estés haciendo
+# Los agents especializados trabajan en paralelo
+# Los MCPs conectan con servicios reales (Supabase, Stripe, GitHub...)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EXPERIENCIA EN CLAUDE CODE ==================== -->
+    <section class="section" id="experiencia" style="background: linear-gradient(135deg, rgba(0, 82, 255, 0.03) 0%, rgba(0, 212, 170, 0.02) 100%);">
+        <div class="container">
+            <h2 class="section-title">Lo Que Ves en Claude Code</h2>
+            <p class="section-subtitle">Así se ve tu ecosistema instalado en Claude Code CLI y Cowork</p>
+
+            <div class="experience-grid">
+                <div class="terminal-card reveal">
+                    <div class="terminal-header">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                        <span class="terminal-title">/skills — 28+ skills disponibles</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="label">Project skills</span> <span class="dim">(.claude/skills)</span></div>
+                        <div><span class="success">brainstorming</span> <span class="dim">· ~53 tokens</span></div>
+                        <div><span class="success">brand-identity</span> <span class="dim">· ~116 tokens</span></div>
+                        <div><span class="success">code-reviewer</span> <span class="dim">· ~81 tokens</span></div>
+                        <div><span class="success">copywriting</span> <span class="dim">· ~173 tokens</span></div>
+                        <div><span class="success">mobile-design</span> <span class="dim">· ~63 tokens</span></div>
+                        <div><span class="success">senior-architect</span> <span class="dim">· ~123 tokens</span></div>
+                        <div><span class="success">senior-backend</span> <span class="dim">· ~101 tokens</span></div>
+                        <div><span class="success">senior-frontend</span> <span class="dim">· ~97 tokens</span></div>
+                        <div><span class="success">senior-security</span> <span class="dim">· ~96 tokens</span></div>
+                        <div><span class="success">senior-prompt-engineer</span> <span class="dim">· ~114 tokens</span></div>
+                        <div><span class="success">ui-ux-pro-max</span> <span class="dim">· ~205 tokens</span></div>
+                        <div><span class="dim">... y 10+ más según tu stack</span></div>
+                        <br>
+                        <div><span class="label">Plugin skills</span> <span class="dim">(plugin)</span></div>
+                        <div><span class="highlight">make-plan</span> <span class="dim">· claude-mem</span></div>
+                        <div><span class="highlight">smart-explore</span> <span class="dim">· claude-mem</span></div>
+                        <div><span class="highlight">frontend-design</span> <span class="dim">· frontend-design</span></div>
+                    </div>
+                </div>
+
+                <div class="terminal-card reveal">
+                    <div class="terminal-header">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                        <span class="terminal-title">/mcp — 15+ servidores conectados</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="label">Project MCPs</span></div>
+                        <div><span class="success">github</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">nano-banana</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <br>
+                        <div><span class="label">Local MCPs</span></div>
+                        <div><span class="success">oracle-oci</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <br>
+                        <div><span class="label">claude.ai</span></div>
+                        <div><span class="success">Asana</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Canva</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Cloudflare</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Gmail</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Google Calendar</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Notion</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <br>
+                        <div><span class="label">Built-in MCPs</span></div>
+                        <div><span class="success">context7</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">playwright</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                    </div>
+                </div>
+
+                <div class="terminal-card reveal">
+                    <div class="terminal-header">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                        <span class="terminal-title">/plugin — Plugins instalados</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="label">Project Plugins</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">code-simplifier</span> <span class="dim">· enabled</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">commit-commands</span> <span class="dim">· enabled</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">context7</span> <span class="dim">· enabled</span></div>
+                        <div>&nbsp;&nbsp;&nbsp;<span class="dim">└ context7 MCP · <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">feature-dev</span> <span class="dim">· enabled</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">frontend-design</span> <span class="dim">· enabled</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">playwright</span> <span class="dim">· enabled</span></div>
+                        <br>
+                        <div><span class="label">Slash Commands Disponibles</span></div>
+                        <div><span class="cmd">/senior-architect</span> <span class="dim">— Diseño de sistemas</span></div>
+                        <div><span class="cmd">/code-reviewer</span> <span class="dim">— Review de código</span></div>
+                        <div><span class="cmd">/copywriting</span> <span class="dim">— Textos y copy</span></div>
+                        <div><span class="cmd">/senior-security</span> <span class="dim">— Auditoría seguridad</span></div>
+                        <div><span class="cmd">/brainstorming</span> <span class="dim">— Ideación creativa</span></div>
+                        <div><span class="dim">... 21 commands en total</span></div>
+                    </div>
                 </div>
             </div>
         </div>
