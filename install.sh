@@ -606,7 +606,15 @@ copy_bundled_skills() {
     for skill in "${skills_dir}"/*; do
         if [[ -d "${skill}" ]]; then
             local skill_name=$(basename "${skill}")
-            cp -r "${skill}" "${TARGET_DIR}/.claude/skills/"
+            local target_path="${TARGET_DIR}/.claude/skills/${skill_name}"
+            # Remove broken symlinks or conflicting files before copying
+            if [[ -L "${target_path}" ]]; then
+                rm -f "${target_path}" 2>/dev/null || unlink "${target_path}" 2>/dev/null || true
+            fi
+            # Use cp with --remove-destination to handle conflicts
+            cp -r --remove-destination "${skill}" "${TARGET_DIR}/.claude/skills/" 2>/dev/null \
+                || cp -r "${skill}" "${TARGET_DIR}/.claude/skills/" 2>/dev/null \
+                || { log_warning "Could not copy skill: ${skill_name}"; continue; }
             skill_count=$((skill_count + 1))
             log_verbose "Copied skill: ${skill_name}"
         fi
