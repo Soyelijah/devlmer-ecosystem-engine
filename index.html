@@ -53,6 +53,7 @@
             padding: 80px 0;
             position: relative;
             overflow: hidden;
+            contain: layout style;
         }
 
         .section-title {
@@ -80,10 +81,12 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(10, 14, 39, 0.7);
-            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 39, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-lighter);
             padding: 15px 0;
+            will-change: auto;
         }
 
         nav {
@@ -287,8 +290,9 @@
         .blob {
             position: absolute;
             border-radius: 50%;
-            mix-blend-mode: multiply;
+            filter: blur(80px);
             animation: float 20s infinite ease-in-out;
+            contain: strict;
         }
 
         .blob-1 {
@@ -990,7 +994,23 @@
 
         .reveal {
             opacity: 0;
-            animation: fadeInUp 0.8s ease-out forwards;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Fallback: si JS tarda, mostrar contenido después de 3s */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
         }
 
         /* ==================== RESPONSIVE ==================== */
@@ -1713,23 +1733,26 @@ cd devlmer-ecosystem-engine</div>
     <script>
         // ==================== INTERSECTION OBSERVER FOR SCROLL REVEALS ====================
         const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
+            threshold: 0.05,
+            rootMargin: '50px 0px 0px 0px'
         };
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards';
+                    entry.target.classList.add('visible');
                     observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);
 
-        document.querySelectorAll('.reveal').forEach(el => {
-            el.style.opacity = '0';
-            observer.observe(el);
-        });
+        const revealElements = document.querySelectorAll('.reveal');
+        revealElements.forEach(el => observer.observe(el));
+
+        // Fallback: forzar visibilidad después de 2.5s para scroll rápido
+        setTimeout(() => {
+            revealElements.forEach(el => el.classList.add('visible'));
+        }, 2500);
 
         // ==================== COPY TO CLIPBOARD ====================
         function copyToClipboard(text) {
