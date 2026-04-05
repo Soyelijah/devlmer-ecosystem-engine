@@ -42,6 +42,38 @@ El resultado: Una experiencia de desarrollo completamente personalizada, lista p
 
 ---
 
+## For Claude Agents (Instrucciones para tu Agente)
+
+### Si alguien te envía este mensaje, cópialo y pégalo en tu agente Claude:
+
+```
+Instala el Devlmer Ecosystem Engine v3.0 en mi proyecto. Ejecuta estos comandos:
+
+git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee-install
+bash /tmp/dee-install/install.sh .
+
+Esto instalará 21+ skills profesionales, slash commands, MCPs recomendados,
+agentes especializados y hooks de auto-verificación. El instalador detectará
+automáticamente mi tipo de proyecto y personalizará todo.
+
+Después de instalar, verifica con: ls .claude/skills/ && ls .claude/commands/
+```
+
+### Instalación Remota (Una Línea)
+
+Si ya tienes Claude Code o Cowork configurado, puedes instalar DEE con un solo comando desde cualquier terminal:
+
+```bash
+git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee-install && bash /tmp/dee-install/install.sh /ruta/a/tu/proyecto
+```
+
+Para saltar configuración interactiva (GitHub y external skills):
+```bash
+git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee-install && bash /tmp/dee-install/install.sh /ruta/a/tu/proyecto --no-github --no-external
+```
+
+---
+
 ## Requirements
 
 ### Requisitos Previos
@@ -183,7 +215,29 @@ Presiona Enter. Verás muchas líneas de información mientras DEE instala todo.
 
 **Tiempo esperado:** 2-5 minutos según tu conexión a internet.
 
-#### Paso 5: Verifica la Instalación
+#### Paso 5: Setup Wizard (Configuración Interactiva)
+
+El instalador lanzará automáticamente un **Setup Wizard** que te pedirá:
+
+```
+╔══════════════════════════════════════════╗
+║     DEE v3.0 — Setup Wizard             ║
+╠══════════════════════════════════════════╣
+║  GitHub Token (opcional):  ghp_xxx...   ║
+║  Gemini API Key (opcional): AIza...     ║
+║  Dominio detectado: [fintech]           ║
+║  Skills a instalar: [21+]              ║
+╚══════════════════════════════════════════╝
+```
+
+Puedes presionar Enter para saltar cualquier paso opcional. Si no tienes API keys, el instalador funciona perfectamente sin ellas.
+
+Para saltar el wizard completamente:
+```bash
+bash install.sh ~/tu-proyecto --no-github --no-external
+```
+
+#### Paso 6: Verifica la Instalación
 
 Cuando el instalador termine, verás:
 
@@ -191,12 +245,26 @@ Cuando el instalador termine, verás:
 [✓] Devlmer Ecosystem Engine v3.0 instalado exitosamente
 [✓] Motor de detección de proyecto: ACTIVO
 [✓] 21+ habilidades cargadas y verificadas
+[✓] 21+ slash commands generados en .claude/commands/
 [✓] GitHub OAuth2 inicializado
 [✓] Nano-Banana-MCP (Gemini) listo para imagen
 [✓] Hooks de sesión inicializados
+[✓] PROJECT_PROFILE.json generado
 
 Tu proyecto está listo para desarrollo empresarial de nivel Devlmer.
 ```
+
+#### Paso 7: Abre tu Proyecto en Claude Code o Cowork
+
+```bash
+# Opción A: Claude Code (terminal)
+claude code ~/tu-proyecto
+
+# Opción B: Cowork (aplicación de escritorio)
+# Abre Cowork → Selecciona tu carpeta de proyecto
+```
+
+Una vez abierto, escribe `/skills` para verificar que todo está instalado. Deberías ver 21+ skills disponibles.
 
 Si algo falla, consulta la sección "Troubleshooting" abajo.
 
@@ -428,6 +496,78 @@ DEE mantiene un "perfil inteligente" de tu proyecto:
 
 ---
 
+## What You See in Claude Code
+
+### Lo Que Ves en Claude Code Después de Instalar
+
+Después de instalar DEE y abrir tu proyecto en Claude Code o Cowork, verás todo integrado nativamente:
+
+#### `/skills` — Tus Habilidades Instaladas
+
+Al escribir `/skills` en Claude Code verás todas las habilidades cargadas:
+
+```
+> /skills
+
+  Installed Skills (21+):
+  ├── code-review          Code review con mejores prácticas
+  ├── security-audit       Auditoría de seguridad enterprise
+  ├── senior-architect     Arquitectura de sistemas
+  ├── copywriting          Copy profesional y marketing
+  ├── frontend-design      Diseño frontend production-grade
+  ├── brand-identity       Identidad visual y branding
+  ├── ui-design-system     Sistema de diseño UI
+  ├── seo-optimizer        Optimización SEO
+  ├── brainstorming        Ideación y lluvia de ideas
+  ├── file-organizer       Organización de archivos
+  └── [11+ más según tu dominio]
+```
+
+#### `/command-name` — Slash Commands Directos
+
+Cada skill instalado genera un slash command invocable directamente:
+
+```
+> /code-review        → Ejecuta revisión de código
+> /security-audit     → Auditoría de seguridad
+> /senior-architect   → Análisis arquitectónico
+> /copywriting        → Genera copy profesional
+> /brainstorming      → Sesión de ideación
+```
+
+#### `/mcp` — Servidores MCP Conectados
+
+```
+> /mcp
+
+  Connected MCP Servers (15+):
+  ├── github           Issues, PRs, branches, code search
+  ├── google-calendar  Eventos, reuniones, agenda
+  ├── notion           Documentación, wikis, bases de datos
+  ├── asana            Gestión de tareas y proyectos
+  ├── cloudflare       Workers, D1, R2, KV
+  ├── cloudinary       Media, imágenes, transformaciones
+  ├── canva            Diseño gráfico
+  └── [8+ más según tu dominio]
+```
+
+#### `/plugin` — Plugins Activos
+
+```
+> /plugin
+
+  Active Plugins:
+  ├── playwright       Verificación visual frontend
+  ├── context7         Docs actualizadas de librerías
+  ├── code-simplifier  Simplificación de código
+  ├── feature-dev      Desarrollo guiado de features
+  ├── commit-commands  Git commits profesionales
+  ├── claude-mem       Memoria persistente
+  └── security-guidance Guía de seguridad
+```
+
+---
+
 ## Project Structure
 
 ### Estructura del Proyecto Instalado
@@ -439,43 +579,47 @@ tu-proyecto/
 ├── .claude/
 │   ├── skills/                          # 21+ habilidades personalizadas
 │   │   ├── code-review/
+│   │   │   └── SKILL.md
 │   │   ├── security-audit/
+│   │   │   └── SKILL.md
 │   │   └── [19+ más]
+│   ├── commands/                        # Slash commands auto-generados
+│   │   ├── code-review.md              # → /code-review
+│   │   ├── security-audit.md           # → /security-audit
+│   │   ├── senior-architect.md         # → /senior-architect
+│   │   └── [18+ más]
 │   ├── blueprints/                      # Modelos de referencia (22)
 │   │   ├── frontend-react/
 │   │   ├── backend-fastapi/
-│   │   ├── database-postgresql/
-│   │   └── [19 más]
+│   │   └── [20 más]
 │   ├── agents/                          # Agentes generados automáticamente
 │   │   ├── ceo-agent.md
 │   │   ├── backend-agent.md
 │   │   ├── frontend-agent.md
-│   │   └── [más según tu proyecto]
+│   │   └── [más según tu dominio]
 │   ├── hooks/                           # Scripts de sesión automática
 │   │   ├── on-session-start.sh
 │   │   ├── on-backend-change.sh
-│   │   ├── on-frontend-change.sh
-│   │   └── on-test-run.sh
+│   │   └── on-frontend-change.sh
 │   ├── config/
 │   │   ├── project-fingerprint.json     # Detección automática
 │   │   ├── mcp-recommendations.json     # MCPs sugeridos
 │   │   ├── github-oauth.json            # Configuración OAuth2
-│   │   ├── nano-banana-config.json      # Configuración Gemini
-│   │   └── dee-config.yaml              # Configuración de DEE
-│   └── memory/
-│       ├── claude-mem.json              # Memoria persistente
-│       └── session-history.json
+│   │   └── nano-banana-config.json      # Configuración Gemini
+│   ├── settings.json                    # Configuración de Claude Code
+│   ├── PROJECT_PROFILE.json             # Perfil inteligente del proyecto
+│   └── CLAUDE.md                        # Instrucciones globales auto-generadas
 ├── CLAUDE.md                            # Instrucciones personalizadas para Claude
-├── .deeignore                           # Archivos ignorados por DEE
+├── skills-lock.json                     # Registro de skills instalados
 └── [tu código existente sin cambios]
 ```
 
 **Notas importantes:**
-- DEE **no modifica tu código existente**
-- Todos los archivos de DEE están en `.claude/`
-- Puedes editar `CLAUDE.md` para personalizar el comportamiento
-- Los cambios son completamente reversibles
-- GitHub OAuth2 se configura de manera segura en `github-oauth.json`
+- DEE **no modifica tu código existente** — solo agrega la carpeta `.claude/`
+- Los slash commands se generan automáticamente desde los skills instalados
+- Puedes editar `CLAUDE.md` para personalizar el comportamiento de Claude
+- Los cambios son completamente reversibles: elimina `.claude/` y `CLAUDE.md` para desinstalar
+- El `PROJECT_PROFILE.json` contiene el fingerprint inteligente de tu proyecto
 
 ---
 
