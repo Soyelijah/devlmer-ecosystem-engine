@@ -1243,6 +1243,13 @@ copy_scripts() {
     SCRIPTS_COPIED=$((SCRIPTS_COPIED + 1))
     log_success "Project intelligence scripts copied"
     log_verbose "Scripts copied from: ${scripts_dir}"
+
+    # Copy setup wizard for post-install use
+    if [[ -f "${SCRIPT_DIR}/setup-wizard.sh" ]]; then
+        cp "${SCRIPT_DIR}/setup-wizard.sh" "${TARGET_DIR}/.claude/setup-wizard.sh"
+        chmod +x "${TARGET_DIR}/.claude/setup-wizard.sh"
+        log_verbose "Setup wizard copied to project"
+    fi
 }
 
 # ============================================================================
@@ -1684,6 +1691,43 @@ show_product_info() {
     echo ""
 }
 
+offer_setup_wizard() {
+    local wizard_path="${SCRIPT_DIR}/setup-wizard.sh"
+
+    # Only offer if MCP env setup file exists (meaning MCPs need keys)
+    if [[ ! -f "${TARGET_DIR}/.claude/mcp-env-setup.sh" ]]; then
+        return
+    fi
+
+    echo ""
+    echo -e "${BOLD}${CYAN}╔════════════════════════════════════════════════════════════╗${RESET}"
+    echo -e "${BOLD}${CYAN}║  🔑 CONFIGURAR SERVICIOS (API Keys)                       ║${RESET}"
+    echo -e "${BOLD}${CYAN}╚════════════════════════════════════════════════════════════╝${RESET}"
+    echo ""
+    echo -e "  Algunos MCPs necesitan API keys para funcionar."
+    echo -e "  Puedes configurarlas ahora con un asistente guiado,"
+    echo -e "  o hacerlo después cuando quieras."
+    echo ""
+    echo -e "  ${CYAN}1${RESET}) ${BOLD}Configurar ahora${RESET} — Asistente paso a paso (recomendado)"
+    echo -e "  ${CYAN}2${RESET}) ${BOLD}Después${RESET} — Ejecuta: ${DIM}bash setup-wizard.sh ${TARGET_DIR}${RESET}"
+    echo ""
+    read -r -p "  ¿Configurar API keys ahora? [1/2]: " wizard_choice
+
+    if [[ "$wizard_choice" == "1" ]]; then
+        if [[ -f "$wizard_path" ]]; then
+            bash "$wizard_path" "${TARGET_DIR}"
+        else
+            log_warning "Setup wizard not found at ${wizard_path}"
+            echo -e "  Puedes configurar manualmente: ${CYAN}${TARGET_DIR}/.claude/mcp-env-setup.sh${RESET}"
+        fi
+    else
+        echo ""
+        echo -e "  ${GREEN}✓${RESET} Sin problema. Cuando quieras, ejecuta:"
+        echo -e "  ${CYAN}  bash setup-wizard.sh ${TARGET_DIR}${RESET}"
+        echo ""
+    fi
+}
+
 # ============================================================================
 # MAIN INSTALLATION FLOW
 # ============================================================================
@@ -1805,6 +1849,9 @@ main() {
 
     # Product info
     show_product_info
+
+    # Offer Setup Wizard for API keys
+    offer_setup_wizard
 }
 
 # ============================================================================
