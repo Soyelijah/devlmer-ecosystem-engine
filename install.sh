@@ -1082,28 +1082,76 @@ install_external_skills() {
 
     if ! command -v npx >/dev/null 2>&1; then
         log_warning "npm/npx not found. Skipping external skill installations."
-        log_info "Install Node.js to enable external skill installations."
+        log_info "Install Node.js to enable external skill installations: $(install_cmd node)"
         return 0
+    fi
+
+    # --- GitHub Rate Limit Protection ---
+    # If user provided a --github-token, set it as env var so npm/npx
+    # authenticates with GitHub API (avoids 60 req/hr anonymous limit → 5000 req/hr)
+    local original_gh_token="${GITHUB_TOKEN:-}"
+    if [[ -n "${GITHUB_TOKEN}" ]]; then
+        export GITHUB_TOKEN="${GITHUB_TOKEN}"
+        # npm uses this env var for GitHub package registry auth
+        export NODE_AUTH_TOKEN="${GITHUB_TOKEN}"
+        log_info "Using GitHub token for authenticated API access (5000 req/hr limit)"
+    elif [[ -n "${GITHUB_PAT}" ]]; then
+        export GITHUB_TOKEN="${GITHUB_PAT}"
+        export NODE_AUTH_TOKEN="${GITHUB_PAT}"
+        log_info "Using GitHub PAT for authenticated API access"
+    else
+        log_warning "No GitHub token provided — GitHub API limit is 60 req/hr (anonymous)"
+        log_info "If rate-limited, re-run with: --github-token ghp_xxxxx"
     fi
 
     log_info "Installing ${#skills[@]} external skills from claude-code-templates..."
     echo ""
 
+    local retry_delay=2
+    local max_retries=2
+
     for skill in "${skills[@]}"; do
-        if npx claude-code-templates@latest "${skill}" --yes 2>/dev/null; then
-            EXTERNAL_SKILLS_INSTALLED=$((EXTERNAL_SKILLS_INSTALLED + 1))
-            log_success "Installed: ${skill}"
-        else
-            log_warning "Failed to install: ${skill}"
+        local installed=0
+        local attempt=0
+
+        while [[ ${attempt} -lt ${max_retries} ]] && [[ ${installed} -eq 0 ]]; do
+            attempt=$((attempt + 1))
+
+            if run_with_timeout 60 npx claude-code-templates@latest "${skill}" --yes 2>/dev/null; then
+                EXTERNAL_SKILLS_INSTALLED=$((EXTERNAL_SKILLS_INSTALLED + 1))
+                log_success "Installed: ${skill}"
+                installed=1
+            else
+                if [[ ${attempt} -lt ${max_retries} ]]; then
+                    log_verbose "Retrying ${skill} in ${retry_delay}s (attempt ${attempt}/${max_retries})..."
+                    sleep ${retry_delay}
+                    retry_delay=$((retry_delay * 2))  # Exponential backoff
+                fi
+            fi
+        done
+
+        if [[ ${installed} -eq 0 ]]; then
+            log_warning "Failed to install: ${skill} (after ${max_retries} attempts)"
             SKILLS_FAILED=$((SKILLS_FAILED + 1))
         fi
+
+        # Small delay between installs to respect rate limits
+        sleep 1
     done
 
     # Special case: copywriting skill
     install_copywriting_skill
 
     echo ""
-    log_info "External skills installation complete (${EXTERNAL_SKILLS_INSTALLED} succeeded, ${SKILLS_FAILED} failed)"
+    if [[ ${SKILLS_FAILED} -gt 0 ]]; then
+        log_warning "External skills: ${EXTERNAL_SKILLS_INSTALLED} succeeded, ${SKILLS_FAILED} failed"
+        if [[ -z "${original_gh_token}" ]]; then
+            log_info "Tip: Re-run with --github-token to avoid GitHub rate limits"
+            log_info "     Or wait 1 hour and run: bash install.sh . --skills-only"
+        fi
+    else
+        log_success "All external skills installed successfully (${EXTERNAL_SKILLS_INSTALLED})"
+    fi
 }
 
 # ============================================================================
