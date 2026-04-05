@@ -735,11 +735,16 @@ install_mcp() {
 }
 
 install_mcps() {
-    log_section "INSTALLING MCPS (MODEL CONTEXT PROTOCOLS)"
+    log_section "INSTALLING & CONFIGURING MCPS (MODEL CONTEXT PROTOCOLS)"
 
     if ! command -v npx &> /dev/null; then
         log_warning "npm/npx not found. Skipping MCP installations."
         log_info "Install Node.js to enable MCP installations."
+        return 0
+    fi
+
+    if ! command -v python3 &> /dev/null; then
+        log_warning "Python 3 not available. Skipping MCP installations."
         return 0
     fi
 
@@ -752,52 +757,6 @@ install_mcps() {
 
     log_info "Reading recommended MCPs from PROJECT_PROFILE.json..."
 
-    # Extract MCPs from profile using grep and basic JSON parsing
-    local mcps_json=""
-    if command -v python3 &> /dev/null; then
-        mcps_json=$(python3 -c "
-import json
-try:
-    with open('${profile_path}', 'r') as f:
-        profile = json.load(f)
-        if 'recommended_mcps' in profile:
-            print(json.dumps(profile['recommended_mcps']))
-except:
-    print('[]')
-" 2>/dev/null || echo "[]")
-    else
-        log_warning "Python 3 not available for JSON parsing. Attempting basic grep parsing..."
-        mcps_json="[]"
-    fi
-
-    # Parse and install each MCP
-    if [[ "${mcps_json}" != "[]" ]] && [[ -n "${mcps_json}" ]]; then
-        if command -v python3 &> /dev/null; then
-            # Use Python to iterate MCPs
-            profile_path="${profile_path}" TARGET_DIR="${TARGET_DIR}" python3 << 'PYTHON_BLOCK'
-import json
-import sys
-import os
-
-profile_path = os.environ.get('profile_path', '')
-target_dir = os.environ.get('TARGET_DIR', '')
-
-try:
-    with open(profile_path, 'r') as f:
-        profile = json.load(f)
-        mcps = profile.get('recommended_mcps', [])
-
-        if isinstance(mcps, list):
-            for mcp in mcps:
-                mcp_name = mcp.get('name', '') if isinstance(mcp, dict) else str(mcp)
-                if mcp_name:
-                    print(f"MCP_NAME={mcp_name}")
-except:
-    pass
-PYTHON_BLOCK
-        fi
-    fi
-
     # Create MCP servers directory
     mkdir -p "${TARGET_DIR}/.claude/mcps"
 
@@ -807,79 +766,340 @@ PYTHON_BLOCK
         echo '{"mcpServers": {}}' > "${settings_file}"
     fi
 
-    # Extract MCPs and install them
-    if command -v python3 &> /dev/null; then
-        profile_path="${profile_path}" TARGET_DIR="${TARGET_DIR}" python3 << 'INSTALL_MCPS_BLOCK'
+    # Master MCP resolution, validation & installation via Python
+    profile_path="${profile_path}" TARGET_DIR="${TARGET_DIR}" python3 << 'MCP_INSTALLER_BLOCK'
 import json
 import subprocess
 import os
+import sys
+import shutil
 
 profile_path = os.environ.get('profile_path', '')
 target_dir = os.environ.get('TARGET_DIR', '')
 settings_file = os.path.join(target_dir, '.claude/settings.json')
 
+# ═══════════════════════════════════════════════════════════════════
+# DEVLMER MCP REGISTRY v3.0
+# Maps short names to verified npm packages with proper configurations
+# ═══════════════════════════════════════════════════════════════════
+MCP_REGISTRY = {
+    # ── Official MCP Protocol Servers ──────────────────────────────
+    "github": {
+        "package": "@modelcontextprotocol/server-github",
+        "env": {"GITHUB_PERSONAL_ACCESS_TOKEN": ""},
+        "description": "GitHub repos, issues, PRs, code search",
+        "env_prompt": "GITHUB_PERSONAL_ACCESS_TOKEN"
+    },
+    "slack": {
+        "package": "@modelcontextprotocol/server-slack",
+        "env": {"SLACK_BOT_TOKEN": "", "SLACK_TEAM_ID": ""},
+        "description": "Slack channels, messages, threads"
+    },
+    "postgres": {
+        "package": "@modelcontextprotocol/server-postgres",
+        "args_extra": [],
+        "description": "PostgreSQL database queries"
+    },
+    "redis": {
+        "package": "@modelcontextprotocol/server-redis",
+        "env": {"REDIS_URL": "redis://localhost:6379"},
+        "description": "Redis key-value operations"
+    },
+    "memory": {
+        "package": "@modelcontextprotocol/server-memory",
+        "description": "Persistent memory for conversations"
+    },
+    "puppeteer": {
+        "package": "@modelcontextprotocol/server-puppeteer",
+        "description": "Browser automation with Puppeteer"
+    },
+    "filesystem": {
+        "package": "@modelcontextprotocol/server-filesystem",
+        "description": "Local filesystem read/write"
+    },
+    "brave-search": {
+        "package": "@modelcontextprotocol/server-brave-search",
+        "env": {"BRAVE_API_KEY": ""},
+        "description": "Brave search engine integration"
+    },
+    "everything": {
+        "package": "@modelcontextprotocol/server-everything",
+        "description": "Combined MCP capabilities server"
+    },
+
+    # ── Community / Verified MCP Servers ───────────────────────────
+    "playwright": {
+        "package": "mcp-playwright",
+        "description": "Browser automation with Playwright"
+    },
+    "context7": {
+        "package": "@upstash/context7-mcp",
+        "description": "Up-to-date library documentation"
+    },
+    "notion": {
+        "package": "@notionhq/notion-mcp-server",
+        "env": {"NOTION_API_KEY": ""},
+        "description": "Notion pages, databases, search"
+    },
+    "stripe": {
+        "package": "mcp-server-stripe",
+        "env": {"STRIPE_SECRET_KEY": ""},
+        "description": "Stripe payments, subscriptions, invoices"
+    },
+    "discord": {
+        "package": "mcp-server-discord",
+        "env": {"DISCORD_BOT_TOKEN": ""},
+        "description": "Discord channels, messages, guilds"
+    },
+    "telegram": {
+        "package": "mcp-server-telegram",
+        "env": {"TELEGRAM_BOT_TOKEN": ""},
+        "description": "Telegram messages, chats, bots"
+    },
+    "whatsapp": {
+        "package": "mcp-server-whatsapp",
+        "description": "WhatsApp messaging integration"
+    },
+    "elasticsearch": {
+        "package": "mcp-server-elasticsearch",
+        "env": {"ELASTICSEARCH_URL": "http://localhost:9200"},
+        "description": "Elasticsearch search & indexing"
+    },
+    "sentry": {
+        "package": "sentry-mcp",
+        "env": {"SENTRY_AUTH_TOKEN": ""},
+        "description": "Sentry error tracking & monitoring"
+    },
+    "supabase": {
+        "package": "supabase-mcp",
+        "env": {"SUPABASE_URL": "", "SUPABASE_KEY": ""},
+        "description": "Supabase database, auth, storage"
+    },
+    "datadog": {
+        "package": "datadog-mcp",
+        "env": {"DD_API_KEY": "", "DD_APP_KEY": ""},
+        "description": "Datadog monitoring & observability"
+    },
+    "langchain": {
+        "package": "langchain-mcp",
+        "description": "LangChain agent framework integration"
+    },
+    "pinecone": {
+        "package": "@pinecone-database/mcp",
+        "env": {"PINECONE_API_KEY": ""},
+        "description": "Pinecone vector database"
+    },
+    "chromadb": {
+        "package": "chromadb-mcp",
+        "description": "ChromaDB vector database"
+    },
+    "e2b": {
+        "package": "@e2b/mcp-server",
+        "env": {"E2B_API_KEY": ""},
+        "description": "E2B code sandbox execution"
+    },
+    "sendgrid": {
+        "package": "sendgrid-mcp-server",
+        "env": {"SENDGRID_API_KEY": ""},
+        "description": "SendGrid email delivery"
+    },
+    "firecrawl": {
+        "package": "firecrawl-mcp",
+        "env": {"FIRECRAWL_API_KEY": ""},
+        "description": "Web scraping & crawling"
+    },
+
+    # ── Fallback resolution patterns ──────────────────────────────
+    # If a name isn't in the registry, we try these patterns in order:
+    # 1. @modelcontextprotocol/server-{name}
+    # 2. mcp-server-{name}
+    # 3. {name}-mcp
+    # 4. mcp-{name}
+}
+
+def resolve_mcp_package(name):
+    """Resolve a short MCP name to its real npm package."""
+    name_lower = name.lower().strip()
+
+    # Direct registry lookup
+    if name_lower in MCP_REGISTRY:
+        return MCP_REGISTRY[name_lower]
+
+    # Return None if not in registry — we'll try fallback patterns
+    return None
+
+def validate_npm_package(package_name):
+    """Check if an npm package exists (fast check via npm info)."""
+    try:
+        result = subprocess.run(
+            ["npm", "info", package_name, "name"],
+            capture_output=True, text=True, timeout=15
+        )
+        return result.returncode == 0 and result.stdout.strip() != ""
+    except:
+        return False
+
+def try_resolve_unknown(name):
+    """Try common patterns to find an unknown MCP package."""
+    patterns = [
+        f"@modelcontextprotocol/server-{name}",
+        f"mcp-server-{name}",
+        f"{name}-mcp",
+        f"mcp-{name}",
+    ]
+    for pattern in patterns:
+        if validate_npm_package(pattern):
+            return {"package": pattern, "description": f"{name} MCP server (auto-resolved)"}
+    return None
+
+# ═══════════════════════════════════════════════════════════════════
+# MAIN INSTALLATION LOGIC
+# ═══════════════════════════════════════════════════════════════════
+
 try:
     with open(profile_path, 'r') as f:
         profile = json.load(f)
-        mcps = profile.get('recommended_mcps', [])
 
-        # Load existing settings
-        settings = {}
-        if os.path.exists(settings_file):
-            with open(settings_file, 'r') as sf:
-                settings = json.load(sf)
+    # Collect all MCP names from profile
+    recommended = profile.get('recommended_mcps', [])
+    installed = profile.get('installed_mcps', [])
+    all_names = list(set(
+        [(m.get('name', '') if isinstance(m, dict) else str(m)) for m in recommended] +
+        [(m.get('name', '') if isinstance(m, dict) else str(m)) for m in installed]
+    ))
+    all_names = [n for n in all_names if n and 'nano-banana' not in n.lower()]
 
-        if 'mcpServers' not in settings:
-            settings['mcpServers'] = {}
+    # Load existing settings
+    settings = {}
+    if os.path.exists(settings_file):
+        with open(settings_file, 'r') as sf:
+            settings = json.load(sf)
+    if 'mcpServers' not in settings:
+        settings['mcpServers'] = {}
 
-        installed = profile.get('installed_mcps', [])
-        all_mcps = list(set(installed + mcps)) if isinstance(mcps, list) else installed
+    total = len(all_names)
+    configured = 0
+    skipped = 0
+    failed = 0
+    resolved_unknown = 0
 
-        if isinstance(all_mcps, list):
-            configured_count = 0
-            for mcp_item in all_mcps:
-                # Handle both dict and string formats
-                if isinstance(mcp_item, dict):
-                    mcp_name = mcp_item.get('name', '')
-                    mcp_package = mcp_item.get('package', mcp_name)
-                else:
-                    mcp_name = str(mcp_item)
-                    mcp_package = mcp_name
+    print(f"\n{'═' * 60}")
+    print(f"  DEVLMER MCP INSTALLER — {total} servers to configure")
+    print(f"{'═' * 60}\n")
 
-                if not mcp_name:
-                    continue
+    for i, name in enumerate(sorted(all_names), 1):
+        prefix = f"  [{i:2d}/{total}]"
 
-                # Special handling for Nano-Banana-MCP (already bundled)
-                if 'nano-banana' in mcp_name.lower():
-                    print(f"Skipping {mcp_name} (already configured via setup_nano_banana_mcp)")
-                    continue
+        # Skip already configured
+        if name in settings['mcpServers']:
+            print(f"{prefix} ⏩ {name} — already configured")
+            skipped += 1
+            continue
 
-                # Skip if already configured
-                if mcp_name in settings['mcpServers']:
-                    print(f"MCP {mcp_name} already configured")
-                    continue
+        # Try registry lookup
+        info = resolve_mcp_package(name)
 
-                print(f"Configuring MCP: {mcp_name}")
+        if info:
+            package = info['package']
+            env_vars = info.get('env', {})
+            desc = info.get('description', '')
+            print(f"{prefix} 📦 {name} → {package}")
+            if desc:
+                print(f"         ℹ️  {desc}")
 
-                # Add MCP configuration
-                settings['mcpServers'][mcp_name] = {
+            # Build MCP config
+            config = {
+                "command": "npx",
+                "args": ["-y", package],
+            }
+            if env_vars:
+                config["env"] = env_vars
+                empty_keys = [k for k, v in env_vars.items() if not v]
+                if empty_keys:
+                    print(f"         ⚠️  Requires env: {', '.join(empty_keys)}")
+
+            settings['mcpServers'][name] = config
+            configured += 1
+
+        else:
+            # Try auto-resolution for unknown packages
+            print(f"{prefix} 🔍 {name} — not in registry, searching npm...")
+            resolved = try_resolve_unknown(name)
+            if resolved:
+                package = resolved['package']
+                print(f"         ✅ Found: {package}")
+                settings['mcpServers'][name] = {
                     "command": "npx",
-                    "args": ["-y", mcp_package],
+                    "args": ["-y", package],
                     "env": {}
                 }
+                configured += 1
+                resolved_unknown += 1
+            else:
+                print(f"         ❌ No valid npm package found — skipping")
+                failed += 1
 
-        # Save updated settings
-        with open(settings_file, 'w') as sf:
-            json.dump(settings, sf, indent=2)
+    # Save settings
+    with open(settings_file, 'w') as sf:
+        json.dump(settings, sf, indent=2)
 
-        print(f"Saved MCP configurations to {settings_file}")
+    # Summary
+    print(f"\n{'═' * 60}")
+    print(f"  MCP INSTALLATION SUMMARY")
+    print(f"{'─' * 60}")
+    print(f"  ✅ Configured:     {configured} servers")
+    if resolved_unknown:
+        print(f"     └─ Auto-resolved: {resolved_unknown} (searched npm)")
+    print(f"  ⏩ Already existed: {skipped} servers")
+    if failed:
+        print(f"  ❌ Not found:      {failed} servers")
+    print(f"  📄 Settings saved: {settings_file}")
+    print(f"{'═' * 60}\n")
+
+    # Generate env setup instructions if needed
+    env_instructions = []
+    for name, config in settings.get('mcpServers', {}).items():
+        if isinstance(config, dict) and 'env' in config:
+            for key, val in config['env'].items():
+                if not val:
+                    env_instructions.append(f"  export {key}=your-{key.lower().replace('_', '-')}-here")
+
+    if env_instructions:
+        env_file = os.path.join(target_dir, '.claude/mcp-env-setup.sh')
+        with open(env_file, 'w') as ef:
+            ef.write("#!/bin/bash\n")
+            ef.write("# ═══════════════════════════════════════════════════════\n")
+            ef.write("# DEVLMER MCP — Environment Variables Setup\n")
+            ef.write("# Fill in your API keys and source this file:\n")
+            ef.write("#   source .claude/mcp-env-setup.sh\n")
+            ef.write("# ═══════════════════════════════════════════════════════\n\n")
+            seen = set()
+            for line in env_instructions:
+                key = line.split('=')[0].strip()
+                if key not in seen:
+                    ef.write(line.replace('  ', '') + "\n")
+                    seen.add(key)
+        os.chmod(env_file, 0o755)
+        print(f"  💡 API keys needed — edit: .claude/mcp-env-setup.sh")
+        print(f"     Then run: source .claude/mcp-env-setup.sh\n")
 
 except Exception as e:
-    print(f"Error processing MCPs: {e}")
-INSTALL_MCPS_BLOCK
-    fi
+    print(f"❌ Error in MCP installation: {e}")
+    import traceback
+    traceback.print_exc()
+MCP_INSTALLER_BLOCK
 
-    log_info "MCP installation complete (${MCPS_INSTALLED} succeeded, ${MCPS_FAILED} failed)"
+    MCPS_INSTALLED=$(python3 -c "
+import json
+try:
+    with open('${TARGET_DIR}/.claude/settings.json') as f:
+        s = json.load(f)
+    print(len(s.get('mcpServers', {})))
+except:
+    print(0)
+" 2>/dev/null || echo "0")
+
+    log_success "MCP installation complete — ${MCPS_INSTALLED} servers configured in settings.json"
 }
 
 # ============================================================================
