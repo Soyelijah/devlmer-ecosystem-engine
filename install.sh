@@ -175,6 +175,7 @@ ${BOLD}OPTIONS:${RESET}
     --verbose           Enable verbose output
     --no-external       Skip external skill installations (from npm)
     --no-mcp            Skip MCP (Model Context Protocol) installations
+    --no-github         Skip GitHub authentication (do not offer repo sync/backup)
     --github-token      Provide GitHub Personal Access Token (non-interactive)
     --gemini-key        Provide Gemini API key for Nano-Banana MCP (non-interactive)
 
@@ -377,6 +378,70 @@ offer_github_features() {
     log_step "Repository synchronization"
     log_step "Configuration backup to GitHub"
     log_step "Automated updates from upstream"
+    echo ""
+
+    log_step "Initializing git repository and backing up ecosystem config..."
+
+    # Initialize git if needed
+    if [[ ! -d "${TARGET_DIR}/.git" ]]; then
+        if git -C "${TARGET_DIR}" init &> /dev/null; then
+            log_verbose "Git repository initialized in ${TARGET_DIR}"
+        else
+            log_warning "Failed to initialize git repository"
+            return 1
+        fi
+    else
+        log_verbose "Git repository already initialized"
+    fi
+
+    # Configure git user if not already set (for commits)
+    if ! git -C "${TARGET_DIR}" config user.email &> /dev/null; then
+        git -C "${TARGET_DIR}" config user.email "devlmer-ecosystem@local" &> /dev/null || true
+    fi
+    if ! git -C "${TARGET_DIR}" config user.name &> /dev/null; then
+        git -C "${TARGET_DIR}" config user.name "Devlmer Ecosystem" &> /dev/null || true
+    fi
+
+    # Add and commit .claude directory if it exists
+    if [[ -d "${TARGET_DIR}/.claude" ]]; then
+        if git -C "${TARGET_DIR}" add .claude/ 2>/dev/null; then
+            if git -C "${TARGET_DIR}" commit -m "Devlmer: ecosystem configured" &> /dev/null; then
+                log_success "Ecosystem config committed to git"
+            else
+                log_verbose "No changes to commit (or commit failed)"
+            fi
+        else
+            log_verbose "Failed to add .claude/ to git"
+        fi
+    fi
+
+    # Check for remote and offer to push
+    if git -C "${TARGET_DIR}" remote get-url origin &> /dev/null; then
+        log_step "A git remote 'origin' is configured."
+        read -p "Would you like to push ecosystem backup to origin? [y/N] " -r
+
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            # Create branch if needed, but don't force
+            local branch_name=".devlmer-backup-$(date +%s)"
+            log_step "Creating backup branch: ${branch_name}"
+
+            if git -C "${TARGET_DIR}" checkout -b "${branch_name}" 2>/dev/null; then
+                if git -C "${TARGET_DIR}" push -u origin "${branch_name}" 2>/dev/null; then
+                    log_success "Configuration backed up to branch: ${branch_name}"
+                else
+                    log_warning "Failed to push to origin (check permissions and credentials)"
+                    return 1
+                fi
+            else
+                log_warning "Failed to create backup branch"
+                return 1
+            fi
+        else
+            log_info "Skipped remote push (use 'git push' manually when ready)"
+        fi
+    else
+        log_info "No git remote configured (add one with 'git remote add origin <url>')"
+    fi
 }
 
 # ============================================================================
@@ -448,18 +513,44 @@ add_nano_banana_to_settings() {
     local settings_file="${TARGET_DIR}/.claude/config/settings.json"
 
     if [[ ! -f "${settings_file}" ]]; then
-        log_verbose "Settings file not yet created, will add during config phase"
+        log_verbose "Settings file not yet created, creating default with nano-banana config"
+
+        # Create directory if it doesn't exist
+        mkdir -p "${TARGET_DIR}/.claude/config" || {
+            log_warning "Failed to create .claude/config directory"
+            return 1
+        }
+
+        # Create settings file with nano-banana config
+        cat > "${settings_file}" << EOF
+{
+  "mcpServers": {
+    "nano-banana": {
+      "command": "node",
+      "args": ["${SCRIPT_DIR}/nano-banana-mcp/index.js"],
+      "env": {
+        "GEMINI_API_KEY": "${GEMINI_KEY}"
+      }
+    }
+  }
+}
+EOF
+        chmod 600 "${settings_file}"
+        log_success "Created settings.json with nano-banana-mcp configuration"
         return 0
     fi
 
-    # Add nano-banana-mcp to mcpServers section (if python is available)
+    # Add nano-banana-mcp to existing mcpServers section (if python is available)
     if command -v python3 &> /dev/null; then
         python3 << PYTHON_SCRIPT
 import json
 import sys
+import os
 
 try:
-    with open('${settings_file}', 'r') as f:
+    settings_file = '${settings_file}'
+
+    with open(settings_file, 'r') as f:
         settings = json.load(f)
 
     if 'mcpServers' not in settings:
@@ -473,13 +564,25 @@ try:
         }
     }
 
-    with open('${settings_file}', 'w') as f:
+    with open(settings_file, 'w') as f:
         json.dump(settings, f, indent=2)
 
+    # Ensure proper permissions
+    os.chmod(settings_file, 0o600)
+
 except Exception as e:
+    sys.stderr.write(f"Error updating settings.json: {e}\n")
     sys.exit(1)
 PYTHON_SCRIPT
-        log_verbose "Updated settings.json with nano-banana-mcp config"
+        if [[ $? -eq 0 ]]; then
+            log_success "Updated settings.json with nano-banana-mcp configuration"
+        else
+            log_warning "Failed to update settings.json with python script"
+            return 1
+        fi
+    else
+        log_warning "python3 not available, settings.json update skipped"
+        return 1
     fi
 }
 
