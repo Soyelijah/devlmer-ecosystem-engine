@@ -607,16 +607,42 @@ copy_bundled_skills() {
         if [[ -d "${skill}" ]]; then
             local skill_name=$(basename "${skill}")
             local target_path="${TARGET_DIR}/.claude/skills/${skill_name}"
-            # Remove broken symlinks or conflicting files before copying
+
+            # Strategy for handling pre-existing conflicts (symlinks, files, stale dirs)
+            # Priority: mv (rename) > rm > unlink > cp --remove-destination
+            # On some mounted filesystems, rm/unlink are blocked but mv (rename) works
             if [[ -L "${target_path}" ]]; then
-                rm -f "${target_path}" 2>/dev/null || unlink "${target_path}" 2>/dev/null || true
+                # Symlink detected — move it out of the way first (mv works where rm doesn't)
+                mv "${target_path}" "${target_path}.bak.$(date +%s)" 2>/dev/null \
+                    || rm -f "${target_path}" 2>/dev/null \
+                    || unlink "${target_path}" 2>/dev/null \
+                    || true
+                log_verbose "Cleared symlink conflict: ${skill_name}"
+            elif [[ -f "${target_path}" ]]; then
+                # Regular file where we expect a directory
+                mv "${target_path}" "${target_path}.bak.$(date +%s)" 2>/dev/null \
+                    || rm -f "${target_path}" 2>/dev/null \
+                    || true
+                log_verbose "Cleared file conflict: ${skill_name}"
             fi
-            # Use cp with --remove-destination to handle conflicts
-            cp -r --remove-destination "${skill}" "${TARGET_DIR}/.claude/skills/" 2>/dev/null \
-                || cp -r "${skill}" "${TARGET_DIR}/.claude/skills/" 2>/dev/null \
-                || { log_warning "Could not copy skill: ${skill_name}"; continue; }
-            skill_count=$((skill_count + 1))
-            log_verbose "Copied skill: ${skill_name}"
+
+            # Copy with escalating fallback strategies
+            if cp -r --remove-destination "${skill}" "${TARGET_DIR}/.claude/skills/" 2>/dev/null; then
+                skill_count=$((skill_count + 1))
+                log_verbose "Copied skill: ${skill_name}"
+            elif cp -rf "${skill}" "${TARGET_DIR}/.claude/skills/" 2>/dev/null; then
+                skill_count=$((skill_count + 1))
+                log_verbose "Copied skill (force): ${skill_name}"
+            elif cp -r "${skill}" "${TARGET_DIR}/.claude/skills/${skill_name}.new" 2>/dev/null \
+                 && mv "${target_path}" "${target_path}.old.$(date +%s)" 2>/dev/null \
+                 && mv "${TARGET_DIR}/.claude/skills/${skill_name}.new" "${target_path}" 2>/dev/null; then
+                # Last resort: copy to temp name, mv old out, mv new in
+                skill_count=$((skill_count + 1))
+                log_verbose "Copied skill (mv-swap): ${skill_name}"
+            else
+                log_warning "Could not copy skill: ${skill_name} — manual install may be needed"
+                continue
+            fi
         fi
     done
 
