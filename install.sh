@@ -512,7 +512,7 @@ EOF
 }
 
 add_nano_banana_to_settings() {
-    local settings_file="${TARGET_DIR}/.claude/config/settings.json"
+    local settings_file="${TARGET_DIR}/.claude/settings.json"
 
     if [[ ! -f "${settings_file}" ]]; then
         log_verbose "Settings file not yet created, creating default with nano-banana config"
