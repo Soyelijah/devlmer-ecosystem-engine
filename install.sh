@@ -54,7 +54,7 @@ readonly ARROW="${CYAN}→${RESET}"
 # ============================================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGET_DIR="${1:-.}"
+TARGET_DIR=""
 MODE="full"  # full, skills-only, scan-only
 VERBOSE=0
 
@@ -74,6 +74,8 @@ SKILLS_FAILED=0
 EXTERNAL_SKILLS_INSTALLED=0
 MCPS_INSTALLED=0
 MCPS_FAILED=0
+AGENTS_CONFIGURED=0
+AGENTS_FAILED=0
 CONFIG_FILES_CREATED=0
 SCRIPTS_COPIED=0
 
@@ -741,14 +743,251 @@ install_mcps() {
         return 0
     fi
 
-    log_info "Installing Model Context Protocols..."
-    echo ""
+    # Check if PROJECT_PROFILE.json exists
+    local profile_path="${TARGET_DIR}/.claude/PROJECT_PROFILE.json"
+    if [[ ! -f "${profile_path}" ]]; then
+        log_info "No PROJECT_PROFILE.json found. Skipping MCP installation from profile."
+        return 0
+    fi
 
-    # Additional MCPs can be added here
-    # install_mcp "Example-MCP" "https://github.com/example/mcp"
+    log_info "Reading recommended MCPs from PROJECT_PROFILE.json..."
 
-    echo ""
+    # Extract MCPs from profile using grep and basic JSON parsing
+    local mcps_json=""
+    if command -v python3 &> /dev/null; then
+        mcps_json=$(python3 -c "
+import json
+try:
+    with open('${profile_path}', 'r') as f:
+        profile = json.load(f)
+        if 'recommended_mcps' in profile:
+            print(json.dumps(profile['recommended_mcps']))
+except:
+    print('[]')
+" 2>/dev/null || echo "[]")
+    else
+        log_warning "Python 3 not available for JSON parsing. Attempting basic grep parsing..."
+        mcps_json="[]"
+    fi
+
+    # Parse and install each MCP
+    if [[ "${mcps_json}" != "[]" ]] && [[ -n "${mcps_json}" ]]; then
+        if command -v python3 &> /dev/null; then
+            # Use Python to iterate MCPs
+            profile_path="${profile_path}" TARGET_DIR="${TARGET_DIR}" python3 << 'PYTHON_BLOCK'
+import json
+import sys
+import os
+
+profile_path = os.environ.get('profile_path', '')
+target_dir = os.environ.get('TARGET_DIR', '')
+
+try:
+    with open(profile_path, 'r') as f:
+        profile = json.load(f)
+        mcps = profile.get('recommended_mcps', [])
+
+        if isinstance(mcps, list):
+            for mcp in mcps:
+                mcp_name = mcp.get('name', '') if isinstance(mcp, dict) else str(mcp)
+                if mcp_name:
+                    print(f"MCP_NAME={mcp_name}")
+except:
+    pass
+PYTHON_BLOCK
+        fi
+    fi
+
+    # Create MCP servers directory
+    mkdir -p "${TARGET_DIR}/.claude/mcps"
+
+    # Initialize settings.json if it doesn't exist
+    local settings_file="${TARGET_DIR}/.claude/settings.json"
+    if [[ ! -f "${settings_file}" ]]; then
+        echo '{"mcpServers": {}}' > "${settings_file}"
+    fi
+
+    # Extract MCPs and install them
+    if command -v python3 &> /dev/null; then
+        profile_path="${profile_path}" TARGET_DIR="${TARGET_DIR}" python3 << 'INSTALL_MCPS_BLOCK'
+import json
+import subprocess
+import os
+
+profile_path = os.environ.get('profile_path', '')
+target_dir = os.environ.get('TARGET_DIR', '')
+settings_file = os.path.join(target_dir, '.claude/settings.json')
+
+try:
+    with open(profile_path, 'r') as f:
+        profile = json.load(f)
+        mcps = profile.get('recommended_mcps', [])
+
+        # Load existing settings
+        settings = {}
+        if os.path.exists(settings_file):
+            with open(settings_file, 'r') as sf:
+                settings = json.load(sf)
+
+        if 'mcpServers' not in settings:
+            settings['mcpServers'] = {}
+
+        installed = profile.get('installed_mcps', [])
+        all_mcps = list(set(installed + mcps)) if isinstance(mcps, list) else installed
+
+        if isinstance(all_mcps, list):
+            configured_count = 0
+            for mcp_item in all_mcps:
+                # Handle both dict and string formats
+                if isinstance(mcp_item, dict):
+                    mcp_name = mcp_item.get('name', '')
+                    mcp_package = mcp_item.get('package', mcp_name)
+                else:
+                    mcp_name = str(mcp_item)
+                    mcp_package = mcp_name
+
+                if not mcp_name:
+                    continue
+
+                # Special handling for Nano-Banana-MCP (already bundled)
+                if 'nano-banana' in mcp_name.lower():
+                    print(f"Skipping {mcp_name} (already configured via setup_nano_banana_mcp)")
+                    continue
+
+                # Skip if already configured
+                if mcp_name in settings['mcpServers']:
+                    print(f"MCP {mcp_name} already configured")
+                    continue
+
+                print(f"Configuring MCP: {mcp_name}")
+
+                # Add MCP configuration
+                settings['mcpServers'][mcp_name] = {
+                    "command": "npx",
+                    "args": ["-y", mcp_package],
+                    "env": {}
+                }
+
+        # Save updated settings
+        with open(settings_file, 'w') as sf:
+            json.dump(settings, sf, indent=2)
+
+        print(f"Saved MCP configurations to {settings_file}")
+
+except Exception as e:
+    print(f"Error processing MCPs: {e}")
+INSTALL_MCPS_BLOCK
+    fi
+
     log_info "MCP installation complete (${MCPS_INSTALLED} succeeded, ${MCPS_FAILED} failed)"
+}
+
+# ============================================================================
+# AGENT CONFIGURATION
+# ============================================================================
+
+configure_agents() {
+    log_section "CONFIGURING AGENTS"
+
+    # Check if PROJECT_PROFILE.json exists
+    local profile_path="${TARGET_DIR}/.claude/PROJECT_PROFILE.json"
+    if [[ ! -f "${profile_path}" ]]; then
+        log_info "No PROJECT_PROFILE.json found. Skipping agent configuration."
+        return 0
+    fi
+
+    log_info "Reading recommended agents from PROJECT_PROFILE.json..."
+
+    # Create agents directory
+    mkdir -p "${TARGET_DIR}/.claude/agents"
+
+    # Use Python to extract and configure agents
+    if command -v python3 &> /dev/null; then
+        profile_path="${profile_path}" TARGET_DIR="${TARGET_DIR}" python3 << 'CONFIGURE_AGENTS_BLOCK'
+import json
+import os
+import sys
+
+profile_path = os.environ.get('profile_path', '')
+target_dir = os.environ.get('TARGET_DIR', '')
+agents_dir = os.path.join(target_dir, '.claude/agents')
+
+try:
+    with open(profile_path, 'r') as f:
+        profile = json.load(f)
+        agents = profile.get('agents', profile.get('recommended_agents', []))
+        domain = profile.get('fingerprint', {}).get('domain', 'general')
+
+        if isinstance(agents, list) and agents:
+            for agent_item in agents:
+                if isinstance(agent_item, dict):
+                    agent_name = agent_item.get('name', '')
+                    description = agent_item.get('role', agent_item.get('description', 'Specialized agent'))
+                elif isinstance(agent_item, str):
+                    agent_name = agent_item
+                    description = f'Specialized {agent_item} agent'
+                else:
+                    continue
+
+                if not agent_name:
+                    continue
+
+                # Create agent markdown file
+                agent_file = os.path.join(agents_dir, f"{agent_name}.md")
+
+                # Generate agent file content
+                agent_content = f"""---
+name: {agent_name}
+description: {description}
+model: sonnet
+---
+
+You are a specialized agent for {domain}. Your role is to {description}.
+
+## Your Capabilities
+- Analyzing and understanding {domain} context
+- Making decisions based on available data
+- Reporting findings with supporting evidence
+- Collaborating with other agents and systems
+
+## Rules
+1. Always verify information before acting
+2. Report findings with evidence and reasoning
+3. Maintain clear communication with users
+4. Respect all safety and security guidelines
+5. Ask for clarification when requirements are ambiguous
+
+## Domain Expertise
+This agent specializes in {domain} and understands:
+- Industry best practices
+- Common workflows and patterns
+- Key challenges and solutions
+- Integration points with other systems
+"""
+
+                try:
+                    with open(agent_file, 'w') as af:
+                        af.write(agent_content)
+                    print(f"Created agent: {agent_name}")
+                except Exception as e:
+                    print(f"Failed to create agent {agent_name}: {e}", file=sys.stderr)
+        else:
+            print("No agents found in profile")
+
+except Exception as e:
+    print(f"Error processing agents: {e}", file=sys.stderr)
+CONFIGURE_AGENTS_BLOCK
+
+        # Count created agents
+        if [[ -d "${TARGET_DIR}/.claude/agents" ]]; then
+            AGENTS_CONFIGURED=$(ls -1 "${TARGET_DIR}/.claude/agents"/*.md 2>/dev/null | wc -l)
+        fi
+    else
+        log_warning "Python 3 not available for agent configuration"
+        return 1
+    fi
+
+    log_info "Agent configuration complete (${AGENTS_CONFIGURED} agents created)"
 }
 
 # ============================================================================
@@ -905,7 +1144,44 @@ EOF
 create_settings_json() {
     log_step "Creating settings.json..."
 
-    cat > "${TARGET_DIR}/.claude/config/settings.json" << 'EOF'
+    local settings_file="${TARGET_DIR}/.claude/settings.json"
+
+    # If settings.json already exists (e.g., from install_mcps), merge instead of overwrite
+    if [[ -f "${settings_file}" ]]; then
+        log_info "settings.json already exists — merging Devlmer config..."
+        if command -v python3 &> /dev/null; then
+            TARGET_DIR="${TARGET_DIR}" python3 << 'MERGE_SETTINGS'
+import json, os
+target_dir = os.environ.get('TARGET_DIR', '')
+settings_file = os.path.join(target_dir, '.claude/settings.json')
+try:
+    with open(settings_file, 'r') as f:
+        existing = json.load(f)
+    # Add Devlmer metadata without touching mcpServers
+    existing.setdefault('version', '3.0')
+    existing.setdefault('engine', 'devlmer-ecosystem-engine')
+    existing.setdefault('brand', 'Devlmer')
+    existing.setdefault('website', 'https://devlmer.com')
+    existing.setdefault('author', 'Pierre Solier')
+    existing.setdefault('hooks', {"session_start": True, "pre_tool_use": True, "post_tool_use": True})
+    existing.setdefault('skills', {"auto_activate": True, "verify_execution": True})
+    existing.setdefault('logging', {"enabled": True, "level": "info", "directory": ".claude/logs"})
+    existing.setdefault('project_intelligence', {"fingerprinting": True, "auto_detect": True, "profile_path": ".claude/PROJECT_PROFILE.json"})
+    existing.setdefault('security', {"audit_sensitive_changes": True, "require_confirmation": True})
+    existing.setdefault('github', {"auth_file": "~/.devlmer/github-auth.json", "enabled": True})
+    with open(settings_file, 'w') as f:
+        json.dump(existing, f, indent=2)
+    print("✅ Merged Devlmer config into existing settings.json")
+except Exception as e:
+    print(f"⚠️ Error merging settings: {e}")
+MERGE_SETTINGS
+        fi
+        CONFIG_FILES_CREATED=$((CONFIG_FILES_CREATED + 1))
+        log_success "Settings.json merged successfully"
+        return 0
+    fi
+
+    cat > "${settings_file}" << 'EOF'
 {
   "version": "3.0",
   "engine": "devlmer-ecosystem-engine",
@@ -1123,6 +1399,15 @@ show_summary() {
         fi
     fi
 
+    if [[ ${AGENTS_CONFIGURED} -gt 0 ]] || [[ ${AGENTS_FAILED} -gt 0 ]]; then
+        echo ""
+        echo -e "${BOLD}Agents:${RESET}"
+        echo -e "  ${GREEN}✓ Configured:${RESET} ${AGENTS_CONFIGURED}"
+        if [[ ${AGENTS_FAILED} -gt 0 ]]; then
+            echo -e "  ${RED}✗ Failed:${RESET} ${AGENTS_FAILED}"
+        fi
+    fi
+
     echo ""
     echo -e "${BOLD}GitHub Authentication:${RESET}"
     if [[ ${GITHUB_AUTHENTICATED} -eq 1 ]]; then
@@ -1189,6 +1474,11 @@ main() {
     # Parse arguments
     parse_arguments "$@"
 
+    # Default target directory to current directory if not set
+    if [[ -z "${TARGET_DIR}" ]]; then
+        TARGET_DIR="."
+    fi
+
     log_info "Installation Mode: ${MODE}"
     log_info "Target Directory: ${TARGET_DIR}"
     echo ""
@@ -1249,13 +1539,9 @@ main() {
         echo ""
     fi
 
-    # MCP installation (full and skills-only modes)
-    if [[ "${MODE}" != "scan-only" ]] && [[ -z "${NO_MCP:-}" ]]; then
-        install_mcps
-        echo ""
-    fi
-
     # Configuration setup (all modes except skills-only)
+    # IMPORTANT: create_settings_json MUST run BEFORE install_mcps
+    # so MCPs can merge into the existing settings file
     if [[ "${MODE}" != "skills-only" ]]; then
         log_section "CONFIGURATION & SETUP"
 
@@ -1269,12 +1555,28 @@ main() {
     fi
 
     # Project intelligence scanning (full and scan-only modes)
+    # MUST run BEFORE install_mcps because the fingerprinter/orchestrator
+    # creates PROJECT_PROFILE.json which install_mcps reads
     if [[ "${MODE}" != "skills-only" ]]; then
         log_section "PROJECT INTELLIGENCE"
 
         run_project_fingerprinter
         run_orchestrator
 
+        echo ""
+    fi
+
+    # MCP installation (full and skills-only modes)
+    # Runs AFTER orchestrator (which creates the profile with MCPs)
+    # and AFTER create_settings_json (which creates the base settings file)
+    if [[ "${MODE}" != "scan-only" ]] && [[ -z "${NO_MCP:-}" ]]; then
+        install_mcps
+        echo ""
+    fi
+
+    # Agent configuration (requires PROJECT_PROFILE.json from orchestrator)
+    if [[ "${MODE}" != "skills-only" ]]; then
+        configure_agents
         echo ""
     fi
 
