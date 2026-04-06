@@ -2258,8 +2258,8 @@
                 <h1 class="hero-title">Devlmer Ecosystem Engine</h1>
                 <p class="hero-subtitle">Intelligent ecosystems for every project</p>
 
-                <div class="install-command" onclick="copyToClipboard('bash install.sh /your/project')">
-                    <span class="install-command-text">bash install.sh /your/project</span>
+                <div class="install-command" onclick="copyToClipboard('rm -rf /tmp/dee &amp;&amp; git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee &amp;&amp; bash /tmp/dee/install.sh &quot;/path/to/your/project&quot;')">
+                    <span class="install-command-text" style="font-size: 0.8em;">rm -rf /tmp/dee && git clone …/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/install.sh "/your/project"</span>
                     <button class="copy-btn">
                         <i class="fas fa-copy"></i> Copiar
                     </button>
@@ -2693,16 +2693,16 @@
 
             <div class="install-steps">
                 <div class="install-step reveal">
-                    <div class="install-step-num">Paso 1 — Clona el Repositorio</div>
-                    <h4>Descarga el instalador oficial</h4>
-                    <div class="code-block">git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git
-cd devlmer-ecosystem-engine</div>
+                    <div class="install-step-num">Paso 1 — Ejecuta el One-Liner</div>
+                    <h4>Un solo comando: clona, detecta tu proyecto e instala todo automáticamente</h4>
+                    <div class="code-block">rm -rf /tmp/dee && git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/install.sh "/path/to/your/project"</div>
                 </div>
 
                 <div class="install-step reveal">
-                    <div class="install-step-num">Paso 2 — Ejecuta el Instalador</div>
-                    <h4>Inicia la detección automática, instalación de skills, MCPs, agents y slash commands</h4>
-                    <div class="code-block">bash install.sh /path/to/your/project</div>
+                    <div class="install-step-num">Paso 2 — Instalación Automática</div>
+                    <h4>El engine detecta tu stack, instala skills, MCPs, agents y slash commands</h4>
+                    <div class="code-block"># Todo es automático — solo espera ~40 segundos
+# Skills, MCPs, Agents, Hooks, Commands... ¡todo incluido!</div>
                 </div>
 
                 <div class="install-step reveal">
@@ -3217,7 +3217,7 @@ cd devlmer-ecosystem-engine</div>
                 <a href="https://github.com/Soyelijah" target="_blank">
                     <i class="fab fa-github"></i> Organization
                 </a>
-                <a href="LICENSE">MIT License</a>
+                <a href="https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE" target="_blank">MIT License</a>
                 <span>© 2026 All Rights Reserved</span>
             </div>
         </div>

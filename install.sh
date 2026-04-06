@@ -242,6 +242,10 @@ SCRIPTS_COPIED=0
 # Non-interactive mode
 NON_INTERACTIVE=0
 
+# Feature flags (set via CLI args)
+NO_EXTERNAL="${NO_EXTERNAL:-}"
+NO_MCP="${NO_MCP:-}"
+
 # Installation step tracking (for error resilience)
 STEP_ERRORS=""
 STEP_COUNT=0
@@ -623,13 +627,19 @@ setup_directories() {
     fi
 
     # Create .claude directory structure
-    mkdir -p "${TARGET_DIR}/.claude/skills"
-    mkdir -p "${TARGET_DIR}/.claude/hooks"
-    mkdir -p "${TARGET_DIR}/.claude/config"
-    mkdir -p "${TARGET_DIR}/.claude/logs"
-
-    # Create global Devlmer directory
-    mkdir -p "${HOME}/.devlmer"
+    local dirs=(
+        "${TARGET_DIR}/.claude/skills"
+        "${TARGET_DIR}/.claude/hooks"
+        "${TARGET_DIR}/.claude/config"
+        "${TARGET_DIR}/.claude/logs"
+        "${HOME}/.devlmer"
+    )
+    for d in "${dirs[@]}"; do
+        if ! mkdir -p "${d}" 2>/dev/null; then
+            log_error "Cannot create directory: ${d}"
+            return 1
+        fi
+    done
 
     log_success "Directory structure created"
     log_verbose "${TARGET_DIR}/.claude/"
@@ -843,9 +853,9 @@ setup_nano_banana_mcp() {
         return 1
     fi
 
-    # Install dependencies
+    # Install dependencies (in subshell to preserve working directory)
     log_step "Installing Nano-Banana-MCP dependencies..."
-    if cd "${mcp_dir}" && npm install 2>/dev/null; then
+    if (cd "${mcp_dir}" && npm install 2>/dev/null); then
         log_success "Nano-Banana-MCP dependencies installed"
     else
         log_warning "Failed to install Nano-Banana-MCP dependencies"
@@ -866,8 +876,6 @@ setup_nano_banana_mcp() {
     else
         log_info "Skipping Nano-Banana-MCP configuration"
     fi
-
-    cd - > /dev/null
 }
 
 save_nano_banana_config() {

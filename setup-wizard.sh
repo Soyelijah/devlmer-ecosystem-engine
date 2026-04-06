@@ -136,12 +136,12 @@ ask_key() {
         echo -e "  ${CHECK} Ya configurado: ${DIM}${masked}${RESET}"
         echo ""
         echo -e "  ${DIM}[Enter] Mantener actual  |  [n] Nueva key  |  [s] Saltar${RESET}"
-        read -r -p "  → " choice
+        read -r -t 60 -p "  → " choice || choice=""
         case "$choice" in
             n|N)
                 echo ""
                 echo -e "  ${LIGHT} ${DIM}${where_to_find}${RESET}"
-                read -r -s -p "  Pega tu nueva key: " new_value
+                read -r -s -t 120 -p "  Pega tu nueva key: " new_value || new_value=""
                 echo ""
                 if [[ -n "$new_value" ]]; then
                     update_env_file "$var_name" "$new_value"
@@ -162,7 +162,7 @@ ask_key() {
         echo -e "  ${LIGHT} ${DIM}Dónde encontrarlo: ${where_to_find}${RESET}"
         echo ""
         echo -e "  ${DIM}[Pega tu key]  |  [Enter] Saltar${RESET}"
-        read -r -s -p "  → " new_value
+        read -r -s -t 120 -p "  → " new_value || new_value=""
         echo ""
 
         if [[ -n "$new_value" ]]; then
@@ -233,8 +233,8 @@ try:
     if changed:
         with open(settings_path, "w") as f:
             json.dump(settings, f, indent=2)
-except Exception:
-    pass
+except Exception as e:
+    print(f"Warning: Could not update settings.json: {e}", file=__import__('sys').stderr)
 PYEOF
 }
 
@@ -263,7 +263,7 @@ main() {
     # Validate project
     if [[ ! -d "$CLAUDE_DIR" ]]; then
         echo -e "${RED}Error: No se encontró .claude/ en ${PROJECT_DIR}${RESET}"
-        echo -e "Ejecuta primero: ${CYAN}bash install.sh ${PROJECT_DIR}${RESET}"
+        echo -e "Ejecuta primero: ${CYAN}bash install.sh \"${PROJECT_DIR}\"${RESET}"
         exit 1
     fi
 
@@ -329,7 +329,7 @@ for mcp in d.get('mcpServers', {}).values():
     echo -e "  ${CYAN}2${RESET}) ${BOLD}Solo esenciales${RESET} — Solo Supabase, Stripe y GitHub ${DIM}(lo mínimo)${RESET}"
     echo -e "  ${CYAN}3${RESET}) ${BOLD}Después${RESET} — Salir y configurar en otro momento"
     echo ""
-    read -r -p "  Elige [1/2/3]: " mode
+    read -r -t 60 -p "  Elige [1/2/3]: " mode || mode="3"
     echo ""
 
     case "$mode" in
@@ -351,7 +351,7 @@ for mcp in d.get('mcpServers', {}).values():
         3)
             echo -e "  ${LIGHT} Sin problema. Cuando quieras configurar, ejecuta:"
             echo ""
-            echo -e "  ${CYAN}  bash setup-wizard.sh ${PROJECT_DIR}${RESET}"
+            echo -e "  ${CYAN}  bash \"${PROJECT_DIR}/.claude/setup-wizard.sh\" \"${PROJECT_DIR}\"${RESET}"
             echo ""
             exit 0
             ;;
@@ -406,13 +406,13 @@ for mcp in d.get('mcpServers', {}).values():
         echo -e "  ${DIM}  ${ENV_FILE}${RESET}"
         echo ""
         echo -e "  ${ROCKET} ${BOLD}Para activarlas en tu sesión actual:${RESET}"
-        echo -e "  ${CYAN}  source ${ENV_FILE}${RESET}"
+        echo -e "  ${CYAN}  source \"${ENV_FILE}\"${RESET}"
         echo ""
     fi
 
     if [[ $skipped -gt 0 ]]; then
         echo -e "  ${LIGHT} Para configurar los que saltaste, ejecuta de nuevo:"
-        echo -e "  ${CYAN}  bash setup-wizard.sh ${PROJECT_DIR}${RESET}"
+        echo -e "  ${CYAN}  bash \"${PROJECT_DIR}/.claude/setup-wizard.sh\" \"${PROJECT_DIR}\"${RESET}"
     fi
 
     echo ""
