@@ -396,7 +396,7 @@ function selectTerminal(el, termId) {
     // Generate the one-liner
     const codeEl = document.getElementById('onelinerCode');
     const cmd = `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
-    codeEl.innerHTML = `<span class="ol-prompt">$ </span><span class="ol-cmd">git clone</span> <span class="ol-url">${REPO_URL}</span> <span class="ol-path">/tmp/dee</span> <span class="ol-cmd">&&</span> <span class="ol-cmd">bash</span> <span class="ol-path">/tmp/dee/install.sh</span> <span class="ol-path">"${p}"</span>`;
+    codeEl.innerHTML = `<span class="ol-prompt">$ </span><span class="ol-cmd">rm -rf</span> <span class="ol-path">/tmp/dee</span> <span class="ol-cmd">&&</span> <span class="ol-cmd">git clone</span> <span class="ol-url">${REPO_URL}</span> <span class="ol-path">/tmp/dee</span> <span class="ol-cmd">&&</span> <span class="ol-cmd">bash</span> <span class="ol-path">/tmp/dee/install.sh</span> <span class="ol-path">"${p}"</span>`;
 
     // Render steps
     const stepsEl = document.getElementById('onelinerSteps');
