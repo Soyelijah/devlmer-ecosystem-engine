@@ -1,0 +1,205 @@
+/* ============================================================
+   Devlmer Ecosystem Engine - COMPONENTS
+   ============================================================ */
+
+/* ==================== HEADER & NAV ==================== */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(10, 14, 39, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-lighter);
+    padding: 15px 0;
+    will-change: auto;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+}
+
+.nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.nav-links a:hover {
+    color: var(--primary-cyan);
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-blue), var(--primary-cyan));
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+.cta-nav {
+    display: flex;
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+
+    .cta-nav {
+        flex-direction: column;
+    }
+}
+
+/* ==================== HERO SECTION ==================== */
+.hero {
+    padding: 200px 0 100px;
+    background: linear-gradient(135deg, rgba(0, 82, 255, 0.05) 0%, rgba(0, 212, 170, 0.03) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content {
+    text-align: center;
+    z-index: 10;
+    position: relative;
+}
+
+.hero-title {
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 800;
+    margin-bottom: 20px;
+    line-height: 1.1;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.hero-subtitle {
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+    animation: fadeInUp 0.8s ease-out 0.2s backwards;
+}
+
+.install-command {
+    background: rgba(0, 82, 255, 0.1);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 40px auto;
+    max-width: 600px;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 0.95rem;
+    color: var(--primary-cyan);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: fadeInUp 0.8s ease-out 0.4s backwards;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.install-command:hover {
+    background: rgba(0, 82, 255, 0.15);
+    border-color: var(--primary-cyan);
+    box-shadow: 0 0 30px var(--glow-blue);
+}
+
+.install-command-text {
+    flex: 1;
+}
+
+.copy-btn {
+    background: var(--primary-blue);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+    background: var(--primary-cyan);
+    box-shadow: 0 0 20px var(--glow-cyan);
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeInUp 0.8s ease-out 0.6s backwards;
+}
+
+.btn {
+    padding: 15px 40px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-blue), #003d99);
+    color: white;
+    box-shadow: 0 10px 40px rgba(0, 82, 255, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 50px rgba(0, 82, 255, 0.4);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--primary-cyan);
+    border: 1.5px solid var(--primary-cyan);
+}
+
+.btn-secondary:hover {
+    background: rgba(0, 212, 170, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px var(--glow-cyan);
+}

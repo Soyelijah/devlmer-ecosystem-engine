@@ -969,6 +969,14 @@ copy_bundled_skills() {
         return 0
     fi
 
+    # Ensure target skills directory exists
+    if [[ ! -d "${TARGET_DIR}/.claude/skills" ]]; then
+        mkdir -p "${TARGET_DIR}/.claude/skills" 2>/dev/null || {
+            log_error "Cannot create skills directory: ${TARGET_DIR}/.claude/skills"
+            return 1
+        }
+    fi
+
     local skill_count=0
     for skill in "${skills_dir}"/*; do
         if [[ -d "${skill}" ]]; then
@@ -1107,10 +1115,16 @@ install_external_skills() {
     log_info "Installing ${#skills[@]} external skills from claude-code-templates..."
     echo ""
 
-    local retry_delay=2
+    # Protect settings.json from being overwritten by external tools
+    # claude-code-templates may try mkdir on paths where a file already exists
+    if [[ -f "${TARGET_DIR}/.claude/settings.json" ]]; then
+        cp "${TARGET_DIR}/.claude/settings.json" "${TARGET_DIR}/.claude/settings.json.pre-external.bak" 2>/dev/null || true
+    fi
+
     local max_retries=2
 
     for skill in "${skills[@]}"; do
+        local retry_delay=2
         local installed=0
         local attempt=0
 
@@ -1141,6 +1155,18 @@ install_external_skills() {
 
     # Special case: copywriting skill
     install_copywriting_skill
+
+    # Restore settings.json if external tools damaged it
+    if [[ -f "${TARGET_DIR}/.claude/settings.json.pre-external.bak" ]]; then
+        if [[ ! -f "${TARGET_DIR}/.claude/settings.json" ]] || [[ -d "${TARGET_DIR}/.claude/settings.json" ]]; then
+            # settings.json was deleted or replaced by a directory — restore from backup
+            rm -rf "${TARGET_DIR}/.claude/settings.json" 2>/dev/null || true
+            mv "${TARGET_DIR}/.claude/settings.json.pre-external.bak" "${TARGET_DIR}/.claude/settings.json"
+            log_verbose "Restored settings.json from pre-external backup"
+        else
+            rm -f "${TARGET_DIR}/.claude/settings.json.pre-external.bak" 2>/dev/null || true
+        fi
+    fi
 
     echo ""
     if [[ ${SKILLS_FAILED} -gt 0 ]]; then
@@ -2060,9 +2086,15 @@ parse_arguments() {
                 shift 2
                 ;;
             *)
-                # First positional argument is the target directory
+                # Positional arguments form the target directory path
+                # Handles unquoted paths with spaces: install.sh ~/My Projects/app
                 if [[ ! "$1" == -* ]]; then
-                    TARGET_DIR="$1"
+                    if [[ -z "${TARGET_DIR:-}" ]]; then
+                        TARGET_DIR="$1"
+                    else
+                        # Append to existing path (space-separated words)
+                        TARGET_DIR="${TARGET_DIR} $1"
+                    fi
                     shift
                 else
                     log_error "Unknown option: $1"
@@ -2072,6 +2104,20 @@ parse_arguments() {
                 ;;
         esac
     done
+
+    # --- Post-parse: Resolve and validate TARGET_DIR ---
+    if [[ -n "${TARGET_DIR:-}" ]]; then
+        # Expand ~ if it wasn't expanded by the shell (e.g., when passed in quotes)
+        TARGET_DIR="${TARGET_DIR/#\~/$HOME}"
+
+        # Resolve to absolute path
+        if [[ -d "${TARGET_DIR}" ]]; then
+            TARGET_DIR="$(cd "${TARGET_DIR}" && pwd)"
+        fi
+
+        # Trim trailing slash
+        TARGET_DIR="${TARGET_DIR%/}"
+    fi
 }
 
 # ============================================================================

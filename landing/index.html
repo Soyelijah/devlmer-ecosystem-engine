@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devlmer Ecosystem Engine v3.0 - Intelligent Ecosystems for Every Project</title>
+    <meta name="description" content="Ecosistemas inteligentes que detectan tu proyecto y configuran automáticamente skills, MCPs, hooks y herramientas profesionales para Claude Code.">
+    <meta name="keywords" content="devlmer, ecosystem, claude code, ai tools, developer tools, mcp, skills">
+    <meta name="author" content="Devlmer">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Devlmer Ecosystem Engine v3.0">
+    <meta property="og:description" content="Intelligent ecosystems for every project. 21 skills, 23+ MCPs, auto-detection.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://devlmer.com">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/wizard.css">
+    <link rel="stylesheet" href="css/sections.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- ==================== HEADER ==================== -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-bolt"></i> Devlmer
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#qué-es">¿Qué es?</a></li>
+                    <li><a href="#cómo-funciona">Cómo Funciona</a></li>
+                    <li><a href="#skills">Skills</a></li>
+                    <li><a href="#por-qué">Por Qué</a></li>
+                </ul>
+                <div class="cta-nav">
+                    <button class="btn btn-secondary" onclick="openWizard()">
+                        <i class="fas fa-download"></i> Instalar
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero">
+        <div class="animated-bg">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Devlmer Ecosystem Engine</h1>
+                <p class="hero-subtitle">Intelligent ecosystems for every project</p>
+
+                <div class="install-command" onclick="copyToClipboard('bash install.sh /your/project')">
+                    <span class="install-command-text">bash install.sh /your/project</span>
+                    <button class="copy-btn">
+                        <i class="fas fa-copy"></i> Copiar
+                    </button>
+                </div>
+
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="scrollToSection('installation')">
+                        <i class="fas fa-rocket"></i> Instalar Ahora
+                    </button>
+                    <a href="https://github.com/Soyelijah/devlmer-ecosystem-engine" target="_blank" class="btn btn-secondary">
+                        <i class="fab fa-github"></i> Ver en GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ¿QUÉ ES DEVLMER? ==================== -->
+    <section class="section what-is" id="qué-es">
+        <div class="container">
+            <h2 class="section-title">¿Qué es Devlmer?</h2>
+            <p class="section-subtitle">La solución inteligente para ecosistemas profesionales automáticos</p>
+
+            <div class="what-is-content">
+                <div class="what-is-text">
+                    <h3>Automatización Completa del Ecosistema</h3>
+                    <p>Devlmer detecta automáticamente el tipo de proyecto en el que estás trabajando y genera un ecosistema profesional completo en minutos. Olvídate de configuraciones manuales y disfruta de skills, MCPs y agents configurados con mejores prácticas enterprise.</p>
+                    <ul>
+                        <li>Detecta automáticamente tu stack tecnológico</li>
+                        <li>Instala skills profesionales específicas</li>
+                        <li>Instala y configura MCPs específicos para tu stack</li>
+                        <li>Crea agents especializados para tu dominio</li>
+                        <li>Genera blueprints de mejores prácticas</li>
+                        <li>Se conecta con tu cuenta de GitHub</li>
+                    </ul>
+                </div>
+
+                <div class="terminal-mockup">
+                    <div class="terminal-line">$ bash install.sh /mi-proyecto</div>
+                    <div class="terminal-line">[*] Detectando stack...</div>
+                    <div class="terminal-line">[✓] Detectado: React 19 + FastAPI + PostgreSQL</div>
+                    <div class="terminal-line">[*] Instalando skills (21/21)...</div>
+                    <div class="terminal-line">[*] Configurando MCPs...</div>
+                    <div class="terminal-line">[✓] Ecosistema listo en 23s</div>
+                    <div class="terminal-line">[✓] GitHub: autenticado — config respaldada en commit</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CÓMO FUNCIONA ==================== -->
+    <section class="section how-works" id="cómo-funciona">
+        <div class="container">
+            <h2 class="section-title">Cómo Funciona</h2>
+            <p class="section-subtitle">Seis pasos automáticos para un ecosistema profesional completo</p>
+
+            <div class="steps-grid">
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-terminal"></i>
+                    </div>
+                    <h4>Ejecuta el Instalador</h4>
+                    <p>Un único comando <code>bash install.sh</code> que inicia todo el proceso automático de detección e instalación.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-magnifying-glass"></i>
+                    </div>
+                    <h4>Detección Automática</h4>
+                    <p>El fingerprinter analiza tu proyecto y detecta tecnologías, frameworks, dominio empresarial y nivel de madurez.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h4>Instalación Completa</h4>
+                    <p>Se instalan 21+ skills, se configuran MCPs personalizados, se crean agents especializados y slash commands.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h4>Setup Wizard</h4>
+                    <p>Un asistente guiado paso a paso te ayuda a configurar tus API keys con explicaciones claras de cada servicio.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 5</div>
+                    <div class="step-icon">
+                        <i class="fas fa-forward-fast"></i>
+                    </div>
+                    <h4>Slash Commands Listos</h4>
+                    <p>Cada skill se registra como un <code>/comando</code> en Claude Code. Escribe <code>/</code> y elige tu skill al instante.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 6</div>
+                    <div class="step-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h4>¡Todo Visible en Claude Code!</h4>
+                    <p>Tus skills aparecen en <code>/skills</code>, MCPs en <code>/mcp</code>, y plugins en <code>/plugin</code>. Todo integrado nativamente.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ESTADÍSTICAS ==================== -->
+    <section class="section stats" id="estadísticas">
+        <div class="container">
+            <h2 class="section-title">Por Números</h2>
+
+            <div class="stats-grid">
+                <div class="stat-item reveal">
+                    <div class="stat-number">157+</div>
+                    <div class="stat-label">Technology Signatures</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">14</div>
+                    <div class="stat-label">Business Domains</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">21+</div>
+                    <div class="stat-label">Professional Skills</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">21</div>
+                    <div class="stat-label">Slash Commands</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">23+</div>
+                    <div class="stat-label">MCP Servers</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">1</div>
+                    <div class="stat-label">Command Installation</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SKILLS INCLUIDOS ==================== -->
+    <section class="section" id="skills">
+        <div class="container">
+            <h2 class="section-title">21 Skills Profesionales + Slash Commands</h2>
+            <p class="section-subtitle">Cada skill se instala como <code style="color: var(--primary-cyan); background: rgba(0, 212, 170, 0.1); padding: 2px 8px; border-radius: 4px;">/slash-command</code> en Claude Code</p>
+
+            <div class="skills-grid">
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-palette"></i></div>
+                    <h4 class="skill-name">Brand Identity</h4>
+                    <p class="skill-desc">Gestión enterprise de identidad visual — logos, paletas, tipografía, voz de marca y guías de estilo consistentes en todo el proyecto.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-pen-fancy"></i></div>
+                    <h4 class="skill-name">Marketing Design</h4>
+                    <p class="skill-desc">Diseño gráfico profesional — assets para redes sociales, campañas de email, infografías, ad creatives y landing pages.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-search"></i></div>
+                    <h4 class="skill-name">SEO Optimizer</h4>
+                    <p class="skill-desc">Auditorías técnicas SEO, optimización on-page, keyword research, Core Web Vitals, schema markup y generación de sitemaps.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-folder-tree"></i></div>
+                    <h4 class="skill-name">File Organizer</h4>
+                    <p class="skill-desc">Análisis de estructura de proyecto, enforcement de convenciones, reorganización inteligente y detección de duplicados.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-code"></i></div>
+                    <h4 class="skill-name">Senior Frontend</h4>
+                    <p class="skill-desc">Desarrollo React/Next.js, Vue/Nuxt y Angular — scaffolding, state management, SSR/SSG, migración entre frameworks y optimización de performance.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-server"></i></div>
+                    <h4 class="skill-name">Senior Backend</h4>
+                    <p class="skill-desc">Arquitectura backend con Node.js/Express — scaffolding de APIs REST, migrations de base de datos y load testing integrado.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-layer-group"></i></div>
+                    <h4 class="skill-name">Senior Fullstack</h4>
+                    <p class="skill-desc">Stack completo React + Node.js + GraphQL + PostgreSQL — API contract sync, auth flows, real-time patterns y end-to-end type safety.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-building"></i></div>
+                    <h4 class="skill-name">Senior Architect</h4>
+                    <p class="skill-desc">Generación de diagramas de arquitectura, análisis de dependencias y diseño de sistemas escalables con patrones enterprise.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-shield"></i></div>
+                    <h4 class="skill-name">Senior Security</h4>
+                    <p class="skill-desc">Threat modeling, auditoría de seguridad automatizada y penetration testing — con scripts de detección de vulnerabilidades.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-brain"></i></div>
+                    <h4 class="skill-name">Prompt Engineer</h4>
+                    <p class="skill-desc">Optimización de prompts para Claude y GPT-4, diseño de sistemas RAG, arquitectura de agents y evaluación de LLMs en producción.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-binoculars"></i></div>
+                    <h4 class="skill-name">Code Reviewer</h4>
+                    <p class="skill-desc">Análisis de PRs, verificación de calidad de código en TypeScript/Python/Go y generación de reportes de mejora.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+                    <h4 class="skill-name">Skill Creator</h4>
+                    <p class="skill-desc">Creación de skills personalizadas con YAML frontmatter, evals de rendimiento y optimización de triggers para Claude Code.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-flask"></i></div>
+                    <h4 class="skill-name">WebApp Testing</h4>
+                    <p class="skill-desc">Testing automático E2E con Playwright — generación de tests, visual regression, coverage tracking, métricas de performance y auditoría de accesibilidad.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-cube"></i></div>
+                    <h4 class="skill-name">MCP Builder</h4>
+                    <p class="skill-desc">Guía para construir MCP servers con FastMCP (Python) o MCP SDK (Node.js) — diseño de tools, validación y deployment.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-mobile"></i></div>
+                    <h4 class="skill-name">Mobile Design</h4>
+                    <p class="skill-desc">Diseño responsive y experiencia móvil premium — breakpoints, componentes adaptativos, React Native/Flutter, performance budgets y offline-first.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-sparkles"></i></div>
+                    <h4 class="skill-name">UI/UX Pro Max</h4>
+                    <p class="skill-desc">Inteligencia de diseño con 50+ estilos, 21 paletas, 50 font pairings y soporte para 9 stacks — de glassmorphism a brutalism.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-swatchbook"></i></div>
+                    <h4 class="skill-name">Design System</h4>
+                    <p class="skill-desc">Generación de design tokens, documentación de componentes UI y mantenimiento de guías de estilo vivas.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-lightbulb"></i></div>
+                    <h4 class="skill-name">Brainstorming</h4>
+                    <p class="skill-desc">Exploración de intención del usuario, design thinking, evaluación de alternativas y validación de conceptos antes de implementar.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-git-alt"></i></div>
+                    <h4 class="skill-name">Git Commit Helper</h4>
+                    <p class="skill-desc">Análisis de diffs para generar mensajes conventional commits — detecta breaking changes, scope correcto y tipo semántico.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-book-open"></i></div>
+                    <h4 class="skill-name">Copywriting</h4>
+                    <p class="skill-desc">Copy profesional para homepages, landing pages, pricing, feature pages y propuestas de valor orientadas a conversión.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4 class="skill-name">Project Intelligence</h4>
+                    <p class="skill-desc">Análisis de métricas, KPIs y health del proyecto — fingerprinting, dashboard de salud en 12 ejes, trend tracking y ecosistema automático.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== DOMINIOS SOPORTADOS ==================== -->
+    <section class="section" style="background: linear-gradient(135deg, rgba(0, 212, 170, 0.02) 0%, rgba(0, 82, 255, 0.02) 100%);">
+        <div class="container">
+            <h2 class="section-title">14 Dominios Empresariales Soportados</h2>
+            <p class="section-subtitle">Ecosistema especializado para cada industria</p>
+
+            <div class="domains-grid">
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-university"></i></div>
+                    <div class="domain-name">FinTech</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-comments"></i></div>
+                    <div class="domain-name">ChatBot</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-robot"></i></div>
+                    <div class="domain-name">AI Agent</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="domain-name">E-Commerce</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-cloud"></i></div>
+                    <div class="domain-name">SaaS</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-store"></i></div>
+                    <div class="domain-name">Marketplace</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-newspaper"></i></div>
+                    <div class="domain-name">Content Platform</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-mobile-screen"></i></div>
+                    <div class="domain-name">Mobile App</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-chart-bar"></i></div>
+                    <div class="domain-name">Analytics</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-tools"></i></div>
+                    <div class="domain-name">DevTools</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-microchip"></i></div>
+                    <div class="domain-name">IoT</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-hospital"></i></div>
+                    <div class="domain-name">HealthTech</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-book"></i></div>
+                    <div class="domain-name">EdTech</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-users"></i></div>
+                    <div class="domain-name">HR Platform</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-home"></i></div>
+                    <div class="domain-name">Real Estate</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-plug"></i></div>
+                    <div class="domain-name">API Platform</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-gamepad"></i></div>
+                    <div class="domain-name">Gaming</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-truck"></i></div>
+                    <div class="domain-name">Logistics</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-gavel"></i></div>
+                    <div class="domain-name">Legal Tech</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-megaphone"></i></div>
+                    <div class="domain-name">Marketing</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-cube"></i></div>
+                    <div class="domain-name">Web3</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-share-nodes"></i></div>
+                    <div class="domain-name">Social</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ARQUITECTURA ==================== -->
+    <section class="section architecture">
+        <div class="container">
+            <h2 class="section-title">Arquitectura Inteligente</h2>
+            <p class="section-subtitle">Pipeline automático de detección e instalación</p>
+
+            <div class="arch-container">
+                <div class="arch-step reveal">
+                    <div class="arch-icon"><i class="fas fa-fingerprint"></i></div>
+                    <div class="arch-title">Fingerprinter</div>
+                    <div class="arch-desc">Analiza tu proyecto detectando tecnologías y patrones</div>
+                </div>
+                <div class="arch-arrow"></div>
+
+                <div class="arch-step reveal">
+                    <div class="arch-icon"><i class="fas fa-network-wired"></i></div>
+                    <div class="arch-title">Orchestrator</div>
+                    <div class="arch-desc">Genera el perfil del proyecto y selecciona el blueprint óptimo</div>
+                </div>
+                <div class="arch-arrow"></div>
+
+                <div class="arch-step reveal">
+                    <div class="arch-icon"><i class="fas fa-diagram-project"></i></div>
+                    <div class="arch-title">Blueprint Matching</div>
+                    <div class="arch-desc">Instala blueprints optimizados para tu dominio</div>
+                </div>
+                <div class="arch-arrow"></div>
+
+                <div class="arch-step reveal">
+                    <div class="arch-icon"><i class="fas fa-rocket"></i></div>
+                    <div class="arch-title">Auto-Install</div>
+                    <div class="arch-desc">Instala skills, MCPs y agents automáticamente</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== INSTALACIÓN ==================== -->
+    <section class="section installation" id="installation">
+        <div class="container">
+            <h2 class="section-title">Cómo Instalar</h2>
+            <p class="section-subtitle">Flujo completo: de cero a ecosistema profesional en minutos</p>
+
+            <div class="install-steps">
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 1 — Clona el Repositorio</div>
+                    <h4>Descarga el instalador oficial</h4>
+                    <div class="code-block">git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git
+cd devlmer-ecosystem-engine</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 2 — Ejecuta el Instalador</div>
+                    <h4>Inicia la detección automática, instalación de skills, MCPs, agents y slash commands</h4>
+                    <div class="code-block">bash install.sh /path/to/your/project</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 3 — Setup Wizard (API Keys)</div>
+                    <h4>Un asistente interactivo te guía para configurar tus credenciales</h4>
+                    <div class="code-block"># El wizard aparece al final de la instalación automáticamente
+# Modo guiado: te explica cada servicio y dónde encontrar la key
+# Modo esenciales: solo Supabase, Stripe y GitHub (lo mínimo)
+# Puedes correrlo después: bash setup-wizard.sh /tu/proyecto</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 4 — Abre Claude Code</div>
+                    <h4>Tus skills aparecen como <code>/slash-commands</code> nativos</h4>
+                    <div class="code-block">cd /your/project && claude
+# Escribe / para ver todos tus skills instalados:
+#   /senior-architect  /code-reviewer  /copywriting
+#   /senior-security   /mobile-design  /brainstorming ...
+# Escribe /skills para ver la lista completa
+# Escribe /mcp para ver los MCPs conectados
+# Escribe /plugin para ver los plugins activos</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 5 — ¡Desarrolla con Superpoderes!</div>
+                    <h4>Claude ahora tiene contexto profundo de tu proyecto y herramientas especializadas</h4>
+                    <div class="code-block"># Claude lee tu CLAUDE.md y PROJECT_PROFILE.json automáticamente
+# Activa skills según el contexto de lo que estés haciendo
+# Los agents especializados trabajan en paralelo
+# Los MCPs conectan con servicios reales (Supabase, Stripe, GitHub...)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EXPERIENCIA EN CLAUDE CODE ==================== -->
+    <section class="section" id="experiencia" style="background: linear-gradient(135deg, rgba(0, 82, 255, 0.03) 0%, rgba(0, 212, 170, 0.02) 100%);">
+        <div class="container">
+            <h2 class="section-title">Lo Que Ves en Claude Code</h2>
+            <p class="section-subtitle">Así se ve tu ecosistema instalado en Claude Code CLI y Cowork</p>
+
+            <div class="experience-grid">
+                <div class="terminal-card reveal">
+                    <div class="terminal-header">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                        <span class="terminal-title">/skills — 28+ skills disponibles</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="label">Project skills</span> <span class="dim">(.claude/skills)</span></div>
+                        <div><span class="success">brainstorming</span> <span class="dim">· ~53 tokens</span></div>
+                        <div><span class="success">brand-identity</span> <span class="dim">· ~116 tokens</span></div>
+                        <div><span class="success">code-reviewer</span> <span class="dim">· ~81 tokens</span></div>
+                        <div><span class="success">copywriting</span> <span class="dim">· ~173 tokens</span></div>
+                        <div><span class="success">mobile-design</span> <span class="dim">· ~63 tokens</span></div>
+                        <div><span class="success">senior-architect</span> <span class="dim">· ~123 tokens</span></div>
+                        <div><span class="success">senior-backend</span> <span class="dim">· ~101 tokens</span></div>
+                        <div><span class="success">senior-frontend</span> <span class="dim">· ~97 tokens</span></div>
+                        <div><span class="success">senior-security</span> <span class="dim">· ~96 tokens</span></div>
+                        <div><span class="success">senior-prompt-engineer</span> <span class="dim">· ~114 tokens</span></div>
+                        <div><span class="success">ui-ux-pro-max</span> <span class="dim">· ~205 tokens</span></div>
+                        <div><span class="dim">... y 10+ más según tu stack</span></div>
+                        <br>
+                        <div><span class="label">Plugin skills</span> <span class="dim">(plugin)</span></div>
+                        <div><span class="highlight">make-plan</span> <span class="dim">· claude-mem</span></div>
+                        <div><span class="highlight">smart-explore</span> <span class="dim">· claude-mem</span></div>
+                        <div><span class="highlight">frontend-design</span> <span class="dim">· frontend-design</span></div>
+                    </div>
+                </div>
+
+                <div class="terminal-card reveal">
+                    <div class="terminal-header">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                        <span class="terminal-title">/mcp — 15+ servidores conectados</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="label">Project MCPs</span></div>
+                        <div><span class="success">github</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">nano-banana</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <br>
+                        <div><span class="label">Local MCPs</span></div>
+                        <div><span class="success">oracle-oci</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <br>
+                        <div><span class="label">claude.ai</span></div>
+                        <div><span class="success">Asana</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Canva</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Cloudflare</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Gmail</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Google Calendar</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Notion</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <br>
+                        <div><span class="label">Built-in MCPs</span></div>
+                        <div><span class="success">context7</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">playwright</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                    </div>
+                </div>
+
+                <div class="terminal-card reveal">
+                    <div class="terminal-header">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                        <span class="terminal-title">/plugin — Plugins instalados</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="label">Project Plugins</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">code-simplifier</span> <span class="dim">· enabled</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">commit-commands</span> <span class="dim">· enabled</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">context7</span> <span class="dim">· enabled</span></div>
+                        <div>&nbsp;&nbsp;&nbsp;<span class="dim">└ context7 MCP · <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">feature-dev</span> <span class="dim">· enabled</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">frontend-design</span> <span class="dim">· enabled</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">playwright</span> <span class="dim">· enabled</span></div>
+                        <br>
+                        <div><span class="label">Slash Commands Disponibles</span></div>
+                        <div><span class="cmd">/senior-architect</span> <span class="dim">— Diseño de sistemas</span></div>
+                        <div><span class="cmd">/code-reviewer</span> <span class="dim">— Review de código</span></div>
+                        <div><span class="cmd">/copywriting</span> <span class="dim">— Textos y copy</span></div>
+                        <div><span class="cmd">/senior-security</span> <span class="dim">— Auditoría seguridad</span></div>
+                        <div><span class="cmd">/brainstorming</span> <span class="dim">— Ideación creativa</span></div>
+                        <div><span class="dim">... 21 commands en total</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== BENEFICIOS ==================== -->
+    <section class="section benefits" id="por-qué">
+        <div class="container">
+            <h2 class="section-title">¿Por Qué Devlmer?</h2>
+            <p class="section-subtitle">Ventajas que transforman tu forma de desarrollar</p>
+
+            <div class="benefits-grid">
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-bolt"></i></div>
+                    <h4>Ahorra Horas</h4>
+                    <p>No perderás tiempo en configuraciones manuales. Todo se instala automáticamente en minutos.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-crown"></i></div>
+                    <h4>Ecosistema Enterprise</h4>
+                    <p>Acceso a herramientas de nivel profesional sin necesidad de inversión en infraestructura.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-star"></i></div>
+                    <h4>Mejores Prácticas</h4>
+                    <p>Todos nuestros skills incluyen patrones de arquitectura y mejores prácticas integradas.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-brain"></i></div>
+                    <h4>Detección Inteligente</h4>
+                    <p>Se adapta automáticamente a tu stack tecnológico y dominio empresarial específico.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-code-branch"></i></div>
+                    <h4>GitHub Integration</h4>
+                    <p>Autenticación integrada con GitHub. Guarda tu ecosistema en un commit y sincroniza con tu repositorio.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-refresh"></i></div>
+                    <h4>Actualización Continua</h4>
+                    <p>El ecosistema es modular y extensible. Agrega nuevos skills, MCPs y agents cuando quieras con <code>--skills-only</code>. Proyecto open source — contribuciones bienvenidas en GitHub.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== QUIÉN SE BENEFICIA ==================== -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">¿A Quién Ayuda Devlmer?</h2>
+            <p class="section-subtitle">Diseñado para profesionales en todos los roles</p>
+
+            <div class="audience-grid">
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-code"></i></div>
+                    <h4>Desarrolladores</h4>
+                    <p>Acceso a ecosistema automático, code review, testing y análisis de seguridad integrados.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-palette"></i></div>
+                    <h4>Diseñadores</h4>
+                    <p>UI/UX Pro Max, design systems, mobile design y brand identity — todo el stack de diseño configurado automáticamente.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-megaphone"></i></div>
+                    <h4>Marketing</h4>
+                    <p>SEO, copywriting, brand management y herramientas de análisis de contenido.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4>CEOs y Managers</h4>
+                    <p>Project Intelligence con detección automática del stack, análisis de dominio empresarial y ecosistema profesional pre-configurado para cada proyecto.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-briefcase"></i></div>
+                    <h4>Freelancers</h4>
+                    <p>Herramientas profesionales sin inversión enterprise. Escala con tus proyectos.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-rocket"></i></div>
+                    <h4>Startups</h4>
+                    <p>Ecosistema enterprise completo desde el día uno. Un comando y tu equipo tiene skills, MCPs y agents configurados — enfócate en tu producto.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PROBLEMAS RESUELTOS ==================== -->
+    <section class="section" style="background: linear-gradient(135deg, rgba(0, 82, 255, 0.03) 0%, rgba(0, 212, 170, 0.02) 100%);">
+        <div class="container">
+            <h2 class="section-title">Problemas Que Resuelve</h2>
+            <p class="section-subtitle">Soluciones reales para desafíos comunes</p>
+
+            <div class="problems-grid">
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Configuro todo manualmente cada proyecto"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Auto-detection + auto-install en un comando. Todo configurado en minutos.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"No sé qué herramientas necesito para este proyecto"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Blueprint matching inteligente según dominio y stack tecnológico.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Mis equipos usan diferentes tools y standards"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Ecosistema estandarizado para toda tu organización. Consistencia garantizada.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Pierdo demasiado tiempo en setup y configuración"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Un comando y listo. Comienza a desarrollar en minutos, no días.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Falta consistencia en calidad de código entre proyectos"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Skills con mejores prácticas integradas. Calidad garantizada por diseño.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Cambiar de proyecto significa reaprender nuevas herramientas"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Interfaz consistente. Ecosistema familiar en cada proyecto nuevo.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TECNOLOGÍAS ==================== -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Construido con Tecnologías Premium</h2>
+            <p class="section-subtitle">Stack profesional y confiable</p>
+
+            <div class="tech-stack">
+                <div class="tech-badge">
+                    <i class="fab fa-python"></i> Python
+                </div>
+                <div class="tech-badge">
+                    <i class="fas fa-terminal"></i> Bash
+                </div>
+                <div class="tech-badge">
+                    <i class="fab fa-node-js"></i> Node.js
+                </div>
+                <div class="tech-badge">
+                    <i class="fas fa-code"></i> Claude Code
+                </div>
+                <div class="tech-badge">
+                    <i class="fas fa-cube"></i> MCP Protocol
+                </div>
+                <div class="tech-badge">
+                    <i class="fab fa-github"></i> GitHub
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== INSTALL WIZARD MODAL ==================== -->
+    <div class="wizard-overlay" id="installWizard">
+        <div class="wizard-backdrop" onclick="closeWizard()"></div>
+        <div class="wizard-container">
+            <!-- Header -->
+            <div class="wizard-header">
+                <div class="wizard-header-left">
+                    <div class="wizard-header-icon"><i class="fas fa-terminal"></i></div>
+                    <div>
+                        <h2>Instalar Devlmer Ecosystem</h2>
+                        <p>Configura tu entorno en menos de 2 minutos</p>
+                    </div>
+                </div>
+                <button class="wizard-close" onclick="closeWizard()" aria-label="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Progress -->
+            <div class="wizard-progress">
+                <div class="wizard-step-dot active" data-step="1">1</div>
+                <div class="wizard-step-line" data-line="1"></div>
+                <div class="wizard-step-dot" data-step="2">2</div>
+                <div class="wizard-step-line" data-line="2"></div>
+                <div class="wizard-step-dot" data-step="3">3</div>
+            </div>
+            <div class="wizard-step-labels">
+                <span class="wizard-step-label active">Entorno</span>
+                <span class="wizard-step-label">Método</span>
+                <span class="wizard-step-label">Ejecutar</span>
+            </div>
+
+            <!-- Body -->
+            <div class="wizard-body">
+                <!-- STEP 1: Environment -->
+                <div class="wizard-step-content active" data-step="1">
+                    <h3>Tu entorno de desarrollo</h3>
+                    <p class="step-desc">Selecciona tu sistema operativo para generar el comando correcto.</p>
+
+                    <div class="os-grid">
+                        <div class="os-card" data-os="macos" onclick="selectOS(this)">
+                            <i class="fab fa-apple" style="color: #a0aec0"></i>
+                            <div class="os-name">macOS</div>
+                            <div class="os-detail">Bash 3.2+ / Zsh</div>
+                        </div>
+                        <div class="os-card" data-os="linux" onclick="selectOS(this)">
+                            <i class="fab fa-linux" style="color: #f9a825"></i>
+                            <div class="os-name">Linux</div>
+                            <div class="os-detail">Ubuntu, Debian, Arch...</div>
+                        </div>
+                        <div class="os-card" data-os="windows" onclick="selectOS(this)">
+                            <i class="fab fa-windows" style="color: #00a4ef"></i>
+                            <div class="os-name">Windows</div>
+                            <div class="os-detail">WSL / Git Bash</div>
+                        </div>
+                    </div>
+
+                    <div class="path-section">
+                        <div class="path-section-label"><i class="fas fa-folder-open"></i> Ruta de tu proyecto</div>
+                        <div class="path-input-row">
+                            <div class="path-input-wrapper">
+                                <span class="path-input-icon"><i class="fas fa-terminal"></i></span>
+                                <input type="text" class="path-input" id="projectPath" placeholder="/ruta/a/tu/proyecto" spellcheck="false" autocomplete="off">
+                            </div>
+                            <button class="path-browse-btn" id="pathBrowseBtn" onclick="browseFolder()">
+                                <i class="fas fa-folder-plus"></i> Buscar
+                            </button>
+                        </div>
+                        <div class="path-suggestions" id="pathSuggestions">
+                            <div class="path-suggestions-label">Rutas comunes:</div>
+                            <div class="path-suggestions-list" id="pathSuggestionsList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Method -->
+                <div class="wizard-step-content" data-step="2">
+                    <h3>Elige tu método</h3>
+                    <p class="step-desc">Dos formas de instalar. Ambas hacen exactamente lo mismo.</p>
+
+                    <div class="method-grid">
+                        <div class="method-card selected" data-method="cli" onclick="selectMethod(this)">
+                            <span class="method-badge recommended">Recomendado</span>
+                            <div class="method-icon"><i class="fas fa-terminal"></i></div>
+                            <h4>CLI — Un comando</h4>
+                            <p>Clona y ejecuta automáticamente desde tu terminal. Rápido y directo.</p>
+                        </div>
+                        <div class="method-card" data-method="manual" onclick="selectMethod(this)">
+                            <span class="method-badge alt">Alternativa</span>
+                            <div class="method-icon"><i class="fas fa-file-archive"></i></div>
+                            <h4>Descarga manual</h4>
+                            <p>Descarga el .zip desde GitHub y ejecuta install.sh manualmente.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Execute -->
+                <div class="wizard-step-content" data-step="3">
+                    <h3>Listo para instalar</h3>
+                    <p class="step-desc">Elige cómo quieres ejecutar la instalación.</p>
+
+                    <!-- Action tabs -->
+                    <div class="exec-tabs">
+                        <button class="exec-tab active" data-tab="auto" onclick="switchExecTab('auto')">
+                            <i class="fas fa-play-circle"></i> Abrir en Terminal
+                        </button>
+                        <button class="exec-tab" data-tab="copy" onclick="switchExecTab('copy')">
+                            <i class="fas fa-copy"></i> Copiar comando
+                        </button>
+                        <button class="exec-tab" data-tab="preview" onclick="switchExecTab('preview')">
+                            <i class="fas fa-eye"></i> Vista previa
+                        </button>
+                    </div>
+
+                    <!-- TAB: Open in Terminal -->
+                    <div class="exec-panel active" id="panelAuto">
+                        <p class="terminal-select-label">¿Qué terminal usas?</p>
+                        <div class="terminal-grid" id="terminalGrid">
+                            <!-- Populated by JS based on OS -->
+                        </div>
+
+                        <div class="oneliner-block" id="onelinerBlock" style="display:none">
+                            <div class="oneliner-header">
+                                <span class="oneliner-tag"><i class="fas fa-bolt"></i> One-liner</span>
+                                <span class="oneliner-hint" id="onelinerHint">Pega con <kbd>⌘V</kbd> en tu terminal</span>
+                            </div>
+                            <div class="oneliner-code" id="onelinerCode"></div>
+                            <button class="exec-main-btn" id="onelinerCopyBtn" onclick="copyOneliner()">
+                                <i class="fas fa-copy"></i> Copiar al portapapeles
+                            </button>
+                            <div class="oneliner-steps" id="onelinerSteps">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: Copy command -->
+                    <div class="exec-panel" id="panelCopy">
+                        <div class="terminal-block">
+                            <div class="terminal-header">
+                                <div class="terminal-dots">
+                                    <span></span><span></span><span></span>
+                                </div>
+                                <span class="terminal-title" id="terminalTitle">Terminal — bash</span>
+                                <button class="terminal-copy-btn" id="terminalCopyBtn" onclick="copyFinalCommand()">
+                                    <i class="fas fa-copy"></i> Copiar
+                                </button>
+                            </div>
+                            <div class="terminal-body" id="terminalBody">
+                                <!-- Generated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: Live preview (xterm simulation) -->
+                    <div class="exec-panel" id="panelPreview">
+                        <div class="terminal-block xterm-block">
+                            <div class="terminal-header">
+                                <div class="terminal-dots">
+                                    <span></span><span></span><span></span>
+                                </div>
+                                <span class="terminal-title">Simulación en vivo</span>
+                                <div class="xterm-controls">
+                                    <button class="terminal-copy-btn" id="xtermReplayBtn" onclick="replaySimulation()">
+                                        <i class="fas fa-redo"></i> Replay
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="xterm-body" id="xtermBody"></div>
+                        </div>
+                    </div>
+
+                    <div class="install-checklist">
+                        <div class="checklist-item"><i class="fas fa-check-circle"></i> 21 skills profesionales</div>
+                        <div class="checklist-item"><i class="fas fa-check-circle"></i> 23+ integraciones MCP</div>
+                        <div class="checklist-item"><i class="fas fa-check-circle"></i> Hooks pre/post automáticos</div>
+                        <div class="checklist-item"><i class="fas fa-check-circle"></i> Detección inteligente de proyecto</div>
+                        <div class="checklist-item"><i class="fas fa-check-circle"></i> Setup wizard interactivo</div>
+                        <div class="checklist-item"><i class="fas fa-check-circle"></i> Compatible Bash 3.2+</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="wizard-footer">
+                <button class="wizard-btn wizard-btn-back" id="wizardBtnBack" onclick="wizardBack()" style="visibility: hidden">
+                    <i class="fas fa-arrow-left"></i> Atrás
+                </button>
+                <button class="wizard-btn wizard-btn-next" id="wizardBtnNext" onclick="wizardNext()" disabled>
+                    Siguiente <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer>
+        <div class="container">
+            <p>
+                <strong>Devlmer Ecosystem Engine v3.0</strong>
+            </p>
+            <p>
+                Created with <i class="fas fa-heart" style="color: #ff6b6b;"></i> by Pierre Solier
+            </p>
+            <div class="footer-links">
+                <a href="https://github.com/Soyelijah/devlmer-ecosystem-engine" target="_blank">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+                <a href="https://github.com/Soyelijah" target="_blank">
+                    <i class="fab fa-github"></i> Organization
+                </a>
+                <a href="LICENSE">MIT License</a>
+                <span>© 2026 All Rights Reserved</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/wizard.js"></script>
+</body>
+</html>
