@@ -69,10 +69,10 @@
                 <h1 class="hero-title">Devlmer Ecosystem Engine</h1>
                 <p class="hero-subtitle">Intelligent ecosystems for every project</p>
 
-                <div class="install-command" onclick="copyToClipboard('rm -rf /tmp/dee &amp;&amp; git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee &amp;&amp; bash /tmp/dee/install.sh &quot;/path/to/your/project&quot;')">
-                    <span class="install-command-text" style="font-size: 0.8em;">rm -rf /tmp/dee && git clone …/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/install.sh "/your/project"</span>
-                    <button class="copy-btn">
-                        <i class="fas fa-copy"></i> Copiar
+                <div class="install-command" onclick="document.getElementById('installation') && scrollToSection('installation')">
+                    <span class="install-command-text">git clone → install.sh → ¡listo!</span>
+                    <button class="copy-btn" onclick="event.stopPropagation(); scrollToSection('installation')">
+                        <i class="fas fa-rocket"></i> Ver pasos
                     </button>
                 </div>
 

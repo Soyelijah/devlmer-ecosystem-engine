@@ -1389,6 +1389,25 @@ MCP_REGISTRY = {
         "description": "Web scraping & crawling"
     },
 
+    # ── MCPs sin paquete npm disponible ──────────────────────────
+    # Marcados con skip=True para evitar búsquedas fallidas
+    "firebase": {
+        "skip": True,
+        "description": "Firebase — use the official Firebase CLI or Firestore REST API"
+    },
+    "posthog": {
+        "skip": True,
+        "description": "PostHog — use the PostHog API directly or the PostHog JS SDK"
+    },
+    "docusign": {
+        "skip": True,
+        "description": "DocuSign — use the DocuSign eSignature REST API"
+    },
+    "homebrew": {
+        "skip": True,
+        "description": "Homebrew — system package manager, no MCP needed"
+    },
+
     # ── Fallback resolution patterns ──────────────────────────────
     # If a name isn't in the registry, we try these patterns in order:
     # 1. @modelcontextprotocol/server-{name}
@@ -1479,6 +1498,12 @@ try:
         # Try registry lookup
         info = resolve_mcp_package(name)
 
+        if info and info.get('skip'):
+            desc = info.get('description', 'No MCP package available')
+            print(f"{prefix} ⏭️  {name} — {desc}")
+            skipped += 1
+            continue
+
         if info:
             package = info['package']
             env_vars = info.get('env', {})
@@ -1530,7 +1555,8 @@ try:
     print(f"  ✅ Configured:     {configured} servers")
     if resolved_unknown:
         print(f"     └─ Auto-resolved: {resolved_unknown} (searched npm)")
-    print(f"  ⏩ Already existed: {skipped} servers")
+    if skipped:
+        print(f"  ⏩ Skipped:        {skipped} servers")
     if failed:
         print(f"  ❌ Not found:      {failed} servers")
     print(f"  📄 Settings saved: {settings_file}")
