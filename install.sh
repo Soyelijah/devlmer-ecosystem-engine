@@ -2445,28 +2445,76 @@ try:
         profile = json.load(f)
     fp = profile.get('fingerprint', {})
     domain = fp.get('domain', 'unknown')
-    confidence = fp.get('confidence', 0)
-    techs = fp.get('technologies', [])
-    frameworks = fp.get('frameworks', [])
-    languages = fp.get('languages', [])
-    infra = fp.get('infrastructure', [])
-    deps = profile.get('parsed_dependencies', {})
+    confidence = fp.get('domain_confidence', fp.get('confidence', 0))
 
-    print(f'  Domain:      {domain.replace(\"_\", \" \").title()}')
-    print(f'  Confidence:  {int(confidence * 100)}%')
-    if languages:
-        print(f'  Languages:   {\", \".join(languages[:8])}')
-    if frameworks:
-        print(f'  Frameworks:  {\", \".join(frameworks[:8])}')
+    # Technologies can be dict {name: score} or list
+    techs_raw = fp.get('technologies', {})
+    if isinstance(techs_raw, dict):
+        techs = sorted(techs_raw.keys(), key=lambda k: techs_raw[k], reverse=True)
+    elif isinstance(techs_raw, list):
+        techs = techs_raw
+    else:
+        techs = []
+
+    # Primary stack categories
+    stack = fp.get('primary_stack', {})
+    frameworks = []
+    languages = []
+    infra = []
+    for cat, items in stack.items():
+        if isinstance(items, list):
+            if cat in ('frontend_framework', 'backend_framework', 'mobile', 'css'):
+                frameworks.extend(items)
+            elif cat in ('language', 'languages'):
+                languages.extend(items)
+            elif cat in ('infrastructure', 'cloud', 'devops', 'container'):
+                infra.extend(items)
+            else:
+                frameworks.extend(items)  # catch-all
+
+    # Architecture
+    arch = fp.get('architecture', {})
+    arch_primary = arch.get('primary', '') if isinstance(arch, dict) else ''
+
+    # Secondary domains
+    sec_domains = fp.get('secondary_domains', [])
+    domain_str = domain.replace('_', ' ').title()
+    if sec_domains and isinstance(sec_domains, list):
+        sec_names = [d.get('name', '').replace('_', ' ').title() for d in sec_domains[:3] if isinstance(d, dict)]
+        if sec_names:
+            domain_str += ' + ' + ', '.join(sec_names)
+
+    print(f'  Domain:       {domain_str}')
+    print(f'  Confidence:   {int(float(confidence) * 100)}%')
+    if arch_primary:
+        print(f'  Architecture: {arch_primary}')
     if techs:
-        print(f'  Tech stack:  {\", \".join(techs[:10])}')
+        print(f'  Technologies: {\", \".join(str(t) for t in techs[:10])}')
+    if frameworks:
+        print(f'  Frameworks:   {\", \".join(str(f) for f in frameworks[:8])}')
+    if languages:
+        print(f'  Languages:    {\", \".join(str(l) for l in languages[:8])}')
     if infra:
-        print(f'  Infra:       {\", \".join(infra[:6])}')
-    if deps:
+        print(f'  Infra:        {\", \".join(str(i) for i in infra[:6])}')
+
+    # Parsed dependencies (from improved detect_project.py)
+    deps = fp.get('parsed_dependencies', profile.get('parsed_dependencies', {}))
+    if deps and isinstance(deps, dict):
         total_deps = sum(len(v) if isinstance(v, (list, dict)) else 0 for v in deps.values())
-        print(f'  Dependencies parsed: {total_deps} packages across {len(deps)} manifest(s)')
+        if total_deps > 0:
+            print(f'  Dependencies: {total_deps} packages across {len(deps)} manifest(s)')
+
+    tc = fp.get('tech_count', len(techs))
+    fc = fp.get('file_count', 0)
+    if tc or fc:
+        maturity = fp.get('maturity', {})
+        mat_label = maturity.get('label', '') if isinstance(maturity, dict) else ''
+        extra = f'  Complexity:   {tc} tech(s), {fc} file(s)'
+        if mat_label:
+            extra += f' — maturity: {mat_label}'
+        print(extra)
 except Exception as e:
-    print(f'  ⚠ Could not parse profile: {e}')
+    print(f'  Could not fully parse profile: {e}')
 " 2>/dev/null || echo -e "  ${YELLOW}⚠ Profile generated but could not be read${RESET}"
     else
         echo -e "  ${DIM}No project profile generated (new/empty project)${RESET}"
