@@ -65,12 +65,12 @@ print_header() {
     fi
     echo ""
     echo -e "${CYAN}${BOLD}"
-    echo "  ╔═══════════════════════════════════════════════════════════╗"
-    echo "  ║                                                           ║"
-    echo "  ║        DEVLMER ECOSYSTEM ENGINE v3.0                     ║"
-    echo "  ║        ${RESET}${CYAN}Setup Wizard — Configuración Guiada${BOLD}              ║"
-    echo "  ║                                                           ║"
-    echo "  ╚═══════════════════════════════════════════════════════════╝"
+    echo -e "  ╔═══════════════════════════════════════════════════════════╗"
+    echo -e "  ║                                                           ║"
+    echo -e "  ║        DEVLMER ECOSYSTEM ENGINE v3.0                     ║"
+    echo -e "  ║        ${RESET}${CYAN}Setup Wizard — Configuración Guiada${BOLD}              ║"
+    echo -e "  ║                                                           ║"
+    echo -e "  ╚═══════════════════════════════════════════════════════════╝"
     echo -e "${RESET}"
 }
 
