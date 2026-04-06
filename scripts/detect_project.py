@@ -3,12 +3,13 @@
 DYSA Project Intelligence Engine v3.0 — Enterprise Project Fingerprinter
 
 Scans any codebase and produces a structured project profile:
-- 80+ technology signatures with confidence scoring
-- 22 business domains with weighted keyword matching
+- 157 technology signatures with confidence scoring
+- 18 business domains with weighted keyword matching
 - Architecture pattern detection (8 patterns)
 - Maturity assessment on 12 axes
 - Multi-domain fusion (projects can match multiple domains)
-- Dependency graph awareness
+- Real dependency parsing (package.json, requirements.txt, docker-compose.yml)
+- Import statement analysis for actual framework usage
 - Security posture assessment
 """
 
@@ -393,6 +394,12 @@ class ProjectFingerprinter:
         self.file_stats: Counter = Counter()
         self.detected_tech: dict[str, float] = {}
         self.detected_domains: dict[str, float] = {}
+        self.parsed_dependencies: dict = {
+            "npm_packages": [],
+            "python_packages": [],
+            "docker_services": [],
+            "scripts_available": []
+        }
 
     # ───────────────────────────────────────────────────────────────
     # PUBLIC API
@@ -401,6 +408,10 @@ class ProjectFingerprinter:
         """Full project scan → structured fingerprint."""
         self._collect_files()
         self._detect_technologies()
+        self._parse_package_json()
+        self._parse_requirements_txt()
+        self._parse_docker_compose()
+        self._analyze_imports()
         self._detect_domains()
 
         tech_sorted = sorted(self.detected_tech.items(), key=lambda x: -x[1])
@@ -437,6 +448,9 @@ class ProjectFingerprinter:
 
             # Security posture
             "security": self._assess_security(),
+
+            # Parsed dependencies (real package names extracted)
+            "parsed_dependencies": self.parsed_dependencies,
 
             # File stats
             "file_stats": dict(self.file_stats.most_common(20)),
@@ -517,6 +531,143 @@ class ProjectFingerprinter:
                         score += 1.0
             if score > 0:
                 self.detected_tech[tech] = min(score / max(len(sigs), 1), 1.0)
+
+    # ───────────────────────────────────────────────────────────────
+    # REAL DEPENDENCY PARSING
+    # ───────────────────────────────────────────────────────────────
+    def _parse_package_json(self):
+        """Extract npm packages, versions, and scripts from package.json."""
+        pkg_files = [f for f in self.files if f.endswith("package.json")]
+        for pkg_file in pkg_files[:3]:  # Check up to 3 package.json files
+            content = self._read_head(pkg_file, lines=500)
+            if not content:
+                continue
+            try:
+                data = json.loads(content)
+                # Extract dependencies
+                for dep_obj in [data.get("dependencies", {}), data.get("devDependencies", {})]:
+                    for pkg_name in dep_obj.keys():
+                        if pkg_name not in self.parsed_dependencies["npm_packages"]:
+                            self.parsed_dependencies["npm_packages"].append(pkg_name)
+                            # Boost confidence for detected technologies
+                            for tech in self.detected_tech:
+                                if pkg_name.lower() in tech or tech in pkg_name.lower():
+                                    self.detected_tech[tech] = min(0.9, self.detected_tech[tech])
+
+                # Extract scripts
+                scripts = data.get("scripts", {})
+                for script_name in scripts.keys():
+                    if script_name not in self.parsed_dependencies["scripts_available"]:
+                        self.parsed_dependencies["scripts_available"].append(script_name)
+            except (json.JSONDecodeError, KeyError):
+                pass
+
+    def _parse_requirements_txt(self):
+        """Extract Python packages from requirements.txt and pyproject.toml."""
+        # Handle requirements.txt
+        req_files = [f for f in self.files if f.endswith("requirements.txt")]
+        for req_file in req_files[:3]:
+            content = self._read_head(req_file, lines=200)
+            if not content:
+                continue
+            for line in content.split("\n"):
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    # Extract package name (before ==, >=, <=, ~=, !=, etc.)
+                    pkg_match = re.match(r"^([a-zA-Z0-9_\-\.]+)", line)
+                    if pkg_match:
+                        pkg_name = pkg_match.group(1)
+                        if pkg_name not in self.parsed_dependencies["python_packages"]:
+                            self.parsed_dependencies["python_packages"].append(pkg_name)
+                            # Boost confidence for detected technologies
+                            for tech in self.detected_tech:
+                                if pkg_name.lower() in tech or tech in pkg_name.lower():
+                                    self.detected_tech[tech] = min(0.9, self.detected_tech[tech])
+
+        # Handle pyproject.toml
+        pyproject_files = [f for f in self.files if f.endswith("pyproject.toml")]
+        for pyproject_file in pyproject_files[:2]:
+            content = self._read_head(pyproject_file, lines=300)
+            if not content:
+                continue
+            # Extract dependencies from [project] dependencies section
+            in_deps = False
+            for line in content.split("\n"):
+                if "[project]" in line or "dependencies" in line:
+                    in_deps = True
+                elif line.startswith("[") and "dependencies" not in line:
+                    in_deps = False
+                elif in_deps and "=" in line:
+                    pkg_match = re.match(r'^\s*"?([a-zA-Z0-9_\-\.]+)"?', line)
+                    if pkg_match:
+                        pkg_name = pkg_match.group(1)
+                        if pkg_name not in self.parsed_dependencies["python_packages"]:
+                            self.parsed_dependencies["python_packages"].append(pkg_name)
+                            # Boost confidence for detected technologies
+                            for tech in self.detected_tech:
+                                if pkg_name.lower() in tech or tech in pkg_name.lower():
+                                    self.detected_tech[tech] = min(0.9, self.detected_tech[tech])
+
+    def _parse_docker_compose(self):
+        """Extract Docker services and environment variables from docker-compose.yml."""
+        docker_files = [f for f in self.files if "docker-compose" in f and f.endswith(("yml", "yaml"))]
+        for docker_file in docker_files:
+            content = self._read_head(docker_file, lines=300)
+            if not content:
+                continue
+            # Extract service names (lines starting with service_name:)
+            for line in content.split("\n"):
+                line_stripped = line.strip()
+                if ":" in line_stripped and not line_stripped.startswith("#"):
+                    # Look for service definitions (not indented properties)
+                    if not line.startswith("  ") or (line.startswith("  ") and not any(x in line for x in ["image:", "ports:", "environment:", "volumes:"])):
+                        service_match = re.match(r"^([a-zA-Z0-9_\-]+):\s*$", line_stripped)
+                        if service_match:
+                            service = service_match.group(1)
+                            if service not in ["version", "services"] and service not in self.parsed_dependencies["docker_services"]:
+                                self.parsed_dependencies["docker_services"].append(service)
+
+    def _analyze_imports(self):
+        """Sample top 20 .py and .ts/.tsx files to extract import statements."""
+        py_files = [f for f in self.files if f.endswith(".py")][:20]
+        ts_files = [f for f in self.files if f.endswith((".ts", ".tsx")) and not f.endswith(".d.ts")][:20]
+
+        # Combine both lists
+        sample_files = py_files + ts_files
+
+        for sample_file in sample_files:
+            content = self._read_head(sample_file, lines=100)
+            if not content:
+                continue
+
+            # Python imports: from X import Y, import X
+            for line in content.split("\n"):
+                line = line.strip()
+                if line.startswith("from ") or line.startswith("import "):
+                    if "import" in line:
+                        # Extract module name
+                        match = re.match(r"(?:from\s+([a-zA-Z0-9_\.]+)|import\s+([a-zA-Z0-9_\.]+))", line)
+                        if match:
+                            module = match.group(1) or match.group(2)
+                            if module:
+                                # Use first part of dotted path
+                                base_module = module.split(".")[0]
+                                # Check if it matches any tech
+                                for tech in self.detected_tech:
+                                    if base_module.lower() == tech or base_module.lower().replace("_", "-") == tech:
+                                        # Set confidence to 0.9 for actual imports found
+                                        self.detected_tech[tech] = 0.9
+
+                # TypeScript/JavaScript imports: import X from 'module'
+                ts_match = re.search(r"import\s+.*?from\s+['\"]([^'\"]+)['\"]", line)
+                if ts_match:
+                    module = ts_match.group(1)
+                    # Handle scoped packages and relative imports
+                    if not module.startswith("."):
+                        base_module = module.split("/")[0]
+                        for tech in self.detected_tech:
+                            if base_module.lower() == tech or base_module.lower().replace("_", "-") == tech:
+                                self.detected_tech[tech] = 0.9
 
     # ───────────────────────────────────────────────────────────────
     # DOMAIN DETECTION — weighted keywords + tech boost

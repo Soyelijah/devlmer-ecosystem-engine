@@ -31,14 +31,14 @@ Sin importar si trabajas con:
 
 **DEE** detecta tu tipo de proyecto y carga automáticamente:
 - **21+ habilidades profesionales** especializadas y auditadas
-- **Motor de inteligencia de proyecto** con 22 modelos de referencia (blueprints)
+- **Motor de inteligencia de proyecto** que detecta automáticamente tu stack tecnológico
 - **Plugins y MCPs** recomendados para tu stack
 - **Hooks de sesión** para auto-verificación y garantía de calidad
 - **Agentes generados automáticamente** basados en tu pila tecnológica
-- **Autenticación OAuth2 con GitHub** integrada y lista para usar
+- **Integración con GitHub CLI** para verificar estado de autenticación
 - **Generación de imágenes Nano-Banana-MCP** (Gemini AI) para visualización
 
-El resultado: Una experiencia de desarrollo completamente personalizada, lista para empresas, sin configuración manual, con garantía de calidad a nivel institucional.
+El resultado: Una experiencia de desarrollo completamente personalizada, lista para usar, sin configuración manual complicada, con herramientas para mantener calidad profesional.
 
 ---
 
@@ -246,7 +246,7 @@ Cuando el instalador termine, verás:
 [✓] Motor de detección de proyecto: ACTIVO
 [✓] 21+ habilidades cargadas y verificadas
 [✓] 21+ slash commands generados en .claude/commands/
-[✓] GitHub OAuth2 inicializado
+[✓] GitHub CLI verificado
 [✓] Nano-Banana-MCP (Gemini) listo para imagen
 [✓] Hooks de sesión inicializados
 [✓] PROJECT_PROFILE.json generado
@@ -323,8 +323,8 @@ Las habilidades se activan automáticamente según el contexto:
 #### 2. Motor de Inteligencia de Proyecto
 
 Un sistema que:
-- **Detecta automáticamente** tu tipo de proyecto (22 dominios soportados)
-- **Carga blueprints** (22 modelos de referencia) personalizados para tu stack
+- **Detecta automáticamente** tu tipo de proyecto analizando stack y archivos de configuración
+- **Carga configuración personalizada** según tu tecnología y patrón arquitectónico
 - **Activa habilidades** relevantes contexto-inteligentemente
 - **Genera agentes** especializados basados en tu pila tecnológica
 
@@ -354,21 +354,20 @@ DEE crea automáticamente agentes especializados:
 - **DevOps Agent** — Gestión de infraestructura
 - **QA Agent** — Testing y calidad
 
-#### 6. GitHub OAuth2 Authentication (NUEVO)
+#### 6. GitHub CLI Integration
 
-DEE incluye autenticación OAuth2 integrada con GitHub:
-- **Autenticación segura** sin exponer credenciales
-- **Integración automática** con repositorios privados y públicos
-- **Permisos granulares** para máxima seguridad
-- **Sincronización bidireccional** de cambios entre Claude y GitHub
-- **Webhooks configurables** para automatización
-- **Listo para production** con best practices OAuth2
+DEE se integra con tu autenticación local de GitHub CLI:
+- **Sin credenciales adicionales** — usa tu autenticación de GitHub CLI existente
+- **Compatible** con repositorios privados y públicos
+- **Respeta permisos** — mantiene la seguridad de tus repositorios
+- **Integración MCP** — accede a GitHub mediante Model Context Providers
+- **Listo de inmediato** — funciona después de `gh auth login`
 
 **Beneficios:**
-- Acceso seguro a repositorios sin API keys en .env
-- Flujo de autenticación estándar y auditable
-- Integración transparente con pipelines CI/CD
-- Soporte para múltiples cuentas GitHub
+- No necesitas API keys adicionales en variables de entorno
+- Usa tokens seguros que ya están configurados en tu máquina
+- Integración transparente con herramientas estándar de GitHub
+- Funciona con la configuración de permisos que ya tienes
 
 #### 7. Nano-Banana-MCP - Generación de Imágenes con Gemini (NUEVO)
 
@@ -391,7 +390,7 @@ DEE integra **Nano-Banana-MCP** para generación inteligente de imágenes:
 
 ## Supported Domains
 
-### Dominios Soportados (22)
+### Dominios Detectados (22 patrones)
 
 DEE detecta automáticamente y optimiza para estos tipos de proyecto:
 
@@ -447,7 +446,7 @@ Cuando abres tu proyecto, DEE:
 - Carga las habilidades relevantes
 - Ejecuta hooks de verificación
 - Propone soluciones contexto-inteligentes
-- Inicializa GitHub OAuth2 si aplica
+- Verifica GitHub CLI si tu proyecto es un repositorio
 - Prepara Nano-Banana-MCP para generación visual
 
 #### 3. Las Habilidades Se Activan por Contexto
@@ -604,7 +603,7 @@ tu-proyecto/
 │   ├── config/
 │   │   ├── project-fingerprint.json     # Detección automática
 │   │   ├── mcp-recommendations.json     # MCPs sugeridos
-│   │   ├── github-oauth.json            # Configuración OAuth2
+│   │   ├── github-config.json           # Estado de GitHub CLI
 │   │   └── nano-banana-config.json      # Configuración Gemini
 │   ├── settings.json                    # Configuración de Claude Code
 │   ├── PROJECT_PROFILE.json             # Perfil inteligente del proyecto
@@ -623,63 +622,48 @@ tu-proyecto/
 
 ---
 
-## GitHub Authentication Feature
+## GitHub Integration
 
-### Autenticación GitHub OAuth2 (NUEVO)
+### GitHub CLI Integration
 
-DEE v3.0 incluye autenticación OAuth2 integrada con GitHub, eliminando la necesidad de API keys en variables de entorno:
+DEE v3.0 verifica e integra con tu autenticación local de GitHub CLI:
 
-#### Configuración Inicial
+#### Cómo Funciona
 
 Cuando DEE detecta un proyecto con repositorio GitHub:
-1. Automáticamente registra una aplicación OAuth2
-2. Genera credenciales seguras en `.claude/config/github-oauth.json`
-3. Configura permisos granulares según tu necesidad
-4. Prepara webhooks para sincronización bidireccional
+1. Verifica que tengas `gh` (GitHub CLI) instalado
+2. Comprueba tu estado de autenticación con `gh auth status`
+3. Permite que uses las herramientas MCP de GitHub de forma segura
+4. Integra con tus tokens existentes de GitHub CLI (no almacena credenciales)
 
 #### Características
 
 **Seguridad:**
-- Tokens de corta duración (expires en 1 hora)
-- Refresh tokens almacenados de forma segura
-- Nunca expone credenciales en logs o archivos de configuración
-- Auditoría automática de acceso
+- No almacena credenciales en `.claude/config/`
+- Usa los tokens seguros de GitHub CLI que ya existen en tu máquina
+- Respeta los permisos que ya configuraste en GitHub CLI
+- No requiere API keys adicionales
 
 **Integración:**
-- Acceso automático a repositorios privados y públicos
-- Sincronización de cambios sin intervención manual
-- Compatible con GitHub Actions y CI/CD
-- Soporte para múltiples cuentas GitHub
+- Acceso a repositorios según permisos de GitHub CLI
+- Compatible con repositorios privados y públicos
+- Funciona con GitHub Actions si tienes permisos
+- Soporte para múltiples cuentas GitHub (si están configuradas en CLI)
 
-**Workflow:**
+**Configuración Inicial:**
 ```bash
-# DEE se conecta automáticamente
-git clone [repositorio-privado]  # Funciona sin credenciales hardcoded
+# Primero, autenticate con GitHub CLI (solo una vez)
+gh auth login
 
-# O autoriza manualmente si lo necesitas
-/github-auth --scope repo,workflow
+# Luego, DEE usará esos tokens automáticamente
+./install.sh tu-proyecto
 ```
 
-#### Permisos Disponibles
+#### Requisitos
 
-- `repo` — Acceso completo a repositorios
-- `read:user` — Información pública del usuario
-- `workflow` — Acceso a GitHub Actions
-- `gist` — Acceso a gists
-- `read:org` — Lectura de información de organización
-
-Configura en `CLAUDE.md`:
-```yaml
-github:
-  scopes:
-    - repo
-    - workflow
-    - read:user
-  auto_sync: true
-  webhook_events:
-    - push
-    - pull_request
-```
+- GitHub CLI (`gh`) instalado: https://cli.github.com
+- Autenticación con `gh auth login` completada
+- Permisos en GitHub configurados según necesites
 
 ---
 
@@ -770,7 +754,7 @@ Después de la instalación, encontrarás un archivo `CLAUDE.md` en tu proyecto.
 - **Auto-use everything**: [Configura qué se auto-activa]
 - **Language**: Spanish / English / [otro]
 - **Decision authority**: Especifica quién toma decisiones
-- **GitHub OAuth**: Configuración de autenticación
+- **GitHub CLI**: Verificación de autenticación local
 - **Nano-Banana MCP**: Preferencias de generación de imágenes
 - **Custom rules**: [Tus propias reglas]
 
@@ -784,7 +768,7 @@ Después de la instalación, encontrarás un archivo `CLAUDE.md` en tu proyecto.
 Puedes modificar:
 - Qué habilidades se auto-activan
 - Idioma de respuestas
-- Configuración GitHub OAuth2
+- Preferencias de verificación de GitHub CLI
 - Parámetros de Nano-Banana-MCP
 - Reglas personalizadas
 
@@ -832,7 +816,7 @@ mcps:
   - notion        # Documentación
   - asana         # Gestión de tareas
   - slack         # Comunicación
-  - github        # Control de versiones con OAuth2
+  - github        # Control de versiones
 ```
 
 #### 5. Configura Hooks Personalizados
@@ -973,17 +957,16 @@ auto_activation:
   context_detection: true
 ```
 
-#### "GitHub OAuth no se conecta"
+#### "GitHub CLI no funciona"
 
-**Verifica configuración:**
+**Verifica tu autenticación de GitHub:**
 ```bash
-cat .claude/config/github-oauth.json
+gh auth status
 ```
 
-**Reinicia OAuth:**
-```
-/github-auth --reset
-/github-auth --authorize
+Si no ves tu usuario, autenticate primero:
+```bash
+gh auth login
 ```
 
 #### "Nano-Banana-MCP no genera imágenes"
@@ -1055,11 +1038,11 @@ bash install.sh /ruta/tu/proyecto
 |-----------------|-----------|
 | `.claude/` | Carpeta raíz de DEE (no editar manualmente) |
 | `.claude/skills/` | 21+ habilidades profesionales auditadas |
-| `.claude/blueprints/` | 22 modelos de referencia por dominio |
+| `.claude/blueprints/` | Plantillas de configuración por tipo de proyecto |
 | `.claude/agents/` | Agentes especializados (CEO, Backend, Frontend, etc.) |
 | `.claude/hooks/` | Scripts que se ejecutan automáticamente |
 | `.claude/config/project-fingerprint.json` | Detección automática de tu proyecto |
-| `.claude/config/github-oauth.json` | Configuración OAuth2 GitHub |
+| `.claude/config/github-config.json` | Estado de GitHub CLI (informativo) |
 | `.claude/config/nano-banana-config.json` | Configuración Nano-Banana-MCP |
 | `.claude/config/dee-config.yaml` | Configuración de DEE |
 | `.claude/memory/` | Memoria persistente entre sesiones |
@@ -1075,14 +1058,14 @@ bash install.sh /ruta/tu/proyecto
 **1. Mantén CLAUDE.md actualizado**
 - Actualiza tu descripción de proyecto
 - Especifica cambios en la arquitectura
-- Configura GitHub OAuth2 según necesidades
+- Documenta cambios arquitectónicos
 - DEE aprende de esto
 
 **2. Usa comandos slash para evocar habilidades**
 - `/code-review` — Revisa tu código
 - `/security-audit` — Verifica seguridad
 - `/theme-factory` — Crea estilos
-- `/github-auth` — Gestiona autenticación GitHub
+- `/mcp` — Gestiona servidores Model Context Provider
 - `/nano-banana` — Genera imágenes con Gemini
 - Y muchos más
 
@@ -1093,14 +1076,14 @@ bash install.sh /ruta/tu/proyecto
 **4. Personaliza sin miedo**
 - Crea skills propios
 - Modifica blueprints
-- Configura OAuth2 según necesidades
+- Personaliza reglas y comportamientos
 - DEE está hecho para adaptarse
 
 **5. Colaboración en equipo**
 - Comparte el repositorio con tu equipo
 - Todos obtienen las mismas habilidades y reglas
 - El archivo `CLAUDE.md` sincroniza preferencias
-- GitHub OAuth2 se comparte de forma segura
+- Cada usuario mantiene su propia configuración local
 
 **6. Aprovecha Nano-Banana-MCP**
 - Genera mockups antes de codificar
@@ -1151,7 +1134,7 @@ Creado y mantenido por:
 **Agradecimientos especiales a:**
 - El equipo de Anthropic por Claude Code y la capacidad de MCPs
 - Google por Gemini AI (Nano-Banana-MCP)
-- GitHub por OAuth2 y webhooks
+- GitHub por control de versiones y APIs
 - Comunidad open source por herramientas inspiradoras
 - Usuarios tempranos que enviaron feedback
 
@@ -1160,7 +1143,8 @@ Creado y mantenido por:
 - Google Gemini (Nano-Banana-MCP)
 - Node.js & npm
 - Python 3
-- Git & GitHub OAuth2
+- Git
+- GitHub CLI (opcional, para integración)
 
 ---
 
@@ -1169,13 +1153,13 @@ Creado y mantenido por:
 ### Preguntas Frecuentes
 
 **P: ¿DEE funciona offline?**
-R: No. DEE requiere conexión a internet porque se comunica con Claude API, GitHub OAuth2, y MCPs (incluyendo Nano-Banana-MCP). Sin embargo, una vez que una sesión está en ejecución, algunos componentes pueden funcionar offline.
+R: No. DEE requiere conexión a internet para descargar habilidades, conectar con MCPs, y comunicarse con Claude API. Sin embargo, una vez que las sesiones están en ejecución, algunos componentes pueden funcionar offline.
 
 **P: ¿Es seguro instalar DEE?**
-R: Sí. DEE no modifica tu código existente. Todo se instala en `.claude/`. Puedes desinstalar eliminando esa carpeta. GitHub OAuth2 utiliza tokens seguros de corta duración.
+R: Sí. DEE no modifica tu código existente. Todo se instala en `.claude/`. Puedes desinstalar eliminando esa carpeta. No almacena credenciales — usa tokens existentes de GitHub CLI cuando los tienes.
 
 **P: ¿Puedo usar DEE en equipos?**
-R: Sí. Comparte el repositorio entero con tu equipo. Todos obtendrán las mismas habilidades, blueprints y configuración. GitHub OAuth2 se configura por usuario.
+R: Sí. Comparte el repositorio entero con tu equipo. Todos obtendrán las mismas habilidades y configuración. Cada usuario mantiene su propia configuración de GitHub CLI de forma independiente.
 
 **P: ¿Funciona con proyectos existentes?**
 R: Sí. DEE funciona con cualquier proyecto existente. No necesita estar vacío.
@@ -1201,8 +1185,8 @@ R: Técnicamente sí, pero no obtendrías los beneficios completos. DEE funciona
 **P: ¿Se puede ejecutar DEE desde CI/CD?**
 R: Sí. El instalador es compatible con pipelines de CI/CD. Consulta la documentación avanzada para detalles.
 
-**P: ¿Cómo funciona GitHub OAuth2 en DEE?**
-R: DEE configura automáticamente una aplicación OAuth2 en tu cuenta GitHub. Los tokens se almacenan de forma segura en `.claude/config/github-oauth.json` con expiración automática.
+**P: ¿Cómo se integra DEE con GitHub?**
+R: DEE verifica tu autenticación local de GitHub CLI con `gh auth status`. No requiere credenciales adicionales ni almacena tokens. Usa la configuración que ya tienes en tu máquina.
 
 **P: ¿Puedo usar Nano-Banana-MCP sin Gemini API?**
 R: No, Nano-Banana-MCP requiere configuración de Google Gemini. DEE te guiará en la configuración inicial.
@@ -1239,11 +1223,13 @@ bash install.sh /ruta/proyecto --skills code-review,security-audit
 bash install.sh /ruta/proyecto --generate-report
 ```
 
-#### Configurar GitHub OAuth2 avanzado
+#### Verificar estado de GitHub CLI
 
 ```bash
-/github-auth --scope repo,workflow --organization myorg
+gh auth status
 ```
+
+Si esto muestra tu usuario autenticado, DEE usará esa configuración automáticamente.
 
 #### Nano-Banana-MCP con parámetros avanzados
 
@@ -1272,7 +1258,7 @@ Usa esta checklist para asegurar que todo está listo:
 - [ ] Mensaje de éxito recibido
 - [ ] Proyecto abierto en Claude Code
 - [ ] CLAUDE.md revisado y personalizado
-- [ ] GitHub OAuth2 configurado (opcional)
+- [ ] GitHub CLI verificado (opcional)
 - [ ] Nano-Banana-MCP verificado (opcional)
 - [ ] Primer skill invocado (ej: `/code-review`)
 

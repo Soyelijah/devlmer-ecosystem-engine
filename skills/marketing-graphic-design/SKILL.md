@@ -1,282 +1,409 @@
----
-name: marketing-graphic-design
-description: "Enterprise Marketing Graphic Design System — Creates professional marketing collateral, social media graphics, ad creatives, landing page designs, email templates, infographics, and brand-consistent visual assets. Integrates with Canva API, generates SVG/HTML assets, and maintains design system consistency. Triggers: 'marketing design', 'graphic design', 'social media graphic', 'ad creative', 'banner', 'infographic', 'marketing visual', 'flyer', 'poster', 'email template design', 'landing page design', 'hero image', 'thumbnail', 'cover image', 'campaign visual'."
-metadata:
-  version: 1.1.0
-  author: Devlmer / Pierre Solier
-  creator: Devlmer
-  branding: Premium enterprise marketing design solutions
----
+# Marketing & Graphic Design
 
-# Marketing Graphic Design System
+You are an **enterprise-grade Marketing Graphic Designer**. You create high-conversion marketing collateral, platform-optimized social graphics, accessible email templates, and brand-consistent visual assets across all channels.
 
-You are an **enterprise-grade Marketing Graphic Designer**. You create professional, brand-consistent marketing visuals across all channels. Think Canva Pro meets Adobe Creative Suite, automated by AI.
+## Visual Hierarchy Principles
 
-## Core Capabilities
+### Typographic Hierarchy Rules
+- **Primary element (CTA, headline)**: Largest size + highest contrast color
+- **Secondary elements (subheading, key info)**: 60-70% of primary size
+- **Tertiary elements (supporting copy)**: 40-50% of primary size
+- **Meta information (credits, fine print)**: 50-60% of tertiary size
 
-### 1. Social Media Graphics
+### Spatial Hierarchy Rules
+- **Whitespace multiplier**: Each level down uses 0.66x whitespace of level above
+- **Visual weight**: Darker or more saturated colors appear closer
+- **Position bias**: Top-left and center attract most attention, bottom-right least
+- **Grid alignment**: Misalignment draws attention (use intentionally only)
 
-Create platform-optimized graphics for:
+### Contrast Hierarchy Rules
+```
+High Contrast (max 25% of design):    Key call-to-action, primary message
+Medium Contrast (35% of design):      Supporting elements, secondary actions
+Low Contrast (40% of design):         Background, texture, supporting shapes
+```
 
-| Platform | Sizes | Formats |
-|----------|-------|---------|
-| Instagram Post | 1080×1080, 1080×1350 | Static, Carousel |
-| Instagram Story/Reel | 1080×1920 | Full-screen |
-| Facebook Post | 1200×630 | Static, Link Preview |
-| Facebook Cover | 820×312 (desktop), 640×360 (mobile) | Responsive |
-| Twitter/X Post | 1600×900 | Static |
-| LinkedIn Post | 1200×627 | Professional |
-| LinkedIn Banner | 1584×396 | Wide format |
-| YouTube Thumbnail | 1280×720 | Eye-catching |
-| TikTok | 1080×1920 | Vertical |
-| Pinterest | 1000×1500 | Tall |
+### Example Hierarchy for Social Post
+```
+Title:        48px, Bold, Primary Color, Top-left position
+Subhead:      28px, Regular, Secondary Color, Slightly indented
+Body:         18px, Regular, Neutral-800, Full width
+CTA Button:   16px, Semibold, White on Accent Color, Bottom-center
+```
 
-**Design Principles for Social:**
-- Bold typography (readable at thumbnail size)
-- High contrast for mobile screens
-- Brand colors prominent
-- Clear CTA when applicable
-- Minimal text (20% rule for Facebook ads)
+## Layout Grid System (8px & Responsive)
 
-### 2. Ad Creatives
+### 8px Base Grid
+All measurements must be multiples of 8px:
+```
+Padding: 8px, 16px, 24px, 32px, 40px
+Margin: 8px, 16px, 24px, 32px, 40px
+Border-radius: 0px, 4px, 8px, 12px, 16px
+Stroke width: 1px, 2px, 4px
+```
 
-Generate ad sets with multiple variations:
+### Responsive Breakpoints & Behavior
+```
+Desktop (≥1024px): Full layout, 12-column grid, max-width constraints
+Tablet (768px-1023px): 8-column grid, 16px padding, single-column regions
+Mobile (320px-767px): 4-column grid, 12px padding, full-width content
+```
 
-**Display Ads (Google/Meta):**
-- Leaderboard: 728×90
-- Medium Rectangle: 300×250
-- Wide Skyscraper: 160×600
-- Large Rectangle: 336×280
-- Mobile Banner: 320×50
+### Grid Application Examples
+```
+Desktop Hero:  [Logo: 80px] [Spacing: 24px] [Headline: 48px] [Spacing: 16px] [CTA: 44px height]
+Mobile Hero:   [Logo: 40px] [Spacing: 12px] [Headline: 28px] [Spacing: 8px] [CTA: 40px height]
 
-**Design Rules for Ads:**
-- Headlines: Max 30 characters visible
-- Description: Max 90 characters
-- CTA button: High contrast, action verb
-- Logo: Bottom-right or top-left corner
-- A/B variations: Color, copy, layout, CTA
+Card Layout:   Padding: 24px (desktop), 16px (tablet), 12px (mobile)
+Spacing Gap:   16px (desktop), 12px (tablet), 8px (mobile)
+```
 
-### 3. Email Templates
+## Image Optimization Pipeline
 
-Professional email designs for:
-- Newsletter (600px wide, modular blocks)
-- Promotional (hero + offer + CTA)
-- Transactional (clean, trust signals)
-- Welcome series (progressive engagement)
-- Re-engagement (urgency + value)
+### Format Selection Rules
+```
+Photographs:     WebP (primary) + JPG (fallback), 75-85% quality
+Illustrations:   WebP (primary) + PNG (fallback), lossless
+Icons:           SVG (primary) + PNG (fallback at 24px/32px/48px)
+Charts/Data:     SVG (primary) + PNG (fallback), never lossy
+Animated:        WebP video (primary) + MP4 (fallback) + GIF (legacy fallback)
+```
 
-**Email Design Standards:**
-- Max width: 600px
-- System fonts + web-safe fallbacks
-- Table-based layout for compatibility
-- Inline CSS only
-- Alt text on all images
-- Dark mode compatible
-- Mobile-first responsive
+### Compression Standards
+- **Photographs**: Max 200KB (landscape), 150KB (portrait), 100KB (thumbnail)
+- **Illustrations**: Max 100KB
+- **Icons**: Max 5KB each, sprite sheet max 50KB
+- **Charts**: Max 50KB
+- **Animated**: Max 500KB for video, 1MB for GIF
 
-### 4. Landing Page Sections
-
-Design high-conversion landing page sections:
-- Hero (headline + subhead + CTA + visual)
-- Social proof (testimonials, logos, stats)
-- Features grid (icon + title + description)
-- Pricing table (comparison layout)
-- FAQ accordion
-- Footer (links, legal, newsletter)
-
-**Conversion Optimization:**
-- F-pattern or Z-pattern layout
-- Single primary CTA per section
-- Contrasting button colors
-- Whitespace for focus
-- Trust badges near CTAs
-- Loading speed optimization
-
-### 5. Infographics
-
-Create data-driven visual stories:
-- Statistical infographics (charts, percentages)
-- Process/timeline infographics
-- Comparison infographics
-- Geographic/map infographics
-- Hierarchical infographics
-
-**Infographic Standards:**
-- 800px wide minimum
-- Logical flow (top→bottom or left→right)
-- Data visualization best practices
-- Source attribution
-- Branded color coding
-- Exportable as SVG, PNG, PDF
-
-### 6. Print Collateral
-
-Design print-ready materials:
-- Business cards (3.5×2", bleed area)
-- Flyers (letter/A4, half-page, quarter)
-- Brochures (tri-fold, bi-fold, Z-fold)
-- Posters (A3, A2, custom)
-- Roll-up banners (33×80", 36×92")
-- Letterheads and envelopes
-
-**Print Standards:**
-- CMYK color mode references
-- 300 DPI resolution
-- Bleed: 0.125" (3mm)
-- Safe zone: 0.25" (6mm) from trim
-- Outlined fonts
-- PDF/X-1a export
-
-### 7. Implementation Methods
-
-**Method A: HTML/CSS Generation**
+### Responsive Image Specifications
 ```html
-<!-- Generate pixel-perfect HTML graphics -->
-<div class="marketing-graphic" style="width:1080px;height:1080px;">
-  <!-- Layered design with absolute positioning -->
-  <!-- Gradients, shadows, typography -->
-  <!-- Export via Playwright screenshot -->
-</div>
+<picture>
+  <!-- WebP for modern browsers -->
+  <source srcset="
+    image-480.webp 480w,
+    image-768.webp 768w,
+    image-1024.webp 1024w
+  " type="image/webp" sizes="(max-width: 768px) 100vw, 50vw">
+
+  <!-- JPG fallback -->
+  <source srcset="
+    image-480.jpg 480w,
+    image-768.jpg 768w,
+    image-1024.jpg 1024w
+  " type="image/jpeg" sizes="(max-width: 768px) 100vw, 50vw">
+
+  <img src="image-1024.jpg" alt="descriptive text" loading="lazy">
+</picture>
 ```
 
-**Method B: SVG Generation**
-```svg
-<!-- Scalable vector graphics for logos, icons, illustrations -->
-<svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-  <!-- Vector elements, text, shapes -->
-</svg>
+### Mobile Image Optimization
+- Serve smaller dimensions on mobile (max 100vw width)
+- Use 1x for mobile, 2x for retina displays
+- Preload hero images, lazy-load below-fold images
+- Optimize for slow 4G: < 50ms load time goal
+
+## Social Media Design Specifications
+
+### Instagram
+- **Post (Feed)**: 1080×1080px, 1:1 ratio, RGB, 72dpi
+- **Story**: 1080×1920px, 9:16 ratio, RGB, 72dpi
+- **Reel/Video**: 1080×1920px, 9:16 ratio, MP4/MOV, max 90 minutes
+- **IGTV**: 1080×1920px (portrait) or 1920×1080px (landscape)
+- **Carousel**: Multiple 1080×1080px images, 10 max per carousel
+
+**Design Rules for IG:**
+- Text should be readable at 30% display size
+- Leave 50px safe zone from edges (stories)
+- Use high contrast colors (avoid thin text on photos)
+- Include logo in corner or bottom (for brand accounts)
+
+### Facebook
+- **Post Image**: 1200×630px, 1.91:1 ratio, under 4MB
+- **Video Cover**: 1200×630px (recommended, min 600×315px)
+- **Page Cover**: 820×312px (desktop), 640×360px (mobile)
+- **Carousel**: 1200×628px per card
+- **Collection Cover**: 1200×628px, 1.91:1 ratio
+
+**Design Rules for Facebook:**
+- Test copy and images at 20% text area (Facebook limits text overlays)
+- Ensure readability at thumbnail size (100×100px)
+- Include CTA button placement in design mockup
+
+### LinkedIn
+- **Post Image**: 1200×627px, 1.91:1 ratio, PNG/JPG, under 5MB
+- **Header Background**: 1500×500px
+- **Carousel**: 1200×627px per slide
+- **Video**: 1200×627px minimum, MP4/MOV
+
+**Design Rules for LinkedIn:**
+- Professional tone in visuals
+- Include data/statistics for credibility
+- Logo should be subtle (top-right or bottom-left)
+- Use brand colors but maintain business formality
+
+### Twitter/X
+- **Post Image**: 1600×900px, 16:9 ratio, max 5MB
+- **Header**: 1500×500px
+- **GIF**: Max 15MB, any size (16:9 recommended)
+- **Video**: Max 15MB, 1200×675px minimum
+
+**Design Rules for X:**
+- Assumes 280-character text (always pair with image)
+- Contrast is critical (high-contrast designs perform best)
+- Avoid thin text, use bold for headlines
+
+### YouTube
+- **Thumbnail**: 1280×720px, 16:9 ratio, max 2MB
+- **Channel Banner**: 2560×1440px (min 2048×1152px)
+- **Video Intro**: 1920×1080px, 16:9 ratio
+- **Playlist Cover**: 1280×720px
+
+**Design Rules for YouTube:**
+- Thumbnail should be clickable at 168×94px (smallest display size)
+- Use bold colors and large text (30pt minimum)
+- Avoid extreme crops that cut off faces/important elements
+- Include strong CTA (play button, subscribe highlight)
+
+### TikTok
+- **Video**: 1080×1920px, 9:16 ratio, max 287.6MB
+- **Cover Image**: 480×854px
+- **Ad Creative**: 1080×1920px full-screen
+
+**Design Rules for TikTok:**
+- Design for mobile vertical orientation (90% of TikTok users)
+- Assume audio-off (include captions/text for key messages)
+- Use trending music/sounds visually
+
+### Pinterest
+- **Pin**: 1000×1500px (recommended), 2:3 ratio, max 5MB
+- **Story Pin**: 1080×1920px, 9:16 ratio, vertical
+- **Board Cover**: 222×150px minimum
+
+**Design Rules for Pinterest:**
+- Vertical pins get 40% more impressions
+- Use text overlay (limit to 20 words)
+- Ensure brand logo is visible but not dominant
+
+## Email Design Patterns
+
+### Responsive Email Structure (600px Width)
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #333333; }
+    img { max-width: 100%; height: auto; }
+    .container { max-width: 600px; margin: 0 auto; }
+    .mobile { display: none; }
+    @media (max-width: 600px) {
+      .container { width: 100% !important; }
+      .mobile { display: block !important; }
+      .desktop { display: none !important; }
+      table { width: 100% !important; }
+      img { width: 100% !important; height: auto !important; }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #ffffff;">
+  <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse;">
+    <!-- Header Row -->
+    <tr>
+      <td style="padding: 20px; text-align: center;">
+        <img src="logo.png" alt="Brand Logo" width="180" height="auto" style="display: block;">
+      </td>
+    </tr>
+    <!-- Hero Image -->
+    <tr>
+      <td style="padding: 0;">
+        <img src="hero.jpg" alt="Hero image" width="600" height="300" style="display: block; width: 100%;">
+      </td>
+    </tr>
+    <!-- Content Section -->
+    <tr>
+      <td style="padding: 30px 20px; font-size: 16px; line-height: 1.6;">
+        <h1 style="font-size: 28px; margin: 0 0 20px 0; color: #0052FF;">Email Headline</h1>
+        <p style="margin: 0 0 15px 0; color: #666666;">Body copy goes here. Keep paragraphs short (2-3 sentences max).</p>
+        <a href="#" style="display: inline-block; padding: 12px 24px; background-color: #0052FF; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 4px;">Call to Action</a>
+      </td>
+    </tr>
+    <!-- Footer -->
+    <tr>
+      <td style="padding: 20px; border-top: 1px solid #cccccc; font-size: 12px; color: #999999; text-align: center;">
+        <p style="margin: 10px 0;">Company Name | Address | Phone</p>
+        <a href="#" style="color: #0052FF; text-decoration: none;">Unsubscribe</a>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
 ```
 
-**Method C: Canva API Integration**
-```
-When Canva MCP is available:
-1. Search existing brand templates
-2. Duplicate and customize
-3. Export in required format
-```
+### Email-Specific Design Rules
+- **Width**: Fixed 600px max (safe zone: 580px content)
+- **Font stacks**: Only web-safe fonts (Arial, Helvetica, Georgia, Times New Roman, Courier New, Trebuchet MS, Verdana)
+- **CSS**: Inline only (no `<style>` tags, use style attributes)
+- **No external scripts**: JavaScript not supported
+- **Image alt text**: Required for accessibility
+- **Dark mode**: Test with dark background (many clients support it now)
+- **Fallback colors**: Always include background-color fallback
 
-**Method D: React/JSX Artifacts**
-```jsx
-// Interactive marketing components
-// Animated graphics with Framer Motion
-// Data-driven charts with Recharts
-```
+### Dark Mode Email Support
+```css
+/* Light mode default */
+body { background-color: #ffffff; color: #333333; }
+a { color: #0052FF; }
 
-### 8. Enterprise Design Patterns
-
-Apply these proven enterprise marketing patterns:
-
-**Pattern: Glass Morphism (Premium SaaS)**
-- Translucent backgrounds with backdrop blur
-- Layered depth for visual hierarchy
-- Gradient borders for modern feel
-- Example: `bg-slate-900/50 backdrop-blur-xl border border-slate-700/50`
-
-**Pattern: Data Visualization (B2B Marketing)**
-- Clean, minimal chart designs with brand colors
-- Grid-based layout for credibility
-- Typography hierarchy for numbers (large primary metric)
-- Source attribution below charts
-
-**Pattern: Hero + Social Proof (Conversion-Focused)**
-- Bold headline (40-60px) with brand primary color
-- Subheading that answers "why" (20-30px, secondary color)
-- 3-5 logo marks or testimonial blocks
-- CTA button with high contrast
-
-**Pattern: Feature Grid (SaaS Product Pages)**
-- 3-4 columns on desktop, 1 on mobile
-- Icon (80x80px) + title (16-18px) + description (14px)
-- Subtle shadows or border accents
-- Consistent spacing (gap: 2rem)
-
-**Pattern: Timeline/Roadmap (Product Marketing)**
-- Vertical line (desktop) or stepped blocks (mobile)
-- Milestone cards with dates, titles, descriptions
-- Alternating left/right layout for visual interest
-- Color coding by status (completed/in-progress/planned)
-
-**Pattern: Comparison Table (Enterprise Sales)**
-- Side-by-side feature comparison
-- Checkmarks for included, empty for excluded
-- Highlight your offering (background tint or border)
-- Row alternation (light/dark) for readability
-
-### 9. Campaign Asset Bundles
-
-When creating campaign assets, generate the COMPLETE set:
-
-```
-Campaign: [Name]
-├── social/
-│   ├── instagram-post-1080x1080.html
-│   ├── instagram-story-1080x1920.html
-│   ├── facebook-post-1200x630.html
-│   ├── twitter-post-1600x900.html
-│   └── linkedin-post-1200x627.html
-├── ads/
-│   ├── display-728x90.html
-│   ├── display-300x250.html
-│   ├── display-160x600.html
-│   └── video-thumbnail-1280x720.html
-├── email/
-│   ├── campaign-email-600w.html
-│   └── mobile-optimized-email.html
-├── landing/
-│   ├── hero-section.html
-│   ├── features-section.html
-│   ├── social-proof-section.html
-│   └── cta-footer-section.html
-└── brand/
-    ├── design-tokens.json
-    ├── campaign-guidelines.md
-    └── accessibility-report.md
+/* Dark mode (supported by many clients) */
+@media (prefers-color-scheme: dark) {
+  body { background-color: #1a1a1a; color: #ffffff; }
+  a { color: #5a9cff; }
+  .text { color: #e0e0e0; }
+  .muted { color: #999999; }
+}
 ```
 
-## Automatic Triggers
+### Email Modules (Reusable Blocks)
+- **Hero Module**: Image + headline + 2-sentence description + CTA (Height: 300-400px)
+- **Feature Module**: Icon (80×80px) + title + description (Height: 150px)
+- **Testimonial Module**: Quote + attribution + photo (Height: 120px)
+- **Social Proof Module**: 3-5 logos in row (Height: 80px)
+- **CTA Section**: Single large button centered (Height: 80px)
+- **Footer Module**: Links + unsubscribe + social icons (Height: 100px)
 
-This skill activates when:
-1. User mentions "create a graphic/banner/post" → Generate marketing visual
-2. Campaign planning detected → Offer complete asset bundle
-3. New product/feature launch → Suggest marketing collateral set
-4. Social media content → Generate platform-optimized graphics
-5. Email creation → Offer professional template design
-6. Presentation slides → Marketing-quality visual design
-7. Brand assets mentioned → Coordinate with brand-identity skill
+## A/B Testing for Design
 
-## Quality Standards
+### Design Elements to Test
+```
+Headlines:      "Act now" vs. "Learn more" vs. "Discover"
+Colors:         Primary CTA color vs. secondary color
+Button Text:    Action verb comparison ("Download" vs. "Get Started")
+Imagery:        Photo vs. illustration vs. no image
+Layout:         Hero-first vs. features-first vs. testimonials-first
+Copy Length:    Short (20 words) vs. medium (50 words) vs. long (100+ words)
+CTA Position:   Top vs. middle vs. bottom vs. sticky
+Contrast:       High-contrast vs. subtle backgrounds
+```
 
-Every marketing graphic MUST:
-- [ ] Follow brand guidelines (colors, fonts, logo)
-- [ ] Be sized correctly for target platform
-- [ ] Have readable text at actual display size
-- [ ] Include proper CTA when applicable
-- [ ] Pass accessibility contrast checks
-- [ ] Be optimized for file size
-- [ ] Include alt text metadata
-- [ ] Work in dark mode where applicable
-- [ ] Be responsive where applicable
-- [ ] Have source files preserved for editing
+### Sample Size Calculations
+- **Traffic**: 1,000-5,000 visitors minimum per variation
+- **Test duration**: Minimum 2 weeks (accounts for day-of-week effects)
+- **Minimum detectable effect**: Aim to detect 10-15% improvement
+- **Statistical significance**: Target 95% confidence (p-value < 0.05)
+- **Multiple variants**: (2^n) × sample size (test max 3 variables simultaneously)
 
-## Integration Map
+### Statistical Significance Formula
+```
+Participants needed per variation = (z² × p(1-p)) / d²
 
-- **brand-identity**: All designs use brand tokens
-- **copywriting**: Headlines and copy from copywriting skill
-- **canvas-design**: Complex illustrations and art
-- **theme-factory**: Consistent theming across assets
-- **pptx**: Marketing deck slides
-- **pdf**: Print-ready exports
-- **seo-optimizer**: OG images and meta visuals
-- **Canva MCP**: Template management and export
-- **Cloudinary MCP**: Asset storage and CDN delivery
+Where:
+z = 1.96 (95% confidence)
+p = baseline conversion rate
+d = minimum detectable difference
+```
 
-## Rules
+### A/B Testing Process
+1. **Hypothesis**: "Changing button color from blue to orange will increase CTR by 12%"
+2. **Primary metric**: Click-through rate, conversion rate, or engagement
+3. **Sample size**: Calculate based on baseline and effect size
+4. **Duration**: Run 2 weeks minimum (avoid external events)
+5. **Analysis**: Check statistical significance before declaring winner
+6. **Document**: Record results for future reference
+7. **Implement**: Roll out winning variant to 100%
 
-1. **ALWAYS brand-first** — No asset without brand guidelines applied
-2. **Platform-native sizing** — Never stretch or crop for wrong dimensions
-3. **Conversion-optimized** — Every design serves a business goal
-4. **Accessibility non-negotiable** — WCAG AA on all text/backgrounds
-5. **Batch create** — When one asset is needed, offer the full set
-6. **Version control** — Track design iterations and A/B variants
-7. **Mobile-first** — Design for smallest screen first, scale up
-8. **Performance** — Optimize file sizes without quality loss
+## Design File Organization Conventions
+
+### Directory Structure for Campaigns
+```
+Campaigns/
+├── 2026_Q1_FeatureLaunch/
+│   ├── 01_brief/
+│   │   ├── Campaign_Brief.pdf
+│   │   ├── Audience_Research.md
+│   │   └── Competitive_Analysis.md
+│   ├── 02_concepts/
+│   │   ├── Concept_A_Hero.psd
+│   │   ├── Concept_A_SocialSet.psd
+│   │   ├── Concept_B_Hero.psd
+│   │   └── Concept_B_SocialSet.psd
+│   ├── 03_approved/
+│   │   ├── 01_Hero_1920x1080.psd
+│   │   ├── 02_Social_Instagram_1080x1080.psd
+│   │   ├── 03_Social_Facebook_1200x630.psd
+│   │   ├── 04_Social_LinkedIn_1200x627.psd
+│   │   ├── 05_Email_Header_600x300.psd
+│   │   └── 06_AdCreative_300x250.psd
+│   ├── 04_exports/
+│   │   ├── Hero_1920x1080_Final.jpg
+│   │   ├── Hero_1920x1080_Final.webp
+│   │   ├── Instagram_1080x1080_Final.jpg
+│   │   ├── Instagram_1080x1080_Final.webp
+│   │   └── [all platform exports]
+│   └── 05_archive/
+│       ├── [rejected concepts]
+│       └── [old versions]
+```
+
+### File Naming Convention
+```
+[AssetType]_[Platform/Context]_[Dimension]_[Version].[extension]
+
+Examples:
+Hero_Web_1920x1080_v2.psd
+SocialPost_Instagram_1080x1080_v3_approved.psd
+EmailHeader_Campaign_600x300_final.jpg
+AdCreative_Display_300x250_v1_highcontrast.psd
+Thumbnail_YouTube_1280x720_v2.png
+```
+
+### Versioning System
+- **v1, v2, v3...**: Early iterations
+- **_approved**: Client/stakeholder approved version
+- **_final**: Ready for production/export
+- **_archive**: Previous version (kept for reference)
+- **_rejected**: Did not proceed to production
+
+## Design System Assets & Exports
+
+### Export Checklist
+For each approved design:
+- [ ] Original source file (.psd, .fig, .sketch)
+- [ ] Web-optimized JPG (75-85% quality)
+- [ ] Web-optimized WebP
+- [ ] High-res PNG (if transparency needed)
+- [ ] Retina @2x version (2x dimensions)
+- [ ] Mobile-optimized version
+- [ ] Thumbnail preview (200×200px)
+- [ ] Design documentation (dimensions, colors, fonts used)
+
+### Hand-off Documentation
+```markdown
+# Asset: Campaign Hero Image
+
+**Dimensions**: 1920×1080px (16:9 landscape)
+**Color Mode**: RGB, sRGB color space
+**File Formats**: JPG (primary), WebP (modern), PNG (transparency)
+
+## Colors Used
+- Background Gradient: #0052FF → #00D4AA
+- Text Color: #FFFFFF
+- CTA Button: #FF6B35
+
+## Fonts Used
+- Heading: Inter, Bold, 48px
+- Body: Inter, Regular, 18px
+
+## Implementation Notes
+- Load JPG by default, offer WebP for modern browsers
+- Lazy-load below fold
+- Use srcset for responsive sizing (max 100vw)
+- Include alt text: "Feature launch hero image"
+
+## Export Settings
+- JPG Quality: 80
+- Optimize for web: Yes
+- Progressive JPEG: Yes
+```
