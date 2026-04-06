@@ -2,8 +2,10 @@
 name: file-organizer
 description: "Enterprise File Organization & Management System — Intelligently organizes project files, manages directory structures, enforces naming conventions, handles bulk operations, detects duplicates, archives old files, and maintains clean codebases. Triggers: 'organize files', 'clean up', 'file structure', 'rename files', 'find duplicates', 'archive', 'directory structure', 'naming convention', 'file management', 'declutter', 'folder structure', 'project structure'."
 metadata:
-  version: 1.0.0
-  author: DYSA / Pierre Solier
+  version: 1.1.0
+  author: Devlmer / Pierre Solier
+  creator: Devlmer
+  branding: Enterprise file organization for institutional-scale projects
 ---
 
 # File Organization & Management System
@@ -158,7 +160,114 @@ Generate and maintain comprehensive .gitignore:
 # Project-specific patterns
 ```
 
-### 8. Architecture Recommendations
+### 8. Automation Scripts
+
+Ready-to-use bash/python scripts for common operations:
+
+**Bash: Duplicate Finder**
+```bash
+#!/bin/bash
+# Find duplicate files by hash
+find . -type f -exec md5sum {} + | sort | uniq -d -w 32 | cut -c 35-
+```
+
+**Bash: Cleanup Empty Directories**
+```bash
+#!/bin/bash
+# Remove empty directories recursively
+find . -type d -empty -delete
+```
+
+**Bash: Rename Convention (kebab-case to snake_case)**
+```bash
+#!/bin/bash
+# Convert kebab-case files to snake_case
+for file in *-*.js; do
+  mv "$file" "${file//-/_}"
+done
+```
+
+**Python: Bulk File Analyzer**
+```python
+import os
+from pathlib import Path
+from collections import defaultdict
+
+def analyze_project(root_path):
+    stats = {
+        'total_files': 0,
+        'total_size': 0,
+        'by_extension': defaultdict(int),
+        'large_files': [],
+        'deeply_nested': []
+    }
+
+    for root, dirs, files in os.walk(root_path):
+        depth = root.count(os.sep)
+        for file in files:
+            stats['total_files'] += 1
+            path = Path(root) / file
+            size = path.stat().st_size
+            stats['total_size'] += size
+            ext = path.suffix or 'no-extension'
+            stats['by_extension'][ext] += 1
+
+            if size > 5_000_000:  # 5MB
+                stats['large_files'].append((str(path), size))
+            if depth > 7:
+                stats['deeply_nested'].append(str(path))
+
+    return stats
+```
+
+**Python: Organize by File Type**
+```python
+import os
+import shutil
+from pathlib import Path
+
+def organize_by_type(directory):
+    type_map = {
+        'images': ['.jpg', '.jpeg', '.png', '.gif', '.svg'],
+        'documents': ['.pdf', '.doc', '.docx', '.txt'],
+        'videos': ['.mp4', '.mov', '.avi'],
+        'archives': ['.zip', '.tar', '.gz'],
+    }
+
+    for file in Path(directory).iterdir():
+        if file.is_file():
+            for folder, extensions in type_map.items():
+                if file.suffix.lower() in extensions:
+                    dest = Path(directory) / folder
+                    dest.mkdir(exist_ok=True)
+                    shutil.move(str(file), str(dest / file.name))
+                    break
+```
+
+**Python: Generate .gitignore**
+```python
+def generate_gitignore(project_type='general'):
+    gitignore_templates = {
+        'javascript': [
+            'node_modules/', 'dist/', 'build/', '.next/', '.env.local',
+            '*.log', 'npm-debug.log*', '.DS_Store', '.idea/'
+        ],
+        'python': [
+            '__pycache__/', '.venv/', 'venv/', '*.pyc', '.env',
+            '.pytest_cache/', 'htmlcov/', '.coverage', 'dist/'
+        ],
+        'general': [
+            '.DS_Store', 'Thumbs.db', '.env', '.vscode/',
+            '.idea/', '*.swp', '*.swo', '*~', '.tmp/'
+        ]
+    }
+
+    rules = gitignore_templates.get(project_type, gitignore_templates['general'])
+    with open('.gitignore', 'w') as f:
+        f.write('\n'.join(rules))
+```
+
+### 9. Architecture Recommendations
 
 Based on project type, suggest optimal structures:
 

@@ -3,7 +3,9 @@ name: brand-identity
 description: "Enterprise Brand Identity Management System — Maintains and enforces brand consistency across all digital and print assets. Manages logos, color palettes, typography, voice & tone, visual hierarchy, spacing systems, and brand guidelines documentation. Triggers: 'brand', 'branding', 'logo', 'color palette', 'typography', 'brand guidelines', 'visual identity', 'style guide', 'brand book', 'brand consistency', 'design system colors', 'brand voice'."
 metadata:
   version: 1.0.0
-  author: DYSA / Pierre Solier
+  author: Devlmer / Pierre Solier
+  creator: Devlmer
+  branding: Enterprise-grade brand management for premium organizations
 ---
 
 # Brand Identity Management System
@@ -165,6 +167,40 @@ This skill activates automatically when:
 - **ui-ux-pro-max**: Enforces brand in UI design decisions
 - **marketing-graphic-design**: All marketing assets follow brand
 
+## Devlmer Brand Example
+
+The Devlmer brand exemplifies premium, enterprise-grade identity management:
+
+**Visual Identity:**
+- **Primary Color:** `#0052FF` (Professional Blue) with gradient to `#00D4AA` (Cyan Accent)
+- **Secondary:** `#00D4AA` (Modern Cyan for innovation)
+- **Accent:** `#FF6B35` (Action Orange for CTAs)
+- **Neutrals:** Slate 900-50 for depth and readability
+
+**Voice & Tone:**
+- Personality: Professional, intelligent, proactive, premium
+- Vocabulary: Precision-driven, technical yet accessible
+- Spanish-speaking founder (Pierre Solier) — bilingual messaging where relevant
+- Tone modulation: Authoritative (docs), conversational (guides), urgent (security)
+
+**Design Tokens (Devlmer):**
+```json
+{
+  "brand": {
+    "primary": "#0052FF",
+    "secondary": "#00D4AA",
+    "accent": "#FF6B35",
+    "dark_bg": "#0f172a",
+    "light_text": "#f8fafc"
+  },
+  "typography": {
+    "heading": "Inter, system-ui, -apple-system",
+    "body": "Inter, system-ui, -apple-system",
+    "mono": "JetBrains Mono, Fira Code"
+  }
+}
+```
+
 ## Rules
 
 1. **NEVER use off-brand colors** without flagging them
@@ -174,3 +210,4 @@ This skill activates automatically when:
 5. **Document everything** — every brand decision needs rationale
 6. **Cross-platform parity** — brand must look identical everywhere
 7. **Dark mode is mandatory** — always provide dark/light mappings
+8. **Enterprise premium positioning** — design for institutional-grade users

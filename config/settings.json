@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '🧠 DYSA ECOSYSTEM ENGINE v3.0 — Scanning project...' && if [ -f .claude/PROJECT_PROFILE.json ]; then echo '✅ Project profile found:' && python3 -c \"import json; p=json.load(open('.claude/PROJECT_PROFILE.json')); print(f'  Domain: {p.get(\\\"blueprint\\\",p.get(\\\"domain\\\",\\\"unknown\\\"))} | Skills: {len(p.get(\\\"activated_skills\\\",[]))} | MCPs: {len(p.get(\\\"installed_mcps\\\",[]))} | Agents: {len(p.get(\\\"agents\\\",[]))}')\" 2>/dev/null || echo '⚠️ Profile exists but could not be read'; else echo '🆕 No project profile found — FULL ECOSYSTEM SCAN REQUIRED'; echo '   → Read .claude/skills/project-intelligence/SKILL.md and run detection pipeline'; fi"
+            "command": "echo '🧠 DEVLMER ECOSYSTEM ENGINE v3.0 — Scanning project...' && if [ -f .claude/PROJECT_PROFILE.json ]; then echo '✅ Project profile found:' && python3 -c \"import json; p=json.load(open('.claude/PROJECT_PROFILE.json')); print(f'  Domain: {p.get(\\\"blueprint\\\",p.get(\\\"domain\\\",\\\"unknown\\\"))} | Skills: {len(p.get(\\\"activated_skills\\\",[]))} | MCPs: {len(p.get(\\\"installed_mcps\\\",[]))} | Agents: {len(p.get(\\\"agents\\\",[]))}')\" 2>/dev/null || echo '⚠️ Profile exists but could not be read'; else echo '🆕 No project profile found — FULL ECOSYSTEM SCAN REQUIRED'; echo '   → Read .claude/skills/project-intelligence/SKILL.md and run detection pipeline'; fi"
           }
         ]
       }

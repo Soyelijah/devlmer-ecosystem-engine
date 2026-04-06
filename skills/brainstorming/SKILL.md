@@ -1,6 +1,11 @@
 ---
 name: brainstorming
 description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
+metadata:
+  version: 1.1.0
+  author: Devlmer / Pierre Solier
+  creator: Devlmer
+  branding: Structured creative ideation for institutional-grade solutions
 ---
 
 # Brainstorming Ideas Into Designs
@@ -44,11 +49,77 @@ Start by understanding the current project context, then ask questions one at a 
 - Use superpowers:using-git-worktrees to create isolated workspace
 - Use superpowers:writing-plans to create detailed implementation plan
 
+## Understanding the Requirement
+
+When exploring ideas, systematically investigate these dimensions:
+
+**User Intent & Value**
+- What problem does this solve?
+- Who is the primary user?
+- What's the measurable success metric?
+- What happens if we don't build this?
+
+**Scope & Constraints**
+- What's in scope? What's explicitly out?
+- Do we have time/resource constraints?
+- Are there technical limitations?
+- Are there compliance/security requirements?
+
+**Alternatives & Trade-offs**
+- What's the simplest solution?
+- What's the most extensible solution?
+- What's the fastest to ship solution?
+- What are the pros/cons of each?
+
+**Validation & Testing**
+- How will we know if it works?
+- What edge cases matter?
+- Who will we test with?
+- What metrics do we measure?
+
+## Design Template
+
+When presenting the design, include these sections:
+
+```markdown
+# Feature Design: [Name]
+
+## Overview
+- Problem statement
+- Success criteria
+- Key assumptions
+
+## Architecture
+- System diagram or flow
+- Key components
+- Data models
+- Integration points
+
+## Implementation Strategy
+- Phased approach (MVP → V1 → V2)
+- Dependencies
+- Risk mitigation
+- Testing plan
+
+## User Experience
+- User flows/wireframes
+- Key interactions
+- Edge cases handled
+- Accessibility considerations
+
+## Success Metrics
+- KPIs to track
+- Baseline vs. goal
+- Measurement method
+```
+
 ## Key Principles
 
 - **One question at a time** - Don't overwhelm with multiple questions
 - **Multiple choice preferred** - Easier to answer than open-ended when possible
 - **YAGNI ruthlessly** - Remove unnecessary features from all designs
-- **Explore alternatives** - Always propose 2-3 approaches before settling
+- **Explore alternatives** - Always propose 2-3 approaches before settling (recommend primary option)
 - **Incremental validation** - Present design in sections, validate each
 - **Be flexible** - Go back and clarify when something doesn't make sense
+- **Think like a product manager** - Focus on outcomes, not features
+- **Document decisions** - Record the "why" not just the "what"

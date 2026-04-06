@@ -1,6 +1,11 @@
 ---
-name: Git Commit Helper
-description: Generate descriptive commit messages by analyzing git diffs. Use when the user asks for help writing commit messages or reviewing staged changes.
+name: git-commit-helper
+description: Generate descriptive, semantic commit messages by analyzing git diffs. Enforces conventional commits format, suggests proper scope, identifies breaking changes, and ensures commit quality. Use when the user asks for help writing commit messages or reviewing staged changes.
+metadata:
+  version: 1.1.0
+  author: Devlmer / Pierre Solier
+  creator: Devlmer
+  branding: Enterprise-grade commit message generation for professional teams
 hooks:
   PostToolUse:
     - matcher: "Bash"
@@ -198,6 +203,79 @@ git commit --amend --no-edit
 4. **Keep it focused** - Don't mix unrelated changes
 5. **Write for humans** - Future you will read this
 
+## Smart Commit Analysis Protocol
+
+When analyzing diffs, follow this workflow:
+
+```
+STEP 1: Scan the changes
+├── What files changed?
+├── What's the pattern? (mostly additions? refactoring? deletion?)
+└── Is this breaking or additive?
+
+STEP 2: Determine type
+├── Features added? → feat
+├── Bugs fixed? → fix
+├── Refactoring without behavior change? → refactor
+├── Tests added/modified? → test
+├── Dependencies/config? → chore
+├── Documentation? → docs
+└── Code formatting? → style
+
+STEP 3: Identify scope (1-2 words max)
+├── Domain: auth, api, ui, db, build
+├── Component: Button, Auth Service, Payment Form
+└── Module: middleware, schema, store
+
+STEP 4: Write impactful summary (<50 chars)
+├── Starts with lowercase
+├── Uses imperative mood (add, remove, update)
+├── Shows impact clearly
+├── Example: "add JWT refresh token rotation"
+
+STEP 5: Generate detailed body
+├── What changed and why
+├── Implementation approach
+├── Testing performed
+├── Related tickets/PRs
+```
+
+## Scope Decision Tree
+
+```
+Is it authentication-related?
+├── YES → scope: auth
+└── NO → Check next...
+
+Is it a database change?
+├── YES → scope: db
+└── NO → Check next...
+
+Is it API-related?
+├── YES → scope: api
+└── NO → Check next...
+
+Is it UI/frontend?
+├── YES → scope: ui
+└── NO → Check next...
+
+Is it infrastructure/build?
+├── YES → scope: build
+└── NO → scope: [feature-name]
+```
+
+## Commit Message Quality Score
+
+Evaluate commits using this rubric (aim for 90%+):
+
+| Criterion | Points | Check |
+|-----------|--------|-------|
+| Follows conventional commits | 30% | Type(scope): message |
+| Summary is clear & concise | 20% | Under 50 chars, explains change |
+| Body explains WHY | 25% | Not just implementation details |
+| Formatted for readability | 15% | Proper wrapping, spacing |
+| Links to issues/PRs | 10% | References included when relevant |
+
 ## Commit message checklist
 
 - [ ] Type is appropriate (feat/fix/docs/etc.)
@@ -207,3 +285,6 @@ git commit --amend --no-edit
 - [ ] Body explains WHY not just WHAT
 - [ ] Breaking changes are clearly marked
 - [ ] Related issue numbers are included
+- [ ] No vague language ("update", "fix stuff")
+- [ ] Formatted for readability (wrapped at 72 chars)
+- [ ] Ready for git log history review

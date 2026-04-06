@@ -1,0 +1,4051 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devlmer Ecosystem Engine v3.0 - Intelligent Ecosystems for Every Project</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0052FF;
+            --primary-cyan: #00D4AA;
+            --dark-bg: #0a0e27;
+            --dark-secondary: #111933;
+            --dark-tertiary: #1a1f3a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --border-light: rgba(255, 255, 255, 0.1);
+            --border-lighter: rgba(255, 255, 255, 0.05);
+            --glow-blue: rgba(0, 82, 255, 0.2);
+            --glow-cyan: rgba(0, 212, 170, 0.2);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--dark-bg);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #0f1229 50%, var(--dark-secondary) 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ==================== UTILITIES ==================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+            contain: layout style;
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 60px;
+        }
+
+        /* ==================== HEADER & NAV ==================== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 14, 39, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-lighter);
+            padding: 15px 0;
+            will-change: auto;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-cyan);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-cyan));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .cta-nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .cta-nav {
+                flex-direction: column;
+            }
+        }
+
+        /* ==================== HERO SECTION ==================== */
+        .hero {
+            padding: 200px 0 100px;
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.05) 0%, rgba(0, 212, 170, 0.03) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .install-command {
+            background: rgba(0, 82, 255, 0.1);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 40px auto;
+            max-width: 600px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.95rem;
+            color: var(--primary-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .install-command:hover {
+            background: rgba(0, 82, 255, 0.15);
+            border-color: var(--primary-cyan);
+            box-shadow: 0 0 30px var(--glow-blue);
+        }
+
+        .install-command-text {
+            flex: 1;
+        }
+
+        .copy-btn {
+            background: var(--primary-blue);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-cyan);
+            box-shadow: 0 0 20px var(--glow-cyan);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.6s backwards;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), #003d99);
+            color: white;
+            box-shadow: 0 10px 40px rgba(0, 82, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(0, 82, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-cyan);
+            border: 1.5px solid var(--primary-cyan);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 212, 170, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px var(--glow-cyan);
+        }
+
+        /* ==================== INSTALL WIZARD MODAL ==================== */
+        .wizard-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+        }
+
+        .wizard-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .wizard-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(5, 7, 20, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+
+        .wizard-container {
+            position: relative;
+            width: 95%;
+            max-width: 780px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: linear-gradient(165deg, rgba(17, 25, 51, 0.98), rgba(10, 14, 39, 0.98));
+            border: 1px solid rgba(0, 212, 170, 0.15);
+            border-radius: 20px;
+            box-shadow:
+                0 0 80px rgba(0, 82, 255, 0.15),
+                0 0 160px rgba(0, 212, 170, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transform: translateY(30px) scale(0.96);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .wizard-overlay.active .wizard-container {
+            transform: translateY(0) scale(1);
+        }
+
+        .wizard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 32px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .wizard-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .wizard-header-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 20px rgba(0, 82, 255, 0.3);
+        }
+
+        .wizard-header h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .wizard-header p {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .wizard-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.25s;
+        }
+
+        .wizard-close:hover {
+            background: rgba(255, 60, 60, 0.15);
+            border-color: rgba(255, 60, 60, 0.3);
+            color: #ff6b6b;
+        }
+
+        /* Progress bar */
+        .wizard-progress {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            padding: 0 32px;
+            margin: 24px 0 8px;
+        }
+
+        .wizard-step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .wizard-step-dot.active {
+            border-color: var(--primary-cyan);
+            background: rgba(0, 212, 170, 0.15);
+            color: var(--primary-cyan);
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.2);
+        }
+
+        .wizard-step-dot.completed {
+            border-color: var(--primary-cyan);
+            background: var(--primary-cyan);
+            color: var(--dark-bg);
+        }
+
+        .wizard-step-line {
+            flex: 1;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.08);
+            transition: background 0.4s;
+        }
+
+        .wizard-step-line.completed {
+            background: linear-gradient(90deg, var(--primary-cyan), var(--primary-blue));
+        }
+
+        .wizard-step-labels {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 24px 0;
+        }
+
+        .wizard-step-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.25);
+            text-align: center;
+            width: 80px;
+            transition: color 0.3s;
+        }
+
+        .wizard-step-label.active {
+            color: var(--primary-cyan);
+        }
+
+        /* Step content */
+        .wizard-body {
+            padding: 28px 32px 32px;
+            min-height: 320px;
+            position: relative;
+        }
+
+        .wizard-step-content {
+            display: none;
+            animation: wizardFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .wizard-step-content.active {
+            display: block;
+        }
+
+        @keyframes wizardFadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .wizard-step-content h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .wizard-step-content .step-desc {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* OS selector cards */
+        .os-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .os-card {
+            padding: 20px 16px;
+            border-radius: 14px;
+            border: 1.5px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .os-card:hover {
+            border-color: rgba(0, 212, 170, 0.25);
+            background: rgba(0, 212, 170, 0.04);
+            transform: translateY(-2px);
+        }
+
+        .os-card.selected {
+            border-color: var(--primary-cyan);
+            background: rgba(0, 212, 170, 0.08);
+            box-shadow: 0 0 30px rgba(0, 212, 170, 0.1);
+        }
+
+        .os-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .os-card .os-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .os-card .os-detail {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Path section */
+        .path-section {
+            margin-top: 20px;
+            padding: 18px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .path-section-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .path-section-label i {
+            color: var(--primary-cyan);
+        }
+
+        .path-input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .path-input-wrapper {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .path-input-icon {
+            position: absolute;
+            left: 14px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.8rem;
+            pointer-events: none;
+            transition: color 0.3s;
+        }
+
+        .path-input-wrapper:focus-within .path-input-icon {
+            color: var(--primary-cyan);
+        }
+
+        .path-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 12px 16px 12px 40px;
+            color: var(--primary-cyan);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .path-input:focus {
+            border-color: var(--primary-cyan);
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.1);
+        }
+
+        .path-input::placeholder {
+            color: rgba(255, 255, 255, 0.18);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+        }
+
+        .path-browse-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.2), rgba(0, 212, 170, 0.15));
+            border: 1.5px solid rgba(0, 212, 170, 0.25);
+            border-radius: 10px;
+            color: var(--primary-cyan);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .path-browse-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.3), rgba(0, 212, 170, 0.25));
+            border-color: var(--primary-cyan);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0, 212, 170, 0.15);
+        }
+
+        .path-browse-btn:active {
+            transform: translateY(0);
+        }
+
+        .path-browse-btn .fa-check {
+            color: #28c840;
+        }
+
+        /* Suggestions */
+        .path-suggestions {
+            margin-top: 14px;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .path-suggestions.visible {
+            opacity: 1;
+            max-height: 200px;
+        }
+
+        .path-suggestions-label {
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .path-suggestions-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .path-chip {
+            padding: 6px 14px;
+            background: rgba(0, 82, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .path-chip:hover {
+            background: rgba(0, 212, 170, 0.1);
+            border-color: rgba(0, 212, 170, 0.3);
+            color: var(--primary-cyan);
+        }
+
+        .path-chip i {
+            font-size: 0.65rem;
+            opacity: 0.6;
+        }
+
+        /* Method cards */
+        .method-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .method-card {
+            padding: 24px 20px;
+            border-radius: 14px;
+            border: 1.5px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .method-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.05), rgba(0, 212, 170, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .method-card:hover::before { opacity: 1; }
+
+        .method-card:hover {
+            border-color: rgba(0, 212, 170, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .method-card.selected {
+            border-color: var(--primary-cyan);
+            background: rgba(0, 212, 170, 0.06);
+            box-shadow: 0 0 30px rgba(0, 212, 170, 0.1);
+        }
+
+        .method-card .method-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .method-card .method-badge.recommended {
+            background: rgba(0, 212, 170, 0.15);
+            color: var(--primary-cyan);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+        }
+
+        .method-card .method-badge.alt {
+            background: rgba(0, 82, 255, 0.15);
+            color: #6b9fff;
+            border: 1px solid rgba(0, 82, 255, 0.3);
+        }
+
+        .method-card .method-icon {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .method-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .method-card p {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Terminal / CLI block */
+        .terminal-block {
+            background: #0d1117;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 7px;
+        }
+
+        .terminal-dots span {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+        }
+
+        .terminal-dots span:nth-child(1) { background: #ff5f57; }
+        .terminal-dots span:nth-child(2) { background: #febc2e; }
+        .terminal-dots span:nth-child(3) { background: #28c840; }
+
+        .terminal-title {
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.35);
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .terminal-copy-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 6px 14px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .terminal-copy-btn:hover {
+            background: rgba(0, 212, 170, 0.15);
+            border-color: var(--primary-cyan);
+            color: var(--primary-cyan);
+        }
+
+        .terminal-copy-btn.copied {
+            background: rgba(0, 212, 170, 0.2);
+            border-color: var(--primary-cyan);
+            color: var(--primary-cyan);
+        }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: #e6edf3;
+            overflow-x: auto;
+        }
+
+        .terminal-body .line {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transform: translateY(5px);
+            animation: terminalLineIn 0.3s ease forwards;
+        }
+
+        .terminal-body .line .prompt {
+            color: var(--primary-cyan);
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .terminal-body .line .cmd {
+            color: #e6edf3;
+            word-break: break-all;
+        }
+
+        .terminal-body .line .comment {
+            color: #6a737d;
+        }
+
+        .terminal-body .line .flag {
+            color: #f97583;
+        }
+
+        .terminal-body .line .path-val {
+            color: #79c0ff;
+        }
+
+        .terminal-body .line .url-val {
+            color: #a5d6ff;
+            text-decoration: underline;
+            text-decoration-color: rgba(165, 214, 255, 0.3);
+        }
+
+        @keyframes terminalLineIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Execution tabs */
+        .exec-tabs {
+            display: flex;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 18px;
+        }
+
+        .exec-tab {
+            flex: 1;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .exec-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .exec-tab.active {
+            background: rgba(0, 212, 170, 0.12);
+            color: var(--primary-cyan);
+            box-shadow: 0 2px 10px rgba(0, 212, 170, 0.1);
+        }
+
+        .exec-panel {
+            display: none;
+            animation: wizardFadeIn 0.35s ease;
+        }
+
+        .exec-panel.active {
+            display: block;
+        }
+
+        /* Terminal selector */
+        .terminal-select-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .terminal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .terminal-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 10px;
+            border-radius: 12px;
+            border: 1.5px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .terminal-option:hover {
+            border-color: rgba(0, 212, 170, 0.2);
+            background: rgba(0, 212, 170, 0.03);
+            transform: translateY(-2px);
+        }
+
+        .terminal-option.selected {
+            border-color: var(--primary-cyan);
+            background: rgba(0, 212, 170, 0.08);
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.1);
+        }
+
+        .terminal-option .term-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .terminal-option .term-name {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        /* One-liner section */
+        .oneliner-block {
+            animation: wizardFadeIn 0.4s ease;
+        }
+
+        .oneliner-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .oneliner-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.15), rgba(0, 212, 170, 0.1));
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--primary-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .oneliner-hint {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .oneliner-hint kbd {
+            display: inline-block;
+            padding: 2px 7px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 5px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .oneliner-code {
+            background: #0d1117;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 18px 20px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            color: #e6edf3;
+            overflow-x: auto;
+            margin-bottom: 14px;
+            word-break: break-all;
+        }
+
+        .oneliner-code .ol-comment { color: #6a737d; }
+        .oneliner-code .ol-cmd { color: #e6edf3; }
+        .oneliner-code .ol-url { color: #a5d6ff; }
+        .oneliner-code .ol-path { color: #79c0ff; }
+        .oneliner-code .ol-flag { color: #f97583; }
+        .oneliner-code .ol-prompt { color: var(--primary-cyan); user-select: none; }
+
+        .oneliner-steps {
+            display: flex;
+            gap: 0;
+            margin-top: 18px;
+        }
+
+        .oneliner-step {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 14px 8px;
+            position: relative;
+        }
+
+        .oneliner-step::after {
+            content: '';
+            position: absolute;
+            top: 24px;
+            right: -10%;
+            width: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-cyan), transparent);
+        }
+
+        .oneliner-step:last-child::after { display: none; }
+
+        .oneliner-step .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(0, 212, 170, 0.12);
+            border: 1.5px solid rgba(0, 212, 170, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--primary-cyan);
+            margin-bottom: 8px;
+        }
+
+        .oneliner-step .step-text {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .oneliner-step .step-text strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        @media (max-width: 640px) {
+            .terminal-grid { grid-template-columns: repeat(3, 1fr); }
+            .oneliner-steps { flex-direction: column; gap: 6px; }
+            .oneliner-step::after { display: none; }
+            .oneliner-step { flex-direction: row; gap: 10px; text-align: left; padding: 8px; }
+            .oneliner-hint { display: none; }
+        }
+
+        .exec-main-btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-blue), #003d99);
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 6px 24px rgba(0, 82, 255, 0.3);
+        }
+
+        .exec-main-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 36px rgba(0, 82, 255, 0.4);
+        }
+
+        .exec-main-btn:active {
+            transform: translateY(0);
+        }
+
+        .exec-main-btn.downloaded {
+            background: linear-gradient(135deg, #28c840, #1fa032);
+            box-shadow: 0 6px 24px rgba(40, 200, 64, 0.3);
+        }
+
+        .exec-note {
+            text-align: center;
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .exec-note i {
+            color: rgba(0, 212, 170, 0.5);
+        }
+
+        /* xterm simulation */
+        .xterm-block .terminal-header {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .xterm-body {
+            background: #0a0a0a;
+            min-height: 260px;
+            max-height: 300px;
+            padding: 16px 18px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            color: #c9d1d9;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .xterm-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .xterm-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .xterm-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+        }
+
+        .xterm-line {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .xterm-line .xt-prompt { color: #58a6ff; }
+        .xterm-line .xt-cmd { color: #e6edf3; }
+        .xterm-line .xt-success { color: #3fb950; }
+        .xterm-line .xt-warning { color: #d29922; }
+        .xterm-line .xt-error { color: #f85149; }
+        .xterm-line .xt-info { color: #8b949e; }
+        .xterm-line .xt-cyan { color: var(--primary-cyan); }
+        .xterm-line .xt-bold { font-weight: 700; }
+        .xterm-line .xt-dim { opacity: 0.5; }
+
+        .xterm-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background: var(--primary-cyan);
+            vertical-align: text-bottom;
+            animation: xtermBlink 1s step-end infinite;
+        }
+
+        @keyframes xtermBlink {
+            50% { opacity: 0; }
+        }
+
+        .xterm-progress-bar {
+            display: inline-block;
+            background: rgba(0, 212, 170, 0.15);
+            border-radius: 3px;
+            overflow: hidden;
+            width: 200px;
+            height: 10px;
+            vertical-align: middle;
+            margin: 0 8px;
+        }
+
+        .xterm-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-cyan));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .xterm-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        @media (max-width: 640px) {
+            .exec-tab { font-size: 0.72rem; padding: 8px 8px; }
+            .exec-tab i { display: none; }
+            .auto-exec-card { flex-direction: column; gap: 14px; }
+        }
+
+        /* Checklist */
+        .install-checklist {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 20px;
+            margin-top: 20px;
+            padding: 18px 20px;
+            background: rgba(0, 212, 170, 0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 170, 0.1);
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 4px 0;
+        }
+
+        .checklist-item i {
+            color: var(--primary-cyan);
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        /* Wizard footer / navigation */
+        .wizard-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 32px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .wizard-btn {
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wizard-btn-back {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .wizard-btn-back:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+        }
+
+        .wizard-btn-next {
+            background: linear-gradient(135deg, var(--primary-blue), #003d99);
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 82, 255, 0.25);
+        }
+
+        .wizard-btn-next:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px rgba(0, 82, 255, 0.35);
+        }
+
+        .wizard-btn-next:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .wizard-btn-copy-final {
+            background: linear-gradient(135deg, var(--primary-cyan), #00a888);
+            color: var(--dark-bg);
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
+            font-weight: 700;
+        }
+
+        .wizard-btn-copy-final:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px rgba(0, 212, 170, 0.4);
+        }
+
+        .wizard-btn-copy-final.copied {
+            background: linear-gradient(135deg, #28c840, #1fa032);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .wizard-container { border-radius: 14px; }
+            .wizard-header, .wizard-body, .wizard-footer { padding-left: 20px; padding-right: 20px; }
+            .os-grid { grid-template-columns: 1fr; }
+            .method-grid { grid-template-columns: 1fr; }
+            .install-checklist { grid-template-columns: 1fr; }
+            .wizard-step-labels { display: none; }
+        }
+
+        /* ==================== ANIMATED BACKGROUND ==================== */
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.3;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 20s infinite ease-in-out;
+            contain: strict;
+        }
+
+        .blob-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary-blue);
+            top: -50px;
+            left: -50px;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 250px;
+            height: 250px;
+            background: var(--primary-cyan);
+            bottom: 100px;
+            right: -50px;
+            animation-delay: 5s;
+        }
+
+        .blob-3 {
+            width: 200px;
+            height: 200px;
+            background: var(--primary-blue);
+            bottom: 300px;
+            left: 50px;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(30px, -50px); }
+            66% { transform: translate(-20px, 20px); }
+        }
+
+        /* ==================== WHAT IS DEVLMER ==================== */
+        .what-is {
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.03) 0%, rgba(0, 212, 170, 0.02) 100%);
+        }
+
+        .what-is-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .what-is-text h3 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+        }
+
+        .what-is-text p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+        }
+
+        .what-is-text ul {
+            list-style: none;
+        }
+
+        .what-is-text li {
+            padding: 12px 0;
+            padding-left: 30px;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .what-is-text li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary-cyan);
+            font-weight: 800;
+        }
+
+        .terminal-mockup {
+            background: rgba(10, 20, 50, 0.8);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--primary-cyan);
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 82, 255, 0.2);
+        }
+
+        .terminal-line {
+            margin: 10px 0;
+            opacity: 0;
+            animation: typeIn 0.5s ease-out forwards;
+            color: var(--primary-cyan);
+        }
+
+        .terminal-line:nth-child(1) { animation-delay: 0.2s; }
+        .terminal-line:nth-child(2) { animation-delay: 0.5s; }
+        .terminal-line:nth-child(3) { animation-delay: 0.8s; }
+        .terminal-line:nth-child(4) { animation-delay: 1.1s; }
+        .terminal-line:nth-child(5) { animation-delay: 1.4s; }
+        .terminal-line:nth-child(6) { animation-delay: 1.7s; }
+        .terminal-line:nth-child(7) { animation-delay: 2s; }
+
+        @keyframes typeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .what-is-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        /* ==================== HOW IT WORKS ==================== */
+        .how-works {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.02) 0%, rgba(0, 82, 255, 0.02) 100%);
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(135deg, transparent 30%, rgba(0, 212, 170, 0.1) 50%, transparent 70%);
+            animation: shine 3s infinite;
+            opacity: 0;
+        }
+
+        .step-card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes shine {
+            0% { transform: translate(-100%, -100%); }
+            100% { transform: translate(100%, 100%); }
+        }
+
+        .step-card:hover {
+            border-color: var(--primary-cyan);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 212, 170, 0.15);
+        }
+
+        .step-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .step-number {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .step-card h4 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .step-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* ==================== STATS SECTION ==================== */
+        .stats {
+            background: linear-gradient(135deg, var(--dark-secondary) 0%, var(--dark-tertiary) 100%);
+            border-top: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            counter-increment: stats;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+
+        /* ==================== SKILLS GRID ==================== */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 60px;
+        }
+
+        .skill-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-cyan));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .skill-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .skill-card:hover {
+            border-color: var(--primary-cyan);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 212, 170, 0.2);
+            background: rgba(0, 212, 170, 0.05);
+        }
+
+        .skill-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .skill-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .skill-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ==================== DOMAINS GRID ==================== */
+        .domains-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 60px;
+        }
+
+        .domain-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .domain-card:hover {
+            border-color: var(--primary-blue);
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 82, 255, 0.2);
+        }
+
+        .domain-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            color: var(--primary-cyan);
+        }
+
+        .domain-name {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* ==================== ARCHITECTURE ==================== */
+        .architecture {
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.03) 0%, rgba(0, 212, 170, 0.02) 100%);
+        }
+
+        .arch-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 60px;
+            position: relative;
+        }
+
+        .arch-step {
+            background: rgba(0, 82, 255, 0.1);
+            border: 1px solid var(--primary-blue);
+            border-radius: 12px;
+            padding: 35px 25px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .arch-step:nth-child(odd) {
+            background: rgba(0, 212, 170, 0.1);
+            border-color: var(--primary-cyan);
+        }
+
+        .arch-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .arch-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .arch-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .arch-arrow {
+            position: absolute;
+            top: 50%;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
+            z-index: 1;
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            .arch-arrow {
+                display: block;
+            }
+
+            .arch-arrow:nth-of-type(1) {
+                right: -42px;
+            }
+
+            .arch-arrow:nth-of-type(2) {
+                right: -42px;
+            }
+
+            .arch-arrow:nth-of-type(3) {
+                right: -42px;
+            }
+        }
+
+        /* ==================== INSTALLATION ==================== */
+        .installation {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.02) 0%, rgba(0, 82, 255, 0.02) 100%);
+        }
+
+        .install-steps {
+            margin-top: 60px;
+        }
+
+        .install-step {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 3px solid var(--primary-cyan);
+            border-radius: 8px;
+        }
+
+        .install-step-num {
+            font-size: 0.85rem;
+            color: var(--primary-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .install-step h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .code-block {
+            background: rgba(10, 20, 50, 0.8);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Monaco', monospace;
+            font-size: 0.9rem;
+            color: var(--primary-cyan);
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        /* ==================== EXPERIENCE IN CLAUDE CODE ==================== */
+        .experience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .terminal-card {
+            background: rgba(10, 14, 39, 0.9);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .terminal-card:hover {
+            border-color: var(--primary-cyan);
+            box-shadow: 0 10px 40px rgba(0, 212, 170, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27c93f; }
+
+        .terminal-title {
+            margin-left: 10px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-family: 'Monaco', monospace;
+        }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .terminal-body .cmd { color: var(--primary-cyan); }
+        .terminal-body .comment { color: #6a7a8a; }
+        .terminal-body .success { color: #27c93f; }
+        .terminal-body .highlight { color: #ffbd2e; }
+        .terminal-body .label { color: var(--primary-blue); font-weight: 600; }
+        .terminal-body .dim { color: #4a5a6a; }
+
+        /* ==================== BENEFITS ==================== */
+        .benefits {
+            background: linear-gradient(135deg, var(--dark-secondary) 0%, var(--dark-tertiary) 100%);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .benefit-card:hover {
+            border-color: var(--primary-cyan);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0, 212, 170, 0.15);
+            background: rgba(0, 212, 170, 0.05);
+        }
+
+        .benefit-icon {
+            font-size: 2rem;
+            color: var(--primary-cyan);
+            margin-bottom: 15px;
+        }
+
+        .benefit-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+        }
+
+        .benefit-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* ==================== AUDIENCE ==================== */
+        .audience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .audience-card {
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.1), rgba(0, 212, 170, 0.05));
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 35px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .audience-card:hover {
+            border-color: var(--primary-cyan);
+            transform: scale(1.05);
+            box-shadow: 0 20px 50px rgba(0, 212, 170, 0.2);
+        }
+
+        .audience-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .audience-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .audience-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* ==================== PROBLEMS & SOLUTIONS ==================== */
+        .problems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .problem-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .problem-card:hover {
+            border-color: var(--primary-blue);
+            box-shadow: 0 15px 40px rgba(0, 82, 255, 0.2);
+        }
+
+        .problem-label {
+            font-size: 0.85rem;
+            color: #ff6b6b;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .problem-text {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .solution-label {
+            font-size: 0.85rem;
+            color: var(--primary-cyan);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .solution-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ==================== TECH STACK ==================== */
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 60px;
+        }
+
+        .tech-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            padding: 10px 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tech-badge:hover {
+            border-color: var(--primary-cyan);
+            background: rgba(0, 212, 170, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .tech-badge i {
+            color: var(--primary-cyan);
+        }
+
+        /* ==================== FOOTER ==================== */
+        footer {
+            background: rgba(0, 0, 0, 0.5);
+            border-top: 1px solid var(--border-light);
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        footer p {
+            margin-bottom: 15px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+
+        .footer-links a {
+            color: var(--primary-cyan);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        /* ==================== SCROLL REVEAL ANIMATIONS ==================== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Fallback: si JS tarda, mostrar contenido después de 3s */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .section {
+                padding: 50px 0;
+            }
+
+            .hero {
+                padding: 120px 0 60px;
+            }
+
+            .steps-grid,
+            .skills-grid,
+            .domains-grid,
+            .benefits-grid,
+            .audience-grid,
+            .problems-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .terminal-mockup {
+                font-size: 0.8rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 0.9rem;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        /* ==================== ACCESSIBILITY ==================== */
+        :focus-visible {
+            outline: 2px solid var(--primary-cyan);
+            outline-offset: 2px;
+        }
+
+        /* ==================== SCROLL SMOOTH ==================== */
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== HEADER ==================== -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-bolt"></i> Devlmer
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#qué-es">¿Qué es?</a></li>
+                    <li><a href="#cómo-funciona">Cómo Funciona</a></li>
+                    <li><a href="#skills">Skills</a></li>
+                    <li><a href="#por-qué">Por Qué</a></li>
+                </ul>
+                <div class="cta-nav">
+                    <button class="btn btn-secondary" onclick="openWizard()">
+                        <i class="fas fa-download"></i> Instalar
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero">
+        <div class="animated-bg">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Devlmer Ecosystem Engine</h1>
+                <p class="hero-subtitle">Intelligent ecosystems for every project</p>
+
+                <div class="install-command" onclick="copyToClipboard('bash install.sh /your/project')">
+                    <span class="install-command-text">bash install.sh /your/project</span>
+                    <button class="copy-btn">
+                        <i class="fas fa-copy"></i> Copiar
+                    </button>
+                </div>
+
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="scrollToSection('installation')">
+                        <i class="fas fa-rocket"></i> Instalar Ahora
+                    </button>
+                    <a href="https://github.com/Soyelijah/devlmer-ecosystem-engine" target="_blank" class="btn btn-secondary">
+                        <i class="fab fa-github"></i> Ver en GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ¿QUÉ ES DEVLMER? ==================== -->
+    <section class="section what-is" id="qué-es">
+        <div class="container">
+            <h2 class="section-title">¿Qué es Devlmer?</h2>
+            <p class="section-subtitle">La solución inteligente para ecosistemas profesionales automáticos</p>
+
+            <div class="what-is-content">
+                <div class="what-is-text">
+                    <h3>Automatización Completa del Ecosistema</h3>
+                    <p>Devlmer detecta automáticamente el tipo de proyecto en el que estás trabajando y genera un ecosistema profesional completo en minutos. Olvídate de configuraciones manuales y disfruta de skills, MCPs y agents configurados con mejores prácticas enterprise.</p>
+                    <ul>
+                        <li>Detecta automáticamente tu stack tecnológico</li>
+                        <li>Instala skills profesionales específicas</li>
+                        <li>Instala y configura MCPs específicos para tu stack</li>
+                        <li>Crea agents especializados para tu dominio</li>
+                        <li>Genera blueprints de mejores prácticas</li>
+                        <li>Se conecta con tu cuenta de GitHub</li>
+                    </ul>
+                </div>
+
+                <div class="terminal-mockup">
+                    <div class="terminal-line">$ bash install.sh /mi-proyecto</div>
+                    <div class="terminal-line">[*] Detectando stack...</div>
+                    <div class="terminal-line">[✓] Detectado: React 19 + FastAPI + PostgreSQL</div>
+                    <div class="terminal-line">[*] Instalando skills (21/21)...</div>
+                    <div class="terminal-line">[*] Configurando MCPs...</div>
+                    <div class="terminal-line">[✓] Ecosistema listo en 23s</div>
+                    <div class="terminal-line">[✓] GitHub: autenticado — config respaldada en commit</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CÓMO FUNCIONA ==================== -->
+    <section class="section how-works" id="cómo-funciona">
+        <div class="container">
+            <h2 class="section-title">Cómo Funciona</h2>
+            <p class="section-subtitle">Seis pasos automáticos para un ecosistema profesional completo</p>
+
+            <div class="steps-grid">
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-terminal"></i>
+                    </div>
+                    <h4>Ejecuta el Instalador</h4>
+                    <p>Un único comando <code>bash install.sh</code> que inicia todo el proceso automático de detección e instalación.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-magnifying-glass"></i>
+                    </div>
+                    <h4>Detección Automática</h4>
+                    <p>El fingerprinter analiza tu proyecto y detecta tecnologías, frameworks, dominio empresarial y nivel de madurez.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h4>Instalación Completa</h4>
+                    <p>Se instalan 21+ skills, se configuran MCPs personalizados, se crean agents especializados y slash commands.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h4>Setup Wizard</h4>
+                    <p>Un asistente guiado paso a paso te ayuda a configurar tus API keys con explicaciones claras de cada servicio.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 5</div>
+                    <div class="step-icon">
+                        <i class="fas fa-forward-fast"></i>
+                    </div>
+                    <h4>Slash Commands Listos</h4>
+                    <p>Cada skill se registra como un <code>/comando</code> en Claude Code. Escribe <code>/</code> y elige tu skill al instante.</p>
+                </div>
+
+                <div class="step-card reveal">
+                    <div class="step-number">Paso 6</div>
+                    <div class="step-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h4>¡Todo Visible en Claude Code!</h4>
+                    <p>Tus skills aparecen en <code>/skills</code>, MCPs en <code>/mcp</code>, y plugins en <code>/plugin</code>. Todo integrado nativamente.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ESTADÍSTICAS ==================== -->
+    <section class="section stats" id="estadísticas">
+        <div class="container">
+            <h2 class="section-title">Por Números</h2>
+
+            <div class="stats-grid">
+                <div class="stat-item reveal">
+                    <div class="stat-number">157+</div>
+                    <div class="stat-label">Technology Signatures</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">14</div>
+                    <div class="stat-label">Business Domains</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">21+</div>
+                    <div class="stat-label">Professional Skills</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">21</div>
+                    <div class="stat-label">Slash Commands</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">23+</div>
+                    <div class="stat-label">MCP Servers</div>
+                </div>
+
+                <div class="stat-item reveal">
+                    <div class="stat-number">1</div>
+                    <div class="stat-label">Command Installation</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SKILLS INCLUIDOS ==================== -->
+    <section class="section" id="skills">
+        <div class="container">
+            <h2 class="section-title">21 Skills Profesionales + Slash Commands</h2>
+            <p class="section-subtitle">Cada skill se instala como <code style="color: var(--primary-cyan); background: rgba(0, 212, 170, 0.1); padding: 2px 8px; border-radius: 4px;">/slash-command</code> en Claude Code</p>
+
+            <div class="skills-grid">
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-palette"></i></div>
+                    <h4 class="skill-name">Brand Identity</h4>
+                    <p class="skill-desc">Gestión enterprise de identidad visual — logos, paletas, tipografía, voz de marca y guías de estilo consistentes en todo el proyecto.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-pen-fancy"></i></div>
+                    <h4 class="skill-name">Marketing Design</h4>
+                    <p class="skill-desc">Diseño gráfico profesional — assets para redes sociales, campañas de email, infografías, ad creatives y landing pages.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-search"></i></div>
+                    <h4 class="skill-name">SEO Optimizer</h4>
+                    <p class="skill-desc">Auditorías técnicas SEO, optimización on-page, keyword research, Core Web Vitals, schema markup y generación de sitemaps.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-folder-tree"></i></div>
+                    <h4 class="skill-name">File Organizer</h4>
+                    <p class="skill-desc">Análisis de estructura de proyecto, enforcement de convenciones, reorganización inteligente y detección de duplicados.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-code"></i></div>
+                    <h4 class="skill-name">Senior Frontend</h4>
+                    <p class="skill-desc">Desarrollo React/Next.js, Vue/Nuxt y Angular — scaffolding, state management, SSR/SSG, migración entre frameworks y optimización de performance.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-server"></i></div>
+                    <h4 class="skill-name">Senior Backend</h4>
+                    <p class="skill-desc">Arquitectura backend con Node.js/Express — scaffolding de APIs REST, migrations de base de datos y load testing integrado.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-layer-group"></i></div>
+                    <h4 class="skill-name">Senior Fullstack</h4>
+                    <p class="skill-desc">Stack completo React + Node.js + GraphQL + PostgreSQL — API contract sync, auth flows, real-time patterns y end-to-end type safety.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-building"></i></div>
+                    <h4 class="skill-name">Senior Architect</h4>
+                    <p class="skill-desc">Generación de diagramas de arquitectura, análisis de dependencias y diseño de sistemas escalables con patrones enterprise.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-shield"></i></div>
+                    <h4 class="skill-name">Senior Security</h4>
+                    <p class="skill-desc">Threat modeling, auditoría de seguridad automatizada y penetration testing — con scripts de detección de vulnerabilidades.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-brain"></i></div>
+                    <h4 class="skill-name">Prompt Engineer</h4>
+                    <p class="skill-desc">Optimización de prompts para Claude y GPT-4, diseño de sistemas RAG, arquitectura de agents y evaluación de LLMs en producción.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-binoculars"></i></div>
+                    <h4 class="skill-name">Code Reviewer</h4>
+                    <p class="skill-desc">Análisis de PRs, verificación de calidad de código en TypeScript/Python/Go y generación de reportes de mejora.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+                    <h4 class="skill-name">Skill Creator</h4>
+                    <p class="skill-desc">Creación de skills personalizadas con YAML frontmatter, evals de rendimiento y optimización de triggers para Claude Code.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-flask"></i></div>
+                    <h4 class="skill-name">WebApp Testing</h4>
+                    <p class="skill-desc">Testing automático E2E con Playwright — generación de tests, visual regression, coverage tracking, métricas de performance y auditoría de accesibilidad.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-cube"></i></div>
+                    <h4 class="skill-name">MCP Builder</h4>
+                    <p class="skill-desc">Guía para construir MCP servers con FastMCP (Python) o MCP SDK (Node.js) — diseño de tools, validación y deployment.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-mobile"></i></div>
+                    <h4 class="skill-name">Mobile Design</h4>
+                    <p class="skill-desc">Diseño responsive y experiencia móvil premium — breakpoints, componentes adaptativos, React Native/Flutter, performance budgets y offline-first.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-sparkles"></i></div>
+                    <h4 class="skill-name">UI/UX Pro Max</h4>
+                    <p class="skill-desc">Inteligencia de diseño con 50+ estilos, 21 paletas, 50 font pairings y soporte para 9 stacks — de glassmorphism a brutalism.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-swatchbook"></i></div>
+                    <h4 class="skill-name">Design System</h4>
+                    <p class="skill-desc">Generación de design tokens, documentación de componentes UI y mantenimiento de guías de estilo vivas.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-lightbulb"></i></div>
+                    <h4 class="skill-name">Brainstorming</h4>
+                    <p class="skill-desc">Exploración de intención del usuario, design thinking, evaluación de alternativas y validación de conceptos antes de implementar.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-git-alt"></i></div>
+                    <h4 class="skill-name">Git Commit Helper</h4>
+                    <p class="skill-desc">Análisis de diffs para generar mensajes conventional commits — detecta breaking changes, scope correcto y tipo semántico.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-book-open"></i></div>
+                    <h4 class="skill-name">Copywriting</h4>
+                    <p class="skill-desc">Copy profesional para homepages, landing pages, pricing, feature pages y propuestas de valor orientadas a conversión.</p>
+                </div>
+
+                <div class="skill-card reveal">
+                    <div class="skill-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4 class="skill-name">Project Intelligence</h4>
+                    <p class="skill-desc">Análisis de métricas, KPIs y health del proyecto — fingerprinting, dashboard de salud en 12 ejes, trend tracking y ecosistema automático.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== DOMINIOS SOPORTADOS ==================== -->
+    <section class="section" style="background: linear-gradient(135deg, rgba(0, 212, 170, 0.02) 0%, rgba(0, 82, 255, 0.02) 100%);">
+        <div class="container">
+            <h2 class="section-title">14 Dominios Empresariales Soportados</h2>
+            <p class="section-subtitle">Ecosistema especializado para cada industria</p>
+
+            <div class="domains-grid">
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-university"></i></div>
+                    <div class="domain-name">FinTech</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-comments"></i></div>
+                    <div class="domain-name">ChatBot</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-robot"></i></div>
+                    <div class="domain-name">AI Agent</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="domain-name">E-Commerce</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-cloud"></i></div>
+                    <div class="domain-name">SaaS</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-store"></i></div>
+                    <div class="domain-name">Marketplace</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-newspaper"></i></div>
+                    <div class="domain-name">Content Platform</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-mobile-screen"></i></div>
+                    <div class="domain-name">Mobile App</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-chart-bar"></i></div>
+                    <div class="domain-name">Analytics</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-tools"></i></div>
+                    <div class="domain-name">DevTools</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-microchip"></i></div>
+                    <div class="domain-name">IoT</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-hospital"></i></div>
+                    <div class="domain-name">HealthTech</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-book"></i></div>
+                    <div class="domain-name">EdTech</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-users"></i></div>
+                    <div class="domain-name">HR Platform</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-home"></i></div>
+                    <div class="domain-name">Real Estate</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-plug"></i></div>
+                    <div class="domain-name">API Platform</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-gamepad"></i></div>
+                    <div class="domain-name">Gaming</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-truck"></i></div>
+                    <div class="domain-name">Logistics</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-gavel"></i></div>
+                    <div class="domain-name">Legal Tech</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-megaphone"></i></div>
+                    <div class="domain-name">Marketing</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-cube"></i></div>
+                    <div class="domain-name">Web3</div>
+                </div>
+                <div class="domain-card reveal">
+                    <div class="domain-icon"><i class="fas fa-share-nodes"></i></div>
+                    <div class="domain-name">Social</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ARQUITECTURA ==================== -->
+    <section class="section architecture">
+        <div class="container">
+            <h2 class="section-title">Arquitectura Inteligente</h2>
+            <p class="section-subtitle">Pipeline automático de detección e instalación</p>
+
+            <div class="arch-container">
+                <div class="arch-step reveal">
+                    <div class="arch-icon"><i class="fas fa-fingerprint"></i></div>
+                    <div class="arch-title">Fingerprinter</div>
+                    <div class="arch-desc">Analiza tu proyecto detectando tecnologías y patrones</div>
+                </div>
+                <div class="arch-arrow"></div>
+
+                <div class="arch-step reveal">
+                    <div class="arch-icon"><i class="fas fa-network-wired"></i></div>
+                    <div class="arch-title">Orchestrator</div>
+                    <div class="arch-desc">Genera el perfil del proyecto y selecciona el blueprint óptimo</div>
+                </div>
+                <div class="arch-arrow"></div>
+
+                <div class="arch-step reveal">
+                    <div class="arch-icon"><i class="fas fa-diagram-project"></i></div>
+                    <div class="arch-title">Blueprint Matching</div>
+                    <div class="arch-desc">Instala blueprints optimizados para tu dominio</div>
+                </div>
+                <div class="arch-arrow"></div>
+
+                <div class="arch-step reveal">
+                    <div class="arch-icon"><i class="fas fa-rocket"></i></div>
+                    <div class="arch-title">Auto-Install</div>
+                    <div class="arch-desc">Instala skills, MCPs y agents automáticamente</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== INSTALACIÓN ==================== -->
+    <section class="section installation" id="installation">
+        <div class="container">
+            <h2 class="section-title">Cómo Instalar</h2>
+            <p class="section-subtitle">Flujo completo: de cero a ecosistema profesional en minutos</p>
+
+            <div class="install-steps">
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 1 — Clona el Repositorio</div>
+                    <h4>Descarga el instalador oficial</h4>
+                    <div class="code-block">git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git
+cd devlmer-ecosystem-engine</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 2 — Ejecuta el Instalador</div>
+                    <h4>Inicia la detección automática, instalación de skills, MCPs, agents y slash commands</h4>
+                    <div class="code-block">bash install.sh /path/to/your/project</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 3 — Setup Wizard (API Keys)</div>
+                    <h4>Un asistente interactivo te guía para configurar tus credenciales</h4>
+                    <div class="code-block"># El wizard aparece al final de la instalación automáticamente
+# Modo guiado: te explica cada servicio y dónde encontrar la key
+# Modo esenciales: solo Supabase, Stripe y GitHub (lo mínimo)
+# Puedes correrlo después: bash setup-wizard.sh /tu/proyecto</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 4 — Abre Claude Code</div>
+                    <h4>Tus skills aparecen como <code>/slash-commands</code> nativos</h4>
+                    <div class="code-block">cd /your/project && claude
+# Escribe / para ver todos tus skills instalados:
+#   /senior-architect  /code-reviewer  /copywriting
+#   /senior-security   /mobile-design  /brainstorming ...
+# Escribe /skills para ver la lista completa
+# Escribe /mcp para ver los MCPs conectados
+# Escribe /plugin para ver los plugins activos</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Paso 5 — ¡Desarrolla con Superpoderes!</div>
+                    <h4>Claude ahora tiene contexto profundo de tu proyecto y herramientas especializadas</h4>
+                    <div class="code-block"># Claude lee tu CLAUDE.md y PROJECT_PROFILE.json automáticamente
+# Activa skills según el contexto de lo que estés haciendo
+# Los agents especializados trabajan en paralelo
+# Los MCPs conectan con servicios reales (Supabase, Stripe, GitHub...)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EXPERIENCIA EN CLAUDE CODE ==================== -->
+    <section class="section" id="experiencia" style="background: linear-gradient(135deg, rgba(0, 82, 255, 0.03) 0%, rgba(0, 212, 170, 0.02) 100%);">
+        <div class="container">
+            <h2 class="section-title">Lo Que Ves en Claude Code</h2>
+            <p class="section-subtitle">Así se ve tu ecosistema instalado en Claude Code CLI y Cowork</p>
+
+            <div class="experience-grid">
+                <div class="terminal-card reveal">
+                    <div class="terminal-header">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                        <span class="terminal-title">/skills — 28+ skills disponibles</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="label">Project skills</span> <span class="dim">(.claude/skills)</span></div>
+                        <div><span class="success">brainstorming</span> <span class="dim">· ~53 tokens</span></div>
+                        <div><span class="success">brand-identity</span> <span class="dim">· ~116 tokens</span></div>
+                        <div><span class="success">code-reviewer</span> <span class="dim">· ~81 tokens</span></div>
+                        <div><span class="success">copywriting</span> <span class="dim">· ~173 tokens</span></div>
+                        <div><span class="success">mobile-design</span> <span class="dim">· ~63 tokens</span></div>
+                        <div><span class="success">senior-architect</span> <span class="dim">· ~123 tokens</span></div>
+                        <div><span class="success">senior-backend</span> <span class="dim">· ~101 tokens</span></div>
+                        <div><span class="success">senior-frontend</span> <span class="dim">· ~97 tokens</span></div>
+                        <div><span class="success">senior-security</span> <span class="dim">· ~96 tokens</span></div>
+                        <div><span class="success">senior-prompt-engineer</span> <span class="dim">· ~114 tokens</span></div>
+                        <div><span class="success">ui-ux-pro-max</span> <span class="dim">· ~205 tokens</span></div>
+                        <div><span class="dim">... y 10+ más según tu stack</span></div>
+                        <br>
+                        <div><span class="label">Plugin skills</span> <span class="dim">(plugin)</span></div>
+                        <div><span class="highlight">make-plan</span> <span class="dim">· claude-mem</span></div>
+                        <div><span class="highlight">smart-explore</span> <span class="dim">· claude-mem</span></div>
+                        <div><span class="highlight">frontend-design</span> <span class="dim">· frontend-design</span></div>
+                    </div>
+                </div>
+
+                <div class="terminal-card reveal">
+                    <div class="terminal-header">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                        <span class="terminal-title">/mcp — 15+ servidores conectados</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="label">Project MCPs</span></div>
+                        <div><span class="success">github</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">nano-banana</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <br>
+                        <div><span class="label">Local MCPs</span></div>
+                        <div><span class="success">oracle-oci</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <br>
+                        <div><span class="label">claude.ai</span></div>
+                        <div><span class="success">Asana</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Canva</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Cloudflare</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Gmail</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Google Calendar</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">Notion</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <br>
+                        <div><span class="label">Built-in MCPs</span></div>
+                        <div><span class="success">context7</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">playwright</span> <span class="dim">· <span class="success">&#10004; connected</span></span></div>
+                    </div>
+                </div>
+
+                <div class="terminal-card reveal">
+                    <div class="terminal-header">
+                        <div class="terminal-dot red"></div>
+                        <div class="terminal-dot yellow"></div>
+                        <div class="terminal-dot green"></div>
+                        <span class="terminal-title">/plugin — Plugins instalados</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div><span class="label">Project Plugins</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">code-simplifier</span> <span class="dim">· enabled</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">commit-commands</span> <span class="dim">· enabled</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">context7</span> <span class="dim">· enabled</span></div>
+                        <div>&nbsp;&nbsp;&nbsp;<span class="dim">└ context7 MCP · <span class="success">&#10004; connected</span></span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">feature-dev</span> <span class="dim">· enabled</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">frontend-design</span> <span class="dim">· enabled</span></div>
+                        <div><span class="success">&#10004;</span> <span class="cmd">playwright</span> <span class="dim">· enabled</span></div>
+                        <br>
+                        <div><span class="label">Slash Commands Disponibles</span></div>
+                        <div><span class="cmd">/senior-architect</span> <span class="dim">— Diseño de sistemas</span></div>
+                        <div><span class="cmd">/code-reviewer</span> <span class="dim">— Review de código</span></div>
+                        <div><span class="cmd">/copywriting</span> <span class="dim">— Textos y copy</span></div>
+                        <div><span class="cmd">/senior-security</span> <span class="dim">— Auditoría seguridad</span></div>
+                        <div><span class="cmd">/brainstorming</span> <span class="dim">— Ideación creativa</span></div>
+                        <div><span class="dim">... 21 commands en total</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== BENEFICIOS ==================== -->
+    <section class="section benefits" id="por-qué">
+        <div class="container">
+            <h2 class="section-title">¿Por Qué Devlmer?</h2>
+            <p class="section-subtitle">Ventajas que transforman tu forma de desarrollar</p>
+
+            <div class="benefits-grid">
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-bolt"></i></div>
+                    <h4>Ahorra Horas</h4>
+                    <p>No perderás tiempo en configuraciones manuales. Todo se instala automáticamente en minutos.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-crown"></i></div>
+                    <h4>Ecosistema Enterprise</h4>
+                    <p>Acceso a herramientas de nivel profesional sin necesidad de inversión en infraestructura.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-star"></i></div>
+                    <h4>Mejores Prácticas</h4>
+                    <p>Todos nuestros skills incluyen patrones de arquitectura y mejores prácticas integradas.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-brain"></i></div>
+                    <h4>Detección Inteligente</h4>
+                    <p>Se adapta automáticamente a tu stack tecnológico y dominio empresarial específico.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-code-branch"></i></div>
+                    <h4>GitHub Integration</h4>
+                    <p>Autenticación integrada con GitHub. Guarda tu ecosistema en un commit y sincroniza con tu repositorio.</p>
+                </div>
+
+                <div class="benefit-card reveal">
+                    <div class="benefit-icon"><i class="fas fa-refresh"></i></div>
+                    <h4>Actualización Continua</h4>
+                    <p>El ecosistema es modular y extensible. Agrega nuevos skills, MCPs y agents cuando quieras con <code>--skills-only</code>. Proyecto open source — contribuciones bienvenidas en GitHub.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== QUIÉN SE BENEFICIA ==================== -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">¿A Quién Ayuda Devlmer?</h2>
+            <p class="section-subtitle">Diseñado para profesionales en todos los roles</p>
+
+            <div class="audience-grid">
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-code"></i></div>
+                    <h4>Desarrolladores</h4>
+                    <p>Acceso a ecosistema automático, code review, testing y análisis de seguridad integrados.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-palette"></i></div>
+                    <h4>Diseñadores</h4>
+                    <p>UI/UX Pro Max, design systems, mobile design y brand identity — todo el stack de diseño configurado automáticamente.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-megaphone"></i></div>
+                    <h4>Marketing</h4>
+                    <p>SEO, copywriting, brand management y herramientas de análisis de contenido.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4>CEOs y Managers</h4>
+                    <p>Project Intelligence con detección automática del stack, análisis de dominio empresarial y ecosistema profesional pre-configurado para cada proyecto.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-briefcase"></i></div>
+                    <h4>Freelancers</h4>
+                    <p>Herramientas profesionales sin inversión enterprise. Escala con tus proyectos.</p>
+                </div>
+
+                <div class="audience-card reveal">
+                    <div class="audience-icon"><i class="fas fa-rocket"></i></div>
+                    <h4>Startups</h4>
+                    <p>Ecosistema enterprise completo desde el día uno. Un comando y tu equipo tiene skills, MCPs y agents configurados — enfócate en tu producto.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PROBLEMAS RESUELTOS ==================== -->
+    <section class="section" style="background: linear-gradient(135deg, rgba(0, 82, 255, 0.03) 0%, rgba(0, 212, 170, 0.02) 100%);">
+        <div class="container">
+            <h2 class="section-title">Problemas Que Resuelve</h2>
+            <p class="section-subtitle">Soluciones reales para desafíos comunes</p>
+
+            <div class="problems-grid">
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Configuro todo manualmente cada proyecto"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Auto-detection + auto-install en un comando. Todo configurado en minutos.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"No sé qué herramientas necesito para este proyecto"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Blueprint matching inteligente según dominio y stack tecnológico.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Mis equipos usan diferentes tools y standards"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Ecosistema estandarizado para toda tu organización. Consistencia garantizada.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Pierdo demasiado tiempo en setup y configuración"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Un comando y listo. Comienza a desarrollar en minutos, no días.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Falta consistencia en calidad de código entre proyectos"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Skills con mejores prácticas integradas. Calidad garantizada por diseño.</div>
+                </div>
+
+                <div class="problem-card reveal">
+                    <div class="problem-label"><i class="fas fa-exclamation-circle"></i> Problema</div>
+                    <div class="problem-text">"Cambiar de proyecto significa reaprender nuevas herramientas"</div>
+                    <div class="solution-label"><i class="fas fa-check-circle"></i> Solución</div>
+                    <div class="solution-text">Interfaz consistente. Ecosistema familiar en cada proyecto nuevo.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TECNOLOGÍAS ==================== -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Construido con Tecnologías Premium</h2>
+            <p class="section-subtitle">Stack profesional y confiable</p>
+
+            <div class="tech-stack">
+                <div class="tech-badge">
+                    <i class="fab fa-python"></i> Python
+                </div>
+                <div class="tech-badge">
+                    <i class="fas fa-terminal"></i> Bash
+                </div>
+                <div class="tech-badge">
+                    <i class="fab fa-node-js"></i> Node.js
+                </div>
+                <div class="tech-badge">
+                    <i class="fas fa-code"></i> Claude Code
+                </div>
+                <div class="tech-badge">
+                    <i class="fas fa-cube"></i> MCP Protocol
+                </div>
+                <div class="tech-badge">
+                    <i class="fab fa-github"></i> GitHub
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== INSTALL WIZARD MODAL ==================== -->
+    <div class="wizard-overlay" id="installWizard">
+        <div class="wizard-backdrop" onclick="closeWizard()"></div>
+        <div class="wizard-container">
+            <!-- Header -->
+            <div class="wizard-header">
+                <div class="wizard-header-left">
+                    <div class="wizard-header-icon"><i class="fas fa-terminal"></i></div>
+                    <div>
+                        <h2>Instalar Devlmer Ecosystem</h2>
+                        <p>Configura tu entorno en menos de 2 minutos</p>
+                    </div>
+                </div>
+                <button class="wizard-close" onclick="closeWizard()" aria-label="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Progress -->
+            <div class="wizard-progress">
+                <div class="wizard-step-dot active" data-step="1">1</div>
+                <div class="wizard-step-line" data-line="1"></div>
+                <div class="wizard-step-dot" data-step="2">2</div>
+                <div class="wizard-step-line" data-line="2"></div>
+                <div class="wizard-step-dot" data-step="3">3</div>
+            </div>
+            <div class="wizard-step-labels">
+                <span class="wizard-step-label active">Entorno</span>
+                <span class="wizard-step-label">Método</span>
+                <span class="wizard-step-label">Ejecutar</span>
+            </div>
+
+            <!-- Body -->
+            <div class="wizard-body">
+                <!-- STEP 1: Environment -->
+                <div class="wizard-step-content active" data-step="1">
+                    <h3>Tu entorno de desarrollo</h3>
+                    <p class="step-desc">Selecciona tu sistema operativo para generar el comando correcto.</p>
+
+                    <div class="os-grid">
+                        <div class="os-card" data-os="macos" onclick="selectOS(this)">
+                            <i class="fab fa-apple" style="color: #a0aec0"></i>
+                            <div class="os-name">macOS</div>
+                            <div class="os-detail">Bash 3.2+ / Zsh</div>
+                        </div>
+                        <div class="os-card" data-os="linux" onclick="selectOS(this)">
+                            <i class="fab fa-linux" style="color: #f9a825"></i>
+                            <div class="os-name">Linux</div>
+                            <div class="os-detail">Ubuntu, Debian, Arch...</div>
+                        </div>
+                        <div class="os-card" data-os="windows" onclick="selectOS(this)">
+                            <i class="fab fa-windows" style="color: #00a4ef"></i>
+                            <div class="os-name">Windows</div>
+                            <div class="os-detail">WSL / Git Bash</div>
+                        </div>
+                    </div>
+
+                    <div class="path-section">
+                        <div class="path-section-label"><i class="fas fa-folder-open"></i> Ruta de tu proyecto</div>
+                        <div class="path-input-row">
+                            <div class="path-input-wrapper">
+                                <span class="path-input-icon"><i class="fas fa-terminal"></i></span>
+                                <input type="text" class="path-input" id="projectPath" placeholder="/ruta/a/tu/proyecto" spellcheck="false" autocomplete="off">
+                            </div>
+                            <button class="path-browse-btn" id="pathBrowseBtn" onclick="browseFolder()">
+                                <i class="fas fa-folder-plus"></i> Buscar
+                            </button>
+                        </div>
+                        <div class="path-suggestions" id="pathSuggestions">
+                            <div class="path-suggestions-label">Rutas comunes:</div>
+                            <div class="path-suggestions-list" id="pathSuggestionsList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Method -->
+                <div class="wizard-step-content" data-step="2">
+                    <h3>Elige tu método</h3>
+                    <p class="step-desc">Dos formas de instalar. Ambas hacen exactamente lo mismo.</p>
+
+                    <div class="method-grid">
+                        <div class="method-card selected" data-method="cli" onclick="selectMethod(this)">
+                            <span class="method-badge recommended">Recomendado</span>
+                            <div class="method-icon"><i class="fas fa-terminal"></i></div>
+                            <h4>CLI — Un comando</h4>
+                            <p>Clona y ejecuta automáticamente desde tu terminal. Rápido y directo.</p>
+                        </div>
+                        <div class="method-card" data-method="manual" onclick="selectMethod(this)">
+                            <span class="method-badge alt">Alternativa</span>
+                            <div class="method-icon"><i class="fas fa-file-archive"></i></div>
+                            <h4>Descarga manual</h4>
+                            <p>Descarga el .zip desde GitHub y ejecuta install.sh manualmente.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Execute -->
+                <div class="wizard-step-content" data-step="3">
+                    <h3>Listo para instalar</h3>
+                    <p class="step-desc">Elige cómo quieres ejecutar la instalación.</p>
+
+                    <!-- Action tabs -->
+                    <div class="exec-tabs">
+                        <button class="exec-tab active" data-tab="auto" onclick="switchExecTab('auto')">
+                            <i class="fas fa-play-circle"></i> Abrir en Terminal
+                        </button>
+                        <button class="exec-tab" data-tab="copy" onclick="switchExecTab('copy')">
+                            <i class="fas fa-copy"></i> Copiar comando
+                        </button>
+                        <button class="exec-tab" data-tab="preview" onclick="switchExecTab('preview')">
+                            <i class="fas fa-eye"></i> Vista previa
+                        </button>
+                    </div>
+
+                    <!-- TAB: Open in Terminal -->
+                    <div class="exec-panel active" id="panelAuto">
+                        <p class="terminal-select-label">¿Qué terminal usas?</p>
+                        <div class="terminal-grid" id="terminalGrid">
+                            <!-- Populated by JS based on OS -->
+                        </div>
+
+                        <div class="oneliner-block" id="onelinerBlock" style="display:none">
+                            <div class="oneliner-header">
+                                <span class="oneliner-tag"><i class="fas fa-bolt"></i> One-liner</span>
+                                <span class="oneliner-hint" id="onelinerHint">Pega con <kbd>⌘V</kbd> en tu terminal</span>
+                            </div>
+                            <div class="oneliner-code" id="onelinerCode"></div>
+                            <button class="exec-main-btn" id="onelinerCopyBtn" onclick="copyOneliner()">
+                                <i class="fas fa-copy"></i> Copiar al portapapeles
+                            </button>
+                            <div class="oneliner-steps" id="onelinerSteps">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: Copy command -->
+                    <div class="exec-panel" id="panelCopy">
+                        <div class="terminal-block">
+                            <div class="terminal-header">
+                                <div class="terminal-dots">
+                                    <span></span><span></span><span></span>
+                                </div>
+                                <span class="terminal-title" id="terminalTitle">Terminal — bash</span>
+                                <button class="terminal-copy-btn" id="terminalCopyBtn" onclick="copyFinalCommand()">
+                                    <i class="fas fa-copy"></i> Copiar
+                                </button>
+                            </div>
+                            <div class="terminal-body" id="terminalBody">
+                                <!-- Generated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: Live preview (xterm simulation) -->
+                    <div class="exec-panel" id="panelPreview">
+                        <div class="terminal-block xterm-block">
+                            <div class="terminal-header">
+                                <div class="terminal-dots">
+                                    <span></span><span></span><span></span>
+                                </div>
+                                <span class="terminal-title">Simulación en vivo</span>
+                                <div class="xterm-controls">
+                                    <button class="terminal-copy-btn" id="xtermReplayBtn" onclick="replaySimulation()">
+                                        <i class="fas fa-redo"></i> Replay
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="xterm-body" id="xtermBody"></div>
+                        </div>
+                    </div>
+
+                    <div class="install-checklist">
+                        <div class="checklist-item"><i class="fas fa-check-circle"></i> 21 skills profesionales</div>
+                        <div class="checklist-item"><i class="fas fa-check-circle"></i> 23+ integraciones MCP</div>
+                        <div class="checklist-item"><i class="fas fa-check-circle"></i> Hooks pre/post automáticos</div>
+                        <div class="checklist-item"><i class="fas fa-check-circle"></i> Detección inteligente de proyecto</div>
+                        <div class="checklist-item"><i class="fas fa-check-circle"></i> Setup wizard interactivo</div>
+                        <div class="checklist-item"><i class="fas fa-check-circle"></i> Compatible Bash 3.2+</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="wizard-footer">
+                <button class="wizard-btn wizard-btn-back" id="wizardBtnBack" onclick="wizardBack()" style="visibility: hidden">
+                    <i class="fas fa-arrow-left"></i> Atrás
+                </button>
+                <button class="wizard-btn wizard-btn-next" id="wizardBtnNext" onclick="wizardNext()" disabled>
+                    Siguiente <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer>
+        <div class="container">
+            <p>
+                <strong>Devlmer Ecosystem Engine v3.0</strong>
+            </p>
+            <p>
+                Created with <i class="fas fa-heart" style="color: #ff6b6b;"></i> by Pierre Solier
+            </p>
+            <div class="footer-links">
+                <a href="https://github.com/Soyelijah/devlmer-ecosystem-engine" target="_blank">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+                <a href="https://github.com/Soyelijah" target="_blank">
+                    <i class="fab fa-github"></i> Organization
+                </a>
+                <a href="LICENSE">MIT License</a>
+                <span>© 2026 All Rights Reserved</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // ==================== INTERSECTION OBSERVER FOR SCROLL REVEALS ====================
+        const observerOptions = {
+            threshold: 0.05,
+            rootMargin: '50px 0px 0px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        const revealElements = document.querySelectorAll('.reveal');
+        revealElements.forEach(el => observer.observe(el));
+
+        // Fallback: forzar visibilidad después de 2.5s para scroll rápido
+        setTimeout(() => {
+            revealElements.forEach(el => el.classList.add('visible'));
+        }, 2500);
+
+        // ==================== COPY TO CLIPBOARD ====================
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target.closest('.copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        // ==================== SCROLL TO SECTION ====================
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // ==================== SMOOTH SCROLL FOR NAV LINKS ====================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // ==================== NAVBAR HIDE ON SCROLL DOWN ====================
+        let lastScrollTop = 0;
+        const header = document.querySelector('header');
+
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > 100) {
+                header.style.borderBottomColor = 'rgba(0, 212, 170, 0.1)';
+            } else {
+                header.style.borderBottomColor = 'rgba(255, 255, 255, 0.05)';
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        });
+
+        // ==================== ANIMATED COUNTER ====================
+        const stats = document.querySelectorAll('.stat-number');
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const element = entry.target;
+                    const text = element.textContent;
+                    const number = parseInt(text.match(/\d+/)[0]);
+                    const duration = 2000;
+                    const steps = 60;
+                    const stepValue = number / steps;
+                    let current = 0;
+                    const timer = setInterval(() => {
+                        current += stepValue;
+                        if (current >= number) {
+                            element.textContent = text;
+                            clearInterval(timer);
+                            counterObserver.unobserve(element);
+                        } else {
+                            element.textContent = Math.floor(current) + text.replace(/\d+/, '');
+                        }
+                    }, duration / steps);
+                }
+            });
+        }, observerOptions);
+
+        stats.forEach(stat => counterObserver.observe(stat));
+
+        // ==================== INSTALL WIZARD ====================
+        const wizardState = {
+            currentStep: 1,
+            os: null,
+            method: 'cli',
+            path: ''
+        };
+
+        const REPO_URL = 'https://github.com/Soyelijah/devlmer-ecosystem-engine.git';
+        const ZIP_URL = 'https://github.com/Soyelijah/devlmer-ecosystem-engine/archive/refs/heads/main.zip';
+
+        function openWizard() {
+            const overlay = document.getElementById('installWizard');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            wizardGoTo(1);
+            // Try to detect OS
+            const ua = navigator.userAgent.toLowerCase();
+            if (ua.includes('mac')) autoSelectOS('macos');
+            else if (ua.includes('win')) autoSelectOS('windows');
+            else if (ua.includes('linux')) autoSelectOS('linux');
+        }
+
+        function closeWizard() {
+            const overlay = document.getElementById('installWizard');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeWizard();
+        });
+
+        function autoSelectOS(os) {
+            const card = document.querySelector(`.os-card[data-os="${os}"]`);
+            if (card) selectOS(card);
+        }
+
+        function selectOS(el) {
+            document.querySelectorAll('.os-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            wizardState.os = el.dataset.os;
+
+            // Set placeholder path based on OS
+            const pathInput = document.getElementById('projectPath');
+            const placeholders = {
+                macos: '/Users/you/projects/my-app',
+                linux: '/home/you/projects/my-app',
+                windows: '/mnt/c/Users/you/projects/my-app'
+            };
+            pathInput.placeholder = placeholders[wizardState.os] || '/path/to/project';
+
+            // Show path suggestions
+            renderPathSuggestions();
+            updateNextBtn();
+        }
+
+        function renderPathSuggestions() {
+            const suggestions = {
+                macos: [
+                    { icon: 'fa-code', path: '~/Developer/my-project' },
+                    { icon: 'fa-folder', path: '~/Projects/my-app' },
+                    { icon: 'fa-desktop', path: '~/Desktop/my-project' },
+                    { icon: 'fa-download', path: '~/Downloads/my-project' },
+                    { icon: 'fa-terminal', path: '$(pwd)' },
+                ],
+                linux: [
+                    { icon: 'fa-code', path: '~/dev/my-project' },
+                    { icon: 'fa-folder', path: '~/projects/my-app' },
+                    { icon: 'fa-home', path: '~/my-project' },
+                    { icon: 'fa-server', path: '/var/www/my-app' },
+                    { icon: 'fa-terminal', path: '$(pwd)' },
+                ],
+                windows: [
+                    { icon: 'fa-code', path: '/mnt/c/dev/my-project' },
+                    { icon: 'fa-folder', path: '/mnt/c/Users/you/projects/my-app' },
+                    { icon: 'fa-desktop', path: '/mnt/c/Users/you/Desktop/my-project' },
+                    { icon: 'fa-terminal', path: '$(pwd)' },
+                ]
+            };
+
+            const list = document.getElementById('pathSuggestionsList');
+            const container = document.getElementById('pathSuggestions');
+            const items = suggestions[wizardState.os] || [];
+
+            list.innerHTML = items.map(s =>
+                `<div class="path-chip" onclick="useSuggestedPath('${s.path}')">
+                    <i class="fas ${s.icon}"></i> ${s.path}
+                </div>`
+            ).join('');
+
+            container.classList.add('visible');
+        }
+
+        function useSuggestedPath(path) {
+            const input = document.getElementById('projectPath');
+            input.value = path;
+            input.focus();
+            // Brief highlight animation
+            input.style.borderColor = 'var(--primary-cyan)';
+            input.style.boxShadow = '0 0 25px rgba(0, 212, 170, 0.2)';
+            setTimeout(() => {
+                input.style.borderColor = '';
+                input.style.boxShadow = '';
+            }, 800);
+        }
+
+        async function browseFolder() {
+            const btn = document.getElementById('pathBrowseBtn');
+
+            // Check if File System Access API is available (Chrome, Edge, Opera)
+            if ('showDirectoryPicker' in window) {
+                try {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+                    const dirHandle = await window.showDirectoryPicker({ mode: 'read' });
+                    const folderName = dirHandle.name;
+
+                    // Build a display path based on OS
+                    const basePaths = {
+                        macos: `/Users/${folderName}`,
+                        linux: `/home/${folderName}`,
+                        windows: `/mnt/c/Users/${folderName}`
+                    };
+
+                    // Try to show folder name in the input
+                    const input = document.getElementById('projectPath');
+                    // We can't get the full path from the API, but we have the folder name
+                    const currentVal = input.value;
+                    if (!currentVal) {
+                        // Suggest a smart path
+                        const base = {
+                            macos: '~/Projects/',
+                            linux: '~/projects/',
+                            windows: '/mnt/c/Users/you/projects/'
+                        };
+                        input.value = (base[wizardState.os] || '~/') + folderName;
+                    } else {
+                        // Append to current path if it ends with /
+                        if (currentVal.endsWith('/')) {
+                            input.value = currentVal + folderName;
+                        } else {
+                            input.value = currentVal;
+                        }
+                    }
+
+                    btn.innerHTML = '<i class="fas fa-check"></i> ' + folderName;
+                    btn.style.borderColor = 'var(--primary-cyan)';
+                    btn.style.background = 'rgba(0, 212, 170, 0.15)';
+
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fas fa-folder-plus"></i> Buscar';
+                        btn.style.borderColor = '';
+                        btn.style.background = '';
+                    }, 3000);
+
+                } catch (err) {
+                    // User cancelled the picker
+                    btn.innerHTML = '<i class="fas fa-folder-plus"></i> Buscar';
+                }
+            } else {
+                // Fallback: show a helpful tooltip/message
+                btn.innerHTML = '<i class="fas fa-info-circle"></i> Escríbela';
+                btn.style.borderColor = 'rgba(255, 190, 50, 0.4)';
+
+                // Show a brief tooltip
+                const tooltip = document.createElement('div');
+                tooltip.style.cssText = `
+                    position: absolute; bottom: calc(100% + 10px); right: 0;
+                    background: rgba(17, 25, 51, 0.98); border: 1px solid rgba(255, 190, 50, 0.3);
+                    border-radius: 10px; padding: 12px 16px; width: 280px;
+                    font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5;
+                    box-shadow: 0 8px 30px rgba(0,0,0,0.4); z-index: 10;
+                    animation: wizardFadeIn 0.3s ease;
+                `;
+                tooltip.innerHTML = `
+                    <div style="color: #febe2e; font-weight: 600; margin-bottom: 6px;">
+                        <i class="fas fa-lightbulb"></i> Tip
+                    </div>
+                    Tu navegador no soporta el selector de carpetas. Escribe la ruta manualmente o usa <code style="color: var(--primary-cyan); background: rgba(0,212,170,0.1); padding: 2px 6px; border-radius: 4px;">$(pwd)</code> para usar el directorio actual.
+                `;
+                btn.parentElement.style.position = 'relative';
+                btn.parentElement.appendChild(tooltip);
+
+                setTimeout(() => {
+                    tooltip.style.opacity = '0';
+                    tooltip.style.transition = 'opacity 0.3s';
+                    setTimeout(() => tooltip.remove(), 300);
+                    btn.innerHTML = '<i class="fas fa-folder-plus"></i> Buscar';
+                    btn.style.borderColor = '';
+                }, 4000);
+            }
+        }
+
+        function selectMethod(el) {
+            document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            wizardState.method = el.dataset.method;
+        }
+
+        function updateNextBtn() {
+            const btn = document.getElementById('wizardBtnNext');
+            if (wizardState.currentStep === 1) {
+                btn.disabled = !wizardState.os;
+            } else {
+                btn.disabled = false;
+            }
+        }
+
+        function wizardNext() {
+            if (wizardState.currentStep === 1) {
+                wizardState.path = document.getElementById('projectPath').value.trim();
+            }
+
+            if (wizardState.currentStep < 3) {
+                wizardGoTo(wizardState.currentStep + 1);
+            }
+        }
+
+        function wizardBack() {
+            if (wizardState.currentStep > 1) {
+                wizardGoTo(wizardState.currentStep - 1);
+            }
+        }
+
+        function wizardGoTo(step) {
+            wizardState.currentStep = step;
+
+            // Update dots
+            document.querySelectorAll('.wizard-step-dot').forEach(dot => {
+                const s = parseInt(dot.dataset.step);
+                dot.classList.remove('active', 'completed');
+                if (s === step) dot.classList.add('active');
+                else if (s < step) {
+                    dot.classList.add('completed');
+                    dot.innerHTML = '<i class="fas fa-check" style="font-size:0.65rem"></i>';
+                } else {
+                    dot.textContent = s;
+                }
+            });
+
+            // Update lines
+            document.querySelectorAll('.wizard-step-line').forEach(line => {
+                const l = parseInt(line.dataset.line);
+                line.classList.toggle('completed', l < step);
+            });
+
+            // Update labels
+            const labels = document.querySelectorAll('.wizard-step-label');
+            labels.forEach((lbl, i) => {
+                lbl.classList.toggle('active', i + 1 === step);
+            });
+
+            // Show/hide content
+            document.querySelectorAll('.wizard-step-content').forEach(content => {
+                const s = parseInt(content.dataset.step);
+                content.classList.toggle('active', s === step);
+            });
+
+            // Back button visibility
+            document.getElementById('wizardBtnBack').style.visibility = step > 1 ? 'visible' : 'hidden';
+
+            // Footer button
+            const nextBtn = document.getElementById('wizardBtnNext');
+            if (step === 3) {
+                // Render terminal options for selected OS
+                renderTerminalOptions();
+                wizardState.terminal = null;
+                document.getElementById('onelinerBlock').style.display = 'none';
+
+                // Set footer based on active tab
+                const activeTab = document.querySelector('.exec-tab.active');
+                const tab = activeTab ? activeTab.dataset.tab : 'auto';
+                updateStep3Footer(tab);
+                renderTerminal();
+            } else {
+                nextBtn.className = 'wizard-btn wizard-btn-next';
+                nextBtn.innerHTML = 'Siguiente <i class="fas fa-arrow-right"></i>';
+                nextBtn.onclick = wizardNext;
+                updateNextBtn();
+            }
+        }
+
+        // ==================== EXEC TABS ====================
+        function switchExecTab(tab) {
+            document.querySelectorAll('.exec-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.exec-tab[data-tab="${tab}"]`).classList.add('active');
+
+            document.querySelectorAll('.exec-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+
+            // Start simulation when preview tab is opened
+            if (tab === 'preview') {
+                setTimeout(() => startSimulation(), 300);
+            }
+
+            // Update footer button based on active tab
+            updateStep3Footer(tab);
+        }
+
+        function updateStep3Footer(tab) {
+            const nextBtn = document.getElementById('wizardBtnNext');
+            if (wizardState.currentStep !== 3) return;
+
+            if (tab === 'auto') {
+                if (wizardState.terminal) {
+                    const os = wizardState.os || 'linux';
+                    const terminals = TERMINALS[os] || TERMINALS.linux;
+                    const t = terminals.find(x => x.id === wizardState.terminal);
+                    nextBtn.className = 'wizard-btn wizard-btn-copy-final';
+                    nextBtn.innerHTML = '<i class="fas fa-copy"></i> Copiar comando para ' + (t ? t.name : 'Terminal');
+                    nextBtn.onclick = copyOneliner;
+                    nextBtn.disabled = false;
+                } else {
+                    nextBtn.className = 'wizard-btn wizard-btn-next';
+                    nextBtn.innerHTML = '<i class="fas fa-hand-pointer"></i> Selecciona tu terminal';
+                    nextBtn.disabled = true;
+                }
+            } else if (tab === 'copy') {
+                nextBtn.className = 'wizard-btn wizard-btn-copy-final';
+                nextBtn.innerHTML = '<i class="fas fa-copy"></i> Copiar comando completo';
+                nextBtn.onclick = copyFinalCommand;
+                nextBtn.disabled = false;
+            } else {
+                nextBtn.className = 'wizard-btn wizard-btn-next';
+                nextBtn.innerHTML = '<i class="fas fa-eye"></i> Simulando...';
+                nextBtn.disabled = true;
+            }
+        }
+
+        // ==================== TERMINAL SELECTOR ====================
+        const TERMINALS = {
+            macos: [
+                { id: 'terminal', name: 'Terminal', icon: '>', color: '#fff', bg: '#1d1d1d', shortcut: '⌘ + Space → "Terminal"' },
+                { id: 'iterm2', name: 'iTerm2', icon: '⟩', color: '#2bff2b', bg: '#000', shortcut: '⌘ + Space → "iTerm"' },
+                { id: 'warp', name: 'Warp', icon: 'W', color: '#01c38d', bg: '#191919', shortcut: '⌘ + Space → "Warp"' },
+                { id: 'vscode', name: 'VS Code', icon: '⟨⟩', color: '#007acc', bg: '#1e1e1e', shortcut: 'Ctrl + ` en VS Code' },
+                { id: 'hyper', name: 'Hyper', icon: 'H', color: '#fff', bg: '#000', shortcut: '⌘ + Space → "Hyper"' },
+            ],
+            linux: [
+                { id: 'gnome', name: 'GNOME Term', icon: '▸', color: '#fff', bg: '#2e3436', shortcut: 'Ctrl + Alt + T' },
+                { id: 'konsole', name: 'Konsole', icon: 'K', color: '#1d99f3', bg: '#232629', shortcut: 'Ctrl + Alt + T' },
+                { id: 'alacritty', name: 'Alacritty', icon: 'A', color: '#f0c674', bg: '#1d1f21', shortcut: 'Launcher → "Alacritty"' },
+                { id: 'kitty', name: 'Kitty', icon: '🐱', color: '#fff', bg: '#000', shortcut: 'Launcher → "Kitty"' },
+                { id: 'vscode', name: 'VS Code', icon: '⟨⟩', color: '#007acc', bg: '#1e1e1e', shortcut: 'Ctrl + ` en VS Code' },
+            ],
+            windows: [
+                { id: 'wt', name: 'Windows Terminal', icon: '⟩_', color: '#0078d4', bg: '#0c0c0c', shortcut: 'Win + R → "wt"' },
+                { id: 'wsl', name: 'WSL', icon: '🐧', color: '#e95420', bg: '#2c001e', shortcut: 'wsl en Windows Terminal' },
+                { id: 'gitbash', name: 'Git Bash', icon: 'G', color: '#f14e32', bg: '#0d1117', shortcut: 'Menú inicio → "Git Bash"' },
+                { id: 'powershell', name: 'PowerShell', icon: 'PS', color: '#012456', bg: '#012456', shortcut: 'Win + X → Terminal' },
+                { id: 'vscode', name: 'VS Code', icon: '⟨⟩', color: '#007acc', bg: '#1e1e1e', shortcut: 'Ctrl + ` en VS Code' },
+            ]
+        };
+
+        function renderTerminalOptions() {
+            const grid = document.getElementById('terminalGrid');
+            const os = wizardState.os || 'linux';
+            const terminals = TERMINALS[os] || TERMINALS.linux;
+
+            grid.innerHTML = terminals.map(t => `
+                <div class="terminal-option" data-terminal="${t.id}" onclick="selectTerminal(this, '${t.id}')">
+                    <div class="term-icon" style="background:${t.bg}; color:${t.color}; border: 1px solid rgba(255,255,255,0.1);">
+                        ${t.icon}
+                    </div>
+                    <span class="term-name">${t.name}</span>
+                </div>
+            `).join('');
+        }
+
+        function selectTerminal(el, termId) {
+            document.querySelectorAll('.terminal-option').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            wizardState.terminal = termId;
+
+            const os = wizardState.os || 'linux';
+            const terminals = TERMINALS[os] || TERMINALS.linux;
+            const term = terminals.find(t => t.id === termId);
+            const p = wizardState.path || '~/projects/my-app';
+
+            // Show the one-liner block
+            const block = document.getElementById('onelinerBlock');
+            block.style.display = 'block';
+
+            // Update paste hint
+            const hint = document.getElementById('onelinerHint');
+            const isMac = os === 'macos';
+            hint.innerHTML = `Pega con <kbd>${isMac ? '⌘V' : 'Ctrl+V'}</kbd> en ${term.name}`;
+
+            // Generate the one-liner
+            const codeEl = document.getElementById('onelinerCode');
+            const cmd = `git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh ${p}`;
+            codeEl.innerHTML = `<span class="ol-prompt">$ </span><span class="ol-cmd">git clone</span> <span class="ol-url">${REPO_URL}</span> <span class="ol-path">/tmp/dee</span> <span class="ol-cmd">&&</span> <span class="ol-cmd">bash</span> <span class="ol-path">/tmp/dee/install.sh</span> <span class="ol-path">${p}</span>`;
+
+            // Render steps
+            const stepsEl = document.getElementById('onelinerSteps');
+            stepsEl.innerHTML = `
+                <div class="oneliner-step">
+                    <div class="step-num">1</div>
+                    <div class="step-text"><strong>Copia</strong>Click en el botón de abajo</div>
+                </div>
+                <div class="oneliner-step">
+                    <div class="step-num">2</div>
+                    <div class="step-text"><strong>Abre ${term.name}</strong>${term.shortcut}</div>
+                </div>
+                <div class="oneliner-step">
+                    <div class="step-num">3</div>
+                    <div class="step-text"><strong>Pega y Enter</strong>${isMac ? '⌘V' : 'Ctrl+V'} → Enter</div>
+                </div>
+            `;
+
+            // Update footer btn
+            const nextBtn = document.getElementById('wizardBtnNext');
+            if (wizardState.currentStep === 3) {
+                nextBtn.className = 'wizard-btn wizard-btn-copy-final';
+                nextBtn.innerHTML = '<i class="fas fa-copy"></i> Copiar comando para ' + term.name;
+                nextBtn.onclick = copyOneliner;
+                nextBtn.disabled = false;
+            }
+        }
+
+        function copyOneliner() {
+            const p = wizardState.path || '~/projects/my-app';
+            const cmd = `git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh ${p}`;
+
+            navigator.clipboard.writeText(cmd).then(() => {
+                const btn = document.getElementById('onelinerCopyBtn');
+                const footerBtn = document.getElementById('wizardBtnNext');
+
+                btn.classList.add('downloaded');
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> ¡Copiado! Ahora pega en tu terminal';
+
+                if (footerBtn && wizardState.currentStep === 3) {
+                    footerBtn.classList.add('copied');
+                    footerBtn.style.background = 'linear-gradient(135deg, #28c840, #1fa032)';
+                    footerBtn.innerHTML = '<i class="fas fa-check"></i> Copiado al portapapeles';
+                }
+
+                setTimeout(() => {
+                    btn.classList.remove('downloaded');
+                    btn.innerHTML = '<i class="fas fa-copy"></i> Copiar al portapapeles';
+                    if (footerBtn) {
+                        footerBtn.classList.remove('copied');
+                        footerBtn.style.background = '';
+                        const term = wizardState.terminal || 'terminal';
+                        const os = wizardState.os || 'linux';
+                        const terminals = TERMINALS[os] || TERMINALS.linux;
+                        const t = terminals.find(x => x.id === term);
+                        footerBtn.innerHTML = '<i class="fas fa-copy"></i> Copiar comando para ' + (t ? t.name : 'Terminal');
+                    }
+                }, 3500);
+            });
+        }
+
+        // ==================== XTERM SIMULATION ====================
+        let simRunning = false;
+
+        async function startSimulation() {
+            if (simRunning) return;
+            simRunning = true;
+            const body = document.getElementById('xtermBody');
+            body.innerHTML = '';
+            const p = wizardState.path || '~/Projects/my-app';
+
+            const lines = [
+                { text: '', delay: 200 },
+                { text: '<span class="xt-cyan xt-bold">⚡ Devlmer Ecosystem Engine — Auto-Installer</span>', delay: 80 },
+                { text: '<span class="xt-cyan">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>', delay: 40 },
+                { text: '', delay: 150 },
+                { text: '<span class="xt-prompt">▶</span> <span class="xt-cmd">Clonando repositorio...</span>', delay: 600, typing: true },
+                { text: '<span class="xt-dim">  Cloning into \'/tmp/dee\'...</span>', delay: 400 },
+                { text: '<span class="xt-dim">  remote: Enumerating objects: 165, done.</span>', delay: 200 },
+                { text: '<span class="xt-dim">  remote: Counting objects: 100% (165/165), done.</span>', delay: 200 },
+                { text: '<span class="xt-dim">  Receiving objects: 100% (165/165), 284.5 KiB, done.</span>', delay: 300 },
+                { text: '<span class="xt-success">✓ Repositorio clonado</span>', delay: 150 },
+                { text: '', delay: 100 },
+                { text: '<span class="xt-prompt">▶</span> <span class="xt-cmd">Ejecutando instalador...</span>', delay: 500, typing: true },
+                { text: '', delay: 100 },
+                { text: '<span class="xt-cyan xt-bold">╔══════════════════════════════════════════╗</span>', delay: 50 },
+                { text: '<span class="xt-cyan xt-bold">║  DEVLMER ECOSYSTEM ENGINE v3.0           ║</span>', delay: 50 },
+                { text: '<span class="xt-cyan xt-bold">║  Professional Toolsets for Claude Code    ║</span>', delay: 50 },
+                { text: '<span class="xt-cyan xt-bold">╚══════════════════════════════════════════╝</span>', delay: 200 },
+                { text: '', delay: 100 },
+                { text: '<span class="xt-info">[1/7]</span> Detecting platform...', delay: 300 },
+                { text: '  <span class="xt-success">✓</span> macOS arm64 detected (Bash 5.2)', delay: 200 },
+                { text: '<span class="xt-info">[2/7]</span> Scanning project...', delay: 400, typing: true },
+                { text: '  <span class="xt-success">✓</span> Fingerprint: <span class="xt-cyan">React + FastAPI (Trading Platform)</span>', delay: 300 },
+                { text: '  <span class="xt-dim">  Confidence: 94% | Domain: fintech</span>', delay: 200 },
+                { text: '<span class="xt-info">[3/7]</span> Installing 21 professional skills...', delay: 200, typing: true },
+                { text: '', delay: 50 },
+                { progress: true, items: [
+                    'senior-architect', 'senior-frontend', 'senior-backend',
+                    'senior-security', 'code-reviewer', 'senior-fullstack',
+                    'senior-prompt-engineer', 'ui-ux-pro-max', 'ui-design-system',
+                    'copywriting', 'seo-optimizer', 'brand-identity',
+                    'brainstorming', 'file-organizer', 'mobile-design',
+                    'marketing-graphic-design', 'git-commit-helper',
+                    'mcp-builder', 'skill-creator', 'project-intelligence',
+                    'webapp-testing'
+                ]},
+                { text: '  <span class="xt-success">✓</span> 21/21 skills installed', delay: 200 },
+                { text: '<span class="xt-info">[4/7]</span> Configuring 23 MCP integrations...', delay: 300, typing: true },
+                { text: '  <span class="xt-success">✓</span> GitHub, Playwright, Cloudflare, Notion...', delay: 200 },
+                { text: '<span class="xt-info">[5/7]</span> Setting up hooks...', delay: 300 },
+                { text: '  <span class="xt-success">✓</span> PreToolUse, PostToolUse, SessionStart', delay: 200 },
+                { text: '<span class="xt-info">[6/7]</span> Generating CLAUDE.md...', delay: 400 },
+                { text: '  <span class="xt-success">✓</span> Auto-configured for <span class="xt-cyan">fintech</span> domain', delay: 200 },
+                { text: '<span class="xt-info">[7/7]</span> Running verification...', delay: 500, typing: true },
+                { text: '  <span class="xt-success">✓</span> All components verified', delay: 300 },
+                { text: '', delay: 100 },
+                { text: '<span class="xt-success xt-bold">═══════════════════════════════════════════</span>', delay: 50 },
+                { text: '<span class="xt-success xt-bold">  ✓ Installation complete! (58s)</span>', delay: 50 },
+                { text: '<span class="xt-success xt-bold">═══════════════════════════════════════════</span>', delay: 100 },
+                { text: '', delay: 50 },
+                { text: '  <span class="xt-cyan">Project:</span>  ' + p, delay: 100 },
+                { text: '  <span class="xt-cyan">Skills:</span>   21 installed', delay: 80 },
+                { text: '  <span class="xt-cyan">MCPs:</span>     23 configured', delay: 80 },
+                { text: '  <span class="xt-cyan">Hooks:</span>    3 active', delay: 80 },
+                { text: '', delay: 150 },
+                { text: '  <span class="xt-dim">Open Claude Code in your project to start.</span>', delay: 100 },
+                { text: '', delay: 50 },
+            ];
+
+            for (const line of lines) {
+                if (!simRunning) break;
+
+                if (line.progress) {
+                    await renderProgressBlock(body, line.items);
+                    continue;
+                }
+
+                const div = document.createElement('div');
+                div.className = 'xterm-line';
+
+                if (line.typing && line.text) {
+                    await typewriterLine(div, line.text, body);
+                } else {
+                    div.innerHTML = line.text || '&nbsp;';
+                    body.appendChild(div);
+                }
+
+                body.scrollTop = body.scrollHeight;
+                await sleep(line.delay || 50);
+            }
+
+            // Add blinking cursor at end
+            const cursor = document.createElement('span');
+            cursor.className = 'xterm-cursor';
+            cursor.innerHTML = '&nbsp;';
+            const lastLine = body.lastElementChild || body;
+            lastLine.appendChild(cursor);
+
+            simRunning = false;
+
+            // Enable footer button
+            const footerBtn = document.getElementById('wizardBtnNext');
+            if (footerBtn && wizardState.currentStep === 3) {
+                footerBtn.className = 'wizard-btn wizard-btn-copy-final';
+                footerBtn.innerHTML = '<i class="fas fa-redo"></i> Reproducir de nuevo';
+                footerBtn.disabled = false;
+                footerBtn.onclick = replaySimulation;
+            }
+        }
+
+        async function typewriterLine(div, html, container) {
+            // Parse the HTML to extract text content for typing
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            const fullText = temp.textContent;
+
+            div.innerHTML = '';
+            container.appendChild(div);
+
+            // Type character by character with the original HTML structure
+            for (let i = 0; i <= fullText.length; i++) {
+                div.innerHTML = html.substring(0, html.length * (i / fullText.length)) || html.substring(0, i * 3);
+                container.scrollTop = container.scrollHeight;
+                await sleep(15 + Math.random() * 20);
+            }
+            div.innerHTML = html;
+        }
+
+        async function renderProgressBlock(container, items) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'xterm-line';
+            wrapper.style.marginLeft = '16px';
+            container.appendChild(wrapper);
+
+            for (let i = 0; i < items.length; i++) {
+                const pct = Math.round(((i + 1) / items.length) * 100);
+                const barWidth = Math.round((pct / 100) * 20);
+                const bar = '█'.repeat(barWidth) + '░'.repeat(20 - barWidth);
+                wrapper.innerHTML = `<span class="xt-dim">[${bar}]</span> <span class="xt-cyan">${pct}%</span> <span class="xt-info">${items[i]}</span>`;
+                container.scrollTop = container.scrollHeight;
+                await sleep(80 + Math.random() * 60);
+            }
+            wrapper.innerHTML = `<span class="xt-dim">[${'█'.repeat(20)}]</span> <span class="xt-success">100%</span> <span class="xt-success">All skills installed</span>`;
+        }
+
+        function replaySimulation() {
+            simRunning = false;
+            setTimeout(() => startSimulation(), 100);
+        }
+
+        function sleep(ms) {
+            return new Promise(r => setTimeout(r, ms));
+        }
+
+        function getInstallCommand() {
+            const p = wizardState.path || '/ruta/a/tu/proyecto';
+
+            if (wizardState.method === 'cli') {
+                return `git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh ${p}`;
+            } else {
+                return `# 1. Descarga desde:\n#    ${ZIP_URL}\n# 2. Descomprime y ejecuta:\ncd devlmer-ecosystem-engine-main && bash install.sh ${p}`;
+            }
+        }
+
+        function renderTerminal() {
+            const body = document.getElementById('terminalBody');
+            const title = document.getElementById('terminalTitle');
+            const p = wizardState.path || '/ruta/a/tu/proyecto';
+            const shells = { macos: 'zsh', linux: 'bash', windows: 'bash (WSL)' };
+            title.textContent = `Terminal — ${shells[wizardState.os] || 'bash'}`;
+
+            let lines = [];
+
+            if (wizardState.method === 'cli') {
+                lines = [
+                    { type: 'comment', text: '# Clona el repositorio e instala en un solo comando' },
+                    { type: 'cmd', parts: [
+                        { text: 'git clone ', cls: 'cmd' },
+                        { text: REPO_URL, cls: 'url-val' },
+                        { text: ' /tmp/dee', cls: 'path-val' }
+                    ]},
+                    { type: 'blank' },
+                    { type: 'comment', text: '# Ejecuta el instalador' },
+                    { type: 'cmd', parts: [
+                        { text: 'bash ', cls: 'cmd' },
+                        { text: '/tmp/dee/install.sh ', cls: 'path-val' },
+                        { text: p, cls: 'path-val' }
+                    ]},
+                ];
+            } else {
+                lines = [
+                    { type: 'comment', text: '# 1. Descarga el .zip desde GitHub:' },
+                    { type: 'cmd', parts: [
+                        { text: 'curl ', cls: 'cmd' },
+                        { text: '-L ', cls: 'flag' },
+                        { text: '-o ', cls: 'flag' },
+                        { text: 'dee.zip ', cls: 'path-val' },
+                        { text: ZIP_URL, cls: 'url-val' }
+                    ]},
+                    { type: 'blank' },
+                    { type: 'comment', text: '# 2. Descomprime:' },
+                    { type: 'cmd', parts: [
+                        { text: 'unzip ', cls: 'cmd' },
+                        { text: 'dee.zip', cls: 'path-val' }
+                    ]},
+                    { type: 'blank' },
+                    { type: 'comment', text: '# 3. Ejecuta el instalador:' },
+                    { type: 'cmd', parts: [
+                        { text: 'cd ', cls: 'cmd' },
+                        { text: 'devlmer-ecosystem-engine-main ', cls: 'path-val' },
+                        { text: '&& bash ', cls: 'cmd' },
+                        { text: 'install.sh ', cls: 'path-val' },
+                        { text: p, cls: 'path-val' }
+                    ]},
+                ];
+            }
+
+            body.innerHTML = '';
+
+            lines.forEach((line, i) => {
+                const div = document.createElement('div');
+                div.className = 'line';
+                div.style.animationDelay = `${i * 0.08}s`;
+
+                if (line.type === 'blank') {
+                    div.innerHTML = '&nbsp;';
+                } else if (line.type === 'comment') {
+                    div.innerHTML = `<span class="comment">${line.text}</span>`;
+                } else if (line.type === 'cmd') {
+                    let html = '<span class="prompt">$</span> ';
+                    line.parts.forEach(part => {
+                        html += `<span class="${part.cls}">${part.text}</span>`;
+                    });
+                    div.innerHTML = html;
+                }
+
+                body.appendChild(div);
+            });
+        }
+
+        function copyFinalCommand() {
+            const p = wizardState.path || '/ruta/a/tu/proyecto';
+            let cmd;
+
+            if (wizardState.method === 'cli') {
+                cmd = `git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh ${p}`;
+            } else {
+                cmd = `curl -L -o dee.zip ${ZIP_URL} && unzip dee.zip && cd devlmer-ecosystem-engine-main && bash install.sh ${p}`;
+            }
+
+            navigator.clipboard.writeText(cmd).then(() => {
+                // Animate the button
+                const btn = document.getElementById('wizardBtnNext');
+                const termBtn = document.getElementById('terminalCopyBtn');
+
+                btn.classList.add('copied');
+                btn.innerHTML = '<i class="fas fa-check"></i> Copiado al portapapeles';
+                termBtn.classList.add('copied');
+                termBtn.innerHTML = '<i class="fas fa-check"></i> Copiado';
+
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = '<i class="fas fa-copy"></i> Copiar comando completo';
+                    termBtn.classList.remove('copied');
+                    termBtn.innerHTML = '<i class="fas fa-copy"></i> Copiar';
+                }, 2500);
+            });
+        }
+    </script>
+</body>
+</html>

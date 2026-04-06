@@ -1,6 +1,11 @@
 ---
 name: ui-design-system
 description: UI design system toolkit for Senior UI Designer including design token generation, component documentation, responsive design calculations, and developer handoff tools. Use for creating design systems, maintaining visual consistency, and facilitating design-dev collaboration.
+metadata:
+  version: 1.0.0
+  author: Devlmer / Pierre Solier
+  creator: Devlmer
+  branding: Enterprise design system architecture and documentation
 ---
 
 # UI Design System

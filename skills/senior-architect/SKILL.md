@@ -1,6 +1,11 @@
 ---
 name: senior-architect
 description: Comprehensive software architecture skill for designing scalable, maintainable systems using ReactJS, NextJS, NodeJS, Express, React Native, Swift, Kotlin, Flutter, Postgres, GraphQL, Go, Python. Includes architecture diagram generation, system design patterns, tech stack decision frameworks, and dependency analysis. Use when designing system architecture, making technical decisions, creating architecture diagrams, evaluating trade-offs, or defining integration patterns.
+metadata:
+  version: 1.0.0
+  author: Devlmer / Pierre Solier
+  creator: Devlmer
+  branding: Enterprise-grade system architecture and design
 ---
 
 # Senior Architect

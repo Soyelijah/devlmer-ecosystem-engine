@@ -1,11 +1,4 @@
 {
-  "_meta": {
-    "version": "2.0.0",
-    "description": "Project Intelligence Engine — Ecosystem Blueprints",
-    "author": "DYSA / Pierre Solier",
-    "last_updated": "2026-04-03"
-  },
-
   "chatbot": {
     "label": "AI Chatbot / Conversational Agent",
     "description": "Full chatbot system with NLP, multi-channel, analytics, and deployment",
@@ -576,5 +569,241 @@
       "inventory_agent": "Track warehouse inventory, predict stockouts, manage reorder points",
       "fleet_agent": "Monitor vehicle health, driver schedules, fuel efficiency"
     }
+  },
+
+  "legal": {
+    "label": "Legal Tech / Contract & Compliance",
+    "description": "Legal platform with contract management, document review, compliance tracking, and litigation support",
+    "skills": {
+      "core": ["docx", "pdf", "xlsx"],
+      "domain": ["legal:contract-review", "legal:compliance", "legal:legal-risk-assessment", "legal:canned-responses", "operations:compliance-tracking"],
+      "operations": ["operations:risk-assessment", "operations:process-optimization"]
+    },
+    "mcps": {
+      "required": [
+        {"name": "github", "reason": "Document version control with audit trail"}
+      ],
+      "recommended": [
+        {"name": "docusign", "search_terms": ["docusign", "signature"], "reason": "E-signature and contract execution"},
+        {"name": "slack", "search_terms": ["slack", "workflow"], "reason": "Legal team collaboration"},
+        {"name": "notion", "search_terms": ["notion", "database"], "reason": "Contract repository and knowledge base"},
+        {"name": "sendgrid", "search_terms": ["sendgrid", "email"], "reason": "Compliance notifications and alerts"},
+        {"name": "datadog", "search_terms": ["datadog", "monitoring"], "reason": "Compliance monitoring and auditing"}
+      ]
+    },
+    "plugins": ["frontend-design@claude-plugins-official"],
+    "agents": {
+      "contract_review_agent": "Automatically review contracts for legal risks, missing clauses, and non-standard terms",
+      "compliance_agent": "Monitor regulatory changes, track compliance obligations, and audit trail maintenance",
+      "litigation_agent": "Manage discovery, depositions, case timelines, and evidence organization"
+    },
+    "custom_skills_to_create": [
+      {
+        "name": "legal-contract-analysis",
+        "description": "Analyze contracts for risk, missing clauses, comparison against templates, and extraction of key terms",
+        "triggers": ["contract review", "contract analysis", "legal risk", "clause extraction", "nda", "terms review"]
+      },
+      {
+        "name": "legal-compliance-framework",
+        "description": "Design compliance programs, regulatory mapping, audit procedures, and policy documentation",
+        "triggers": ["compliance framework", "regulatory compliance", "audit trail", "policy", "gdpr", "ccpa"]
+      },
+      {
+        "name": "legal-document-management",
+        "description": "Organize and version-control legal documents with classification, retention policies, and access controls",
+        "triggers": ["document management", "legal filing", "discovery", "document retention", "edrm"]
+      }
+    ],
+    "hooks": {
+      "PostToolUse": "After contract edits, run compliance checks and flag missing clauses or risky terms",
+      "SessionStart": "Load contract templates and recent regulatory updates for context"
+    },
+    "claude_md_additions": [
+      "## Legal Tech Architecture",
+      "- Contract lifecycle: Draft → Review → Negotiation → Execution → Monitoring → Renewal",
+      "- Compliance monitoring: Regulatory database → Obligation mapping → Audit procedures → Reporting",
+      "- Risk assessment: Contract risk scoring, litigation probability, regulatory violation flags",
+      "- Document management: OCR, entity extraction, semantic search, version control with audit logs"
+    ]
+  },
+
+  "marketing": {
+    "label": "Marketing Platform / Campaign Management",
+    "description": "Marketing platform with campaign management, audience segmentation, analytics, and content optimization",
+    "skills": {
+      "core": ["docx", "xlsx", "web-artifacts-builder"],
+      "domain": ["marketing:campaign-planning", "marketing:content-creation", "marketing:seo-audit", "marketing:performance-analytics", "marketing:brand-voice"],
+      "operations": ["operations:process-optimization"]
+    },
+    "mcps": {
+      "recommended": [
+        {"name": "google-analytics", "search_terms": ["analytics", "google"], "reason": "Web and campaign analytics"},
+        {"name": "mailchimp", "search_terms": ["mailchimp", "newsletter"], "reason": "Email campaign management"},
+        {"name": "facebook-ads", "search_terms": ["facebook", "ads"], "reason": "Social media advertising"},
+        {"name": "stripe", "search_terms": ["stripe", "billing"], "reason": "Marketing attribution and billing"},
+        {"name": "slack", "search_terms": ["slack", "messaging"], "reason": "Campaign team collaboration"},
+        {"name": "zapier", "search_terms": ["zapier", "automation"], "reason": "Marketing automation workflows"},
+        {"name": "segment", "search_terms": ["segment", "cdp"], "reason": "Customer data platform"},
+        {"name": "mixpanel", "search_terms": ["mixpanel", "analytics"], "reason": "Product and campaign analytics"}
+      ]
+    },
+    "plugins": ["frontend-design@claude-plugins-official"],
+    "agents": {
+      "campaign_agent": "Plan, execute, and optimize multi-channel marketing campaigns with A/B testing and scheduling",
+      "analytics_agent": "Track campaign performance, attribution, conversion funnels, and ROI by channel",
+      "content_agent": "Generate and optimize marketing copy, email sequences, landing pages, and social content",
+      "segmentation_agent": "Build audience segments based on behavior, demographics, and engagement patterns"
+    },
+    "custom_skills_to_create": [
+      {
+        "name": "marketing-campaign-strategy",
+        "description": "Design integrated marketing campaigns with messaging, targeting, channels, timeline, and success metrics",
+        "triggers": ["campaign strategy", "marketing plan", "campaign brief", "go-to-market", "launch strategy"]
+      },
+      {
+        "name": "marketing-audience-segmentation",
+        "description": "Build audience segments, personas, and targeting strategies based on behavioral and demographic data",
+        "triggers": ["audience segmentation", "persona", "targeting", "audience analysis", "cohort"]
+      },
+      {
+        "name": "marketing-performance-analysis",
+        "description": "Analyze campaign performance, attribution, conversion funnels, CAC, LTV, and ROI by channel",
+        "triggers": ["campaign analytics", "conversion rate", "attribution", "CAC", "marketing ROI", "funnel analysis"]
+      }
+    ],
+    "hooks": {
+      "PostToolUse": "After campaign launch, auto-track performance metrics and flag optimization opportunities",
+      "SessionStart": "Load brand voice guidelines, recent campaign results, and competitive analysis"
+    },
+    "claude_md_additions": [
+      "## Marketing Architecture",
+      "- Campaign funnel: Awareness → Consideration → Conversion → Retention → Advocacy",
+      "- Attribution: First-touch, last-touch, multi-touch, incrementality testing across channels",
+      "- Content strategy: Brand voice, messaging pillars, content calendar, distribution channels",
+      "- Analytics: CTR, conversion rate, CAC, LTV, ROAS, engagement rate, segment performance"
+    ]
+  },
+
+  "web3": {
+    "label": "Web3 / Blockchain Platform",
+    "description": "Web3 platform with smart contracts, DeFi protocols, NFT functionality, and wallet integration",
+    "skills": {
+      "core": ["web-artifacts-builder", "xlsx"],
+      "domain": ["product-management:feature-spec", "security-guidance", "operations:risk-assessment"],
+      "operations": ["operations:compliance-tracking", "legal:compliance"]
+    },
+    "mcps": {
+      "recommended": [
+        {"name": "alchemy", "search_terms": ["alchemy", "rpc"], "reason": "Blockchain RPC and APIs"},
+        {"name": "ethers", "search_terms": ["ethers", "ethereum"], "reason": "Ethereum SDK"},
+        {"name": "hardhat", "search_terms": ["hardhat", "solidity"], "reason": "Smart contract development"},
+        {"name": "foundry", "search_terms": ["foundry", "forge"], "reason": "Rust-based smart contract framework"},
+        {"name": "ipfs", "search_terms": ["ipfs", "decentralized"], "reason": "Decentralized storage"},
+        {"name": "thegraph", "search_terms": ["thegraph", "graphql"], "reason": "Blockchain data indexing"},
+        {"name": "openzeppelin", "search_terms": ["openzeppelin", "contracts"], "reason": "Smart contract security standards"},
+        {"name": "metamask", "search_terms": ["metamask", "wallet"], "reason": "Wallet integration and signing"}
+      ]
+    },
+    "agents": {
+      "smart_contract_agent": "Design, audit, and deploy smart contracts with security best practices and gas optimization",
+      "defi_agent": "Manage liquidity pools, yield strategies, price feeds, and protocol economics",
+      "nft_agent": "Manage NFT minting, metadata, marketplaces, and royalty distribution",
+      "security_agent": "Audit contracts for vulnerabilities, reentrancy, front-running, and exploit patterns"
+    },
+    "custom_skills_to_create": [
+      {
+        "name": "web3-smart-contract-design",
+        "description": "Design and implement secure smart contracts with proper access controls, auditing, and gas optimization",
+        "triggers": ["smart contract", "solidity", "contract audit", "contract design", "evm", "gas optimization"]
+      },
+      {
+        "name": "web3-defi-protocol",
+        "description": "Design DeFi protocols: AMM, lending, yield strategies, tokenomics, and economic modeling",
+        "triggers": ["defi", "liquidity", "yield", "amm", "dex", "lending protocol", "tokenomics"]
+      },
+      {
+        "name": "web3-nft-architecture",
+        "description": "Design NFT systems: metadata standards, minting mechanisms, marketplaces, and royalty distribution",
+        "triggers": ["nft", "erc721", "erc1155", "nft marketplace", "metadata", "collection design"]
+      },
+      {
+        "name": "web3-security-audit",
+        "description": "Audit smart contracts for vulnerabilities: reentrancy, overflow, access control, front-running",
+        "triggers": ["smart contract audit", "security audit", "vulnerability", "reentrancy", "slippage"]
+      }
+    ],
+    "hooks": {
+      "PostToolUse": "After smart contract code changes, run static analysis and security checks",
+      "SessionStart": "Load blockchain network status, gas prices, and recent security incidents"
+    },
+    "claude_md_additions": [
+      "## Web3 Architecture",
+      "- Smart contract layers: Protocol (core logic) → Integration (adapters) → Frontend (user interface)",
+      "- Security: Formal verification, automated audits, multi-sig governance, circuit breakers, emergency pauses",
+      "- DeFi primitives: AMM (constant product formula), lending (collateralization), derivatives (perpetuals, options)",
+      "- Token standards: ERC-20 (fungible), ERC-721/1155 (NFTs), ERC-1967 (proxies), ERC-2612 (permit signatures)",
+      "- Network economics: Gas optimization, MEV resistance, cross-chain bridges, liquidity incentives"
+    ]
+  },
+
+  "social": {
+    "label": "Social Platform / Feed & Community",
+    "description": "Social platform with feeds, messaging, user profiles, notifications, and community features",
+    "skills": {
+      "core": ["web-artifacts-builder", "docx"],
+      "domain": ["design:ux-writing", "design:design-system-management", "product-management:metrics-tracking", "marketing:campaign-planning"],
+      "operations": ["operations:process-optimization", "legal:compliance"]
+    },
+    "mcps": {
+      "required": [
+        {"name": "github", "reason": "Version control"}
+      ],
+      "recommended": [
+        {"name": "firebase", "search_terms": ["firebase", "realtime"], "reason": "Real-time messaging and notifications"},
+        {"name": "redis", "search_terms": ["redis", "cache"], "reason": "Feed caching and real-time activity"},
+        {"name": "elasticsearch", "search_terms": ["elasticsearch", "search"], "reason": "User and content search"},
+        {"name": "sendgrid", "search_terms": ["sendgrid", "email"], "reason": "Email notifications"},
+        {"name": "stripe", "search_terms": ["stripe", "billing"], "reason": "Premium features and creator payments"},
+        {"name": "slack", "search_terms": ["slack", "messaging"], "reason": "Team communication"},
+        {"name": "sentry", "search_terms": ["sentry", "monitoring"], "reason": "Error tracking and monitoring"},
+        {"name": "datadog", "search_terms": ["datadog", "apm"], "reason": "Real-time monitoring and APM"}
+      ]
+    },
+    "plugins": ["frontend-design@claude-plugins-official"],
+    "agents": {
+      "feed_agent": "Optimize feed algorithms, ranking, personalization, and content quality scoring",
+      "moderation_agent": "Detect spam, harassment, abuse, and enforce community guidelines at scale",
+      "recommendation_agent": "Generate personalized recommendations for users, content, and communities",
+      "notification_agent": "Route notifications smartly to maximize engagement while respecting user preferences"
+    },
+    "custom_skills_to_create": [
+      {
+        "name": "social-feed-algorithms",
+        "description": "Design feed ranking algorithms with personalization, diversity, recency, and engagement optimization",
+        "triggers": ["feed algorithm", "recommendation", "personalization", "ranking", "social ranking"]
+      },
+      {
+        "name": "social-moderation-strategy",
+        "description": "Build content moderation workflows: automated detection, human review queues, and appeal processes",
+        "triggers": ["moderation", "community guidelines", "content policy", "abuse detection", "safety"]
+      },
+      {
+        "name": "social-engagement-metrics",
+        "description": "Define and track engagement metrics: CTR, shares, comments, retention, and virality coefficients",
+        "triggers": ["engagement metrics", "social analytics", "user engagement", "viral coefficient"]
+      }
+    ],
+    "hooks": {
+      "PostToolUse": "After feed algorithm changes, validate against engagement metrics and quality scores",
+      "SessionStart": "Load community guidelines, recent moderation decisions, and trending content analysis"
+    },
+    "claude_md_additions": [
+      "## Social Platform Architecture",
+      "- Feed system: Personalized ranking → Diversity filters → Spam/quality → Caching → Delivery",
+      "- Real-time: WebSocket connections → Activity streams → Notifications → Presence tracking",
+      "- Moderation: ML detection (spam, abuse) → Human review queue → Appeals → Enforcement (shadow ban, suspension)",
+      "- Engagement: Feed ranking, notifications, recommendations, creator incentives, gamification",
+      "- Monetization: Premium features, creator payouts, ads, sponsored content, virtual gifts"
+    ]
   }
 }

@@ -1,0 +1,36 @@
+/* ============================================================
+   Devlmer Ecosystem Engine - VARIABLES
+   ============================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-blue: #0052FF;
+    --primary-cyan: #00D4AA;
+    --dark-bg: #0a0e27;
+    --dark-secondary: #111933;
+    --dark-tertiary: #1a1f3a;
+    --text-primary: #ffffff;
+    --text-secondary: #a0aec0;
+    --border-light: rgba(255, 255, 255, 0.1);
+    --border-lighter: rgba(255, 255, 255, 0.05);
+    --glow-blue: rgba(0, 82, 255, 0.2);
+    --glow-cyan: rgba(0, 212, 170, 0.2);
+}
+
+html {
+    scroll-behavior: smooth;
+    background-color: var(--dark-bg);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--dark-bg) 0%, #0f1229 50%, var(--dark-secondary) 100%);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    min-height: 100vh;
+}

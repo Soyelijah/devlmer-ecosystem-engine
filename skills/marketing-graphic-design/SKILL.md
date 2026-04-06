@@ -2,8 +2,10 @@
 name: marketing-graphic-design
 description: "Enterprise Marketing Graphic Design System — Creates professional marketing collateral, social media graphics, ad creatives, landing page designs, email templates, infographics, and brand-consistent visual assets. Integrates with Canva API, generates SVG/HTML assets, and maintains design system consistency. Triggers: 'marketing design', 'graphic design', 'social media graphic', 'ad creative', 'banner', 'infographic', 'marketing visual', 'flyer', 'poster', 'email template design', 'landing page design', 'hero image', 'thumbnail', 'cover image', 'campaign visual'."
 metadata:
-  version: 1.0.0
-  author: DYSA / Pierre Solier
+  version: 1.1.0
+  author: Devlmer / Pierre Solier
+  creator: Devlmer
+  branding: Premium enterprise marketing design solutions
 ---
 
 # Marketing Graphic Design System
@@ -160,7 +162,47 @@ When Canva MCP is available:
 // Data-driven charts with Recharts
 ```
 
-### 8. Campaign Asset Bundles
+### 8. Enterprise Design Patterns
+
+Apply these proven enterprise marketing patterns:
+
+**Pattern: Glass Morphism (Premium SaaS)**
+- Translucent backgrounds with backdrop blur
+- Layered depth for visual hierarchy
+- Gradient borders for modern feel
+- Example: `bg-slate-900/50 backdrop-blur-xl border border-slate-700/50`
+
+**Pattern: Data Visualization (B2B Marketing)**
+- Clean, minimal chart designs with brand colors
+- Grid-based layout for credibility
+- Typography hierarchy for numbers (large primary metric)
+- Source attribution below charts
+
+**Pattern: Hero + Social Proof (Conversion-Focused)**
+- Bold headline (40-60px) with brand primary color
+- Subheading that answers "why" (20-30px, secondary color)
+- 3-5 logo marks or testimonial blocks
+- CTA button with high contrast
+
+**Pattern: Feature Grid (SaaS Product Pages)**
+- 3-4 columns on desktop, 1 on mobile
+- Icon (80x80px) + title (16-18px) + description (14px)
+- Subtle shadows or border accents
+- Consistent spacing (gap: 2rem)
+
+**Pattern: Timeline/Roadmap (Product Marketing)**
+- Vertical line (desktop) or stepped blocks (mobile)
+- Milestone cards with dates, titles, descriptions
+- Alternating left/right layout for visual interest
+- Color coding by status (completed/in-progress/planned)
+
+**Pattern: Comparison Table (Enterprise Sales)**
+- Side-by-side feature comparison
+- Checkmarks for included, empty for excluded
+- Highlight your offering (background tint or border)
+- Row alternation (light/dark) for readability
+
+### 9. Campaign Asset Bundles
 
 When creating campaign assets, generate the COMPLETE set:
 
@@ -175,14 +217,20 @@ Campaign: [Name]
 ├── ads/
 │   ├── display-728x90.html
 │   ├── display-300x250.html
-│   └── display-160x600.html
+│   ├── display-160x600.html
+│   └── video-thumbnail-1280x720.html
 ├── email/
-│   └── campaign-email.html
+│   ├── campaign-email-600w.html
+│   └── mobile-optimized-email.html
 ├── landing/
-│   └── hero-section.html
+│   ├── hero-section.html
+│   ├── features-section.html
+│   ├── social-proof-section.html
+│   └── cta-footer-section.html
 └── brand/
     ├── design-tokens.json
-    └── campaign-guidelines.md
+    ├── campaign-guidelines.md
+    └── accessibility-report.md
 ```
 
 ## Automatic Triggers

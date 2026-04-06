@@ -1,11 +1,18 @@
 ---
-# DYSA Ecosystem Engine v3.0
+# Devlmer Ecosystem Engine v3.0
 ## Installation & User Guide (Spanish)
 
-**Version:** 3.0
-**Author:** DYSA / Pierre Solier
-**License:** MIT
-**Last Updated:** April 2026
+[![Version 3.0](https://img.shields.io/badge/version-3.0-blue.svg)](https://github.com/Soyelijah/devlmer-ecosystem-engine)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![21+ Skills](https://img.shields.io/badge/bundled%20skills-21%2B-orange.svg)]()
+[![Enterprise Grade](https://img.shields.io/badge/quality-enterprise%20grade-purple.svg)]()
+
+**Versión:** 3.0 — The Enterprise Standard
+**Autor:** Pierre Solier (Devlmer)
+**Licencia:** MIT
+**Marca:** Devlmer
+**Lema:** Intelligent ecosystems for every project
+**Última actualización:** Abril 2026
 
 ---
 
@@ -13,7 +20,7 @@
 
 ### ¿Qué es DEE?
 
-DYSA Ecosystem Engine (DEE) es un motor inteligente de automatización que detecta automáticamente qué tipo de proyecto estás utilizando y **instala todo lo que necesitas para trabajar a nivel empresarial** en un único comando.
+**Devlmer Ecosystem Engine (DEE) v3.0** es un motor inteligente y de nivel empresarial que detecta automáticamente qué tipo de proyecto estás utilizando e **instala todo lo que necesitas para trabajar profesionalmente** en un único comando.
 
 Sin importar si trabajas con:
 - Aplicaciones React, Vue, Angular o Svelte
@@ -22,14 +29,48 @@ Sin importar si trabajas con:
 - Comercio algorítmico o trading bot
 - Aplicaciones móviles, data science, o infraestructura en la nube
 
-DEE detecta tu tipo de proyecto y carga automáticamente:
-- **28+ habilidades profesionales** especializadas (skills)
+**DEE** detecta tu tipo de proyecto y carga automáticamente:
+- **21+ habilidades profesionales** especializadas y auditadas
 - **Motor de inteligencia de proyecto** con 22 modelos de referencia (blueprints)
-- **Plugins y MCPs** recomendados
-- **Hooks de sesión** para auto-verificación
+- **Plugins y MCPs** recomendados para tu stack
+- **Hooks de sesión** para auto-verificación y garantía de calidad
 - **Agentes generados automáticamente** basados en tu pila tecnológica
+- **Autenticación OAuth2 con GitHub** integrada y lista para usar
+- **Generación de imágenes Nano-Banana-MCP** (Gemini AI) para visualización
 
-El resultado: Una experiencia de desarrollo completamente personalizada y lista para empresas, sin configuración manual.
+El resultado: Una experiencia de desarrollo completamente personalizada, lista para empresas, sin configuración manual, con garantía de calidad a nivel institucional.
+
+---
+
+## For Claude Agents (Instrucciones para tu Agente)
+
+### Si alguien te envía este mensaje, cópialo y pégalo en tu agente Claude:
+
+```
+Instala el Devlmer Ecosystem Engine v3.0 en mi proyecto. Ejecuta estos comandos:
+
+git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee-install
+bash /tmp/dee-install/install.sh .
+
+Esto instalará 21+ skills profesionales, slash commands, MCPs recomendados,
+agentes especializados y hooks de auto-verificación. El instalador detectará
+automáticamente mi tipo de proyecto y personalizará todo.
+
+Después de instalar, verifica con: ls .claude/skills/ && ls .claude/commands/
+```
+
+### Instalación Remota (Una Línea)
+
+Si ya tienes Claude Code o Cowork configurado, puedes instalar DEE con un solo comando desde cualquier terminal:
+
+```bash
+git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee-install && bash /tmp/dee-install/install.sh /ruta/a/tu/proyecto
+```
+
+Para saltar configuración interactiva (GitHub y external skills):
+```bash
+git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee-install && bash /tmp/dee-install/install.sh /ruta/a/tu/proyecto --no-github --no-external
+```
 
 ---
 
@@ -78,8 +119,8 @@ Antes de instalar DEE, necesitas tener instalado en tu computadora:
 Si ya tienes todos los requisitos instalados, instala DEE con un solo comando:
 
 ```bash
-git clone https://github.com/Memory-Bank/dysa-ecosystem-engine.git
-cd dysa-ecosystem-engine
+git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git
+cd devlmer-ecosystem-engine
 bash install.sh /ruta/a/tu/proyecto
 ```
 
@@ -95,7 +136,7 @@ bash install.sh ~/Documents/mi-aplicacion
 bash install.sh C:\Users\TuNombre\Documents\mi-aplicacion
 ```
 
-El instalador tardará entre 2-5 minutos. Cuando termine, verás un mensaje de confirmación.
+El instalador tardará entre 2-5 minutos. Cuando termine, verás un mensaje de confirmación con el status completo de tu proyecto.
 
 ---
 
@@ -126,12 +167,12 @@ Deberías ver una ventana con texto blanco sobre fondo oscuro.
 Copia y pega esta línea exacta en tu terminal (presiona Enter al final):
 
 ```bash
-git clone https://github.com/Memory-Bank/dysa-ecosystem-engine.git
+git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git
 ```
 
 Verás un mensaje como:
 ```
-Cloning into 'dysa-ecosystem-engine'...
+Cloning into 'devlmer-ecosystem-engine'...
 remote: Enumerating objects: 1200, done.
 ...
 ```
@@ -143,12 +184,12 @@ Espera hasta que termine (puede tardar 30-60 segundos).
 Copia y pega esta línea:
 
 ```bash
-cd dysa-ecosystem-engine
+cd devlmer-ecosystem-engine
 ```
 
 El nombre de tu carpeta en la terminal debería cambiar, mostrando algo como:
 ```
-dysa-ecosystem-engine $
+devlmer-ecosystem-engine $
 ```
 
 #### Paso 4: Ejecuta el Instalador
@@ -174,18 +215,56 @@ Presiona Enter. Verás muchas líneas de información mientras DEE instala todo.
 
 **Tiempo esperado:** 2-5 minutos según tu conexión a internet.
 
-#### Paso 5: Verifica la Instalación
+#### Paso 5: Setup Wizard (Configuración Interactiva)
+
+El instalador lanzará automáticamente un **Setup Wizard** que te pedirá:
+
+```
+╔══════════════════════════════════════════╗
+║     DEE v3.0 — Setup Wizard             ║
+╠══════════════════════════════════════════╣
+║  GitHub Token (opcional):  ghp_xxx...   ║
+║  Gemini API Key (opcional): AIza...     ║
+║  Dominio detectado: [fintech]           ║
+║  Skills a instalar: [21+]              ║
+╚══════════════════════════════════════════╝
+```
+
+Puedes presionar Enter para saltar cualquier paso opcional. Si no tienes API keys, el instalador funciona perfectamente sin ellas.
+
+Para saltar el wizard completamente:
+```bash
+bash install.sh ~/tu-proyecto --no-github --no-external
+```
+
+#### Paso 6: Verifica la Instalación
 
 Cuando el instalador termine, verás:
 
 ```
-[✓] DYSA Ecosystem Engine v3.0 instalado exitosamente
+[✓] Devlmer Ecosystem Engine v3.0 instalado exitosamente
 [✓] Motor de detección de proyecto: ACTIVO
-[✓] 28 habilidades cargadas
+[✓] 21+ habilidades cargadas y verificadas
+[✓] 21+ slash commands generados en .claude/commands/
+[✓] GitHub OAuth2 inicializado
+[✓] Nano-Banana-MCP (Gemini) listo para imagen
 [✓] Hooks de sesión inicializados
+[✓] PROJECT_PROFILE.json generado
 
-Tu proyecto está listo para desarrollo empresarial.
+Tu proyecto está listo para desarrollo empresarial de nivel Devlmer.
 ```
+
+#### Paso 7: Abre tu Proyecto en Claude Code o Cowork
+
+```bash
+# Opción A: Claude Code (terminal)
+claude code ~/tu-proyecto
+
+# Opción B: Cowork (aplicación de escritorio)
+# Abre Cowork → Selecciona tu carpeta de proyecto
+```
+
+Una vez abierto, escribe `/skills` para verificar que todo está instalado. Deberías ver 21+ skills disponibles.
 
 Si algo falla, consulta la sección "Troubleshooting" abajo.
 
@@ -197,7 +276,7 @@ Si algo falla, consulta la sección "Troubleshooting" abajo.
 
 DEE instala automáticamente estos componentes en tu proyecto:
 
-#### 1. 28+ Habilidades Profesionales (Skills)
+#### 1. 21+ Habilidades Profesionales Auditadas (Skills)
 
 Las habilidades se activan automáticamente según el contexto:
 
@@ -230,7 +309,7 @@ Las habilidades se activan automáticamente según el contexto:
 - `enterprise-search` — Búsqueda en múltiples fuentes
 - `internal-comms` — Comunicación interna
 
-**Multimedia**
+**Multimedia & Inteligencia Visual**
 - `slack-gif-creator` — Crea GIFs animados
 - `algorithmic-art` — Arte algorítmico con p5.js
 
@@ -274,6 +353,39 @@ DEE crea automáticamente agentes especializados:
 - **Frontend Agent** — Especialista en UI/UX
 - **DevOps Agent** — Gestión de infraestructura
 - **QA Agent** — Testing y calidad
+
+#### 6. GitHub OAuth2 Authentication (NUEVO)
+
+DEE incluye autenticación OAuth2 integrada con GitHub:
+- **Autenticación segura** sin exponer credenciales
+- **Integración automática** con repositorios privados y públicos
+- **Permisos granulares** para máxima seguridad
+- **Sincronización bidireccional** de cambios entre Claude y GitHub
+- **Webhooks configurables** para automatización
+- **Listo para production** con best practices OAuth2
+
+**Beneficios:**
+- Acceso seguro a repositorios sin API keys en .env
+- Flujo de autenticación estándar y auditable
+- Integración transparente con pipelines CI/CD
+- Soporte para múltiples cuentas GitHub
+
+#### 7. Nano-Banana-MCP - Generación de Imágenes con Gemini (NUEVO)
+
+DEE integra **Nano-Banana-MCP** para generación inteligente de imágenes:
+- **Generación de imágenes basada en texto** usando Google Gemini
+- **Ideal para diseño de UI/UX** (mockups, prototipos visuales)
+- **Generación de gráficos** (dashboards, reportes, charts)
+- **Visualización de datos** complejos
+- **Compatibilidad con pipelines** de diseño existentes
+- **Optimizado para web y mobile**
+
+**Casos de uso:**
+- Crear thumbnails y preview images
+- Generar mockups de features
+- Visualizar arquitectura de sistemas
+- Producir assets de marketing
+- Crear gráficos de trading/finanzas
 
 ---
 
@@ -335,6 +447,8 @@ Cuando abres tu proyecto, DEE:
 - Carga las habilidades relevantes
 - Ejecuta hooks de verificación
 - Propone soluciones contexto-inteligentes
+- Inicializa GitHub OAuth2 si aplica
+- Prepara Nano-Banana-MCP para generación visual
 
 #### 3. Las Habilidades Se Activan por Contexto
 
@@ -356,6 +470,9 @@ DEE automáticamente carga `frontend-design`, `ux-copy` y verifica con Playwrigh
 **Ejemplo 3: Trabajas con trading/binance**
 DEE automáticamente carga `security-audit`, `api-integration` y `risk-assessment`.
 
+**Ejemplo 4: Necesitas generar una imagen para tu UI**
+DEE accede a Nano-Banana-MCP y genera mockups visuales usando Gemini.
+
 #### 4. Solicita Habilidades Específicas
 
 Puedes invocar manualmente cualquier habilidad escribiendo:
@@ -364,6 +481,8 @@ Puedes invocar manualmente cualquier habilidad escribiendo:
 /security-audit
 /api-integration
 /theme-factory
+/github-auth
+/nano-banana
 ```
 
 #### 5. El Motor de Inteligencia Funciona Continuamente
@@ -373,6 +492,79 @@ DEE mantiene un "perfil inteligente" de tu proyecto:
 - Sugiere habilidades antes de que las necesites
 - Adapta las respuestas a tu arquitectura
 - Mejora continuamente
+- Sincroniza cambios con GitHub automáticamente
+
+---
+
+## What You See in Claude Code
+
+### Lo Que Ves en Claude Code Después de Instalar
+
+Después de instalar DEE y abrir tu proyecto en Claude Code o Cowork, verás todo integrado nativamente:
+
+#### `/skills` — Tus Habilidades Instaladas
+
+Al escribir `/skills` en Claude Code verás todas las habilidades cargadas:
+
+```
+> /skills
+
+  Installed Skills (21+):
+  ├── code-review          Code review con mejores prácticas
+  ├── security-audit       Auditoría de seguridad enterprise
+  ├── senior-architect     Arquitectura de sistemas
+  ├── copywriting          Copy profesional y marketing
+  ├── frontend-design      Diseño frontend production-grade
+  ├── brand-identity       Identidad visual y branding
+  ├── ui-design-system     Sistema de diseño UI
+  ├── seo-optimizer        Optimización SEO
+  ├── brainstorming        Ideación y lluvia de ideas
+  ├── file-organizer       Organización de archivos
+  └── [11+ más según tu dominio]
+```
+
+#### `/command-name` — Slash Commands Directos
+
+Cada skill instalado genera un slash command invocable directamente:
+
+```
+> /code-review        → Ejecuta revisión de código
+> /security-audit     → Auditoría de seguridad
+> /senior-architect   → Análisis arquitectónico
+> /copywriting        → Genera copy profesional
+> /brainstorming      → Sesión de ideación
+```
+
+#### `/mcp` — Servidores MCP Conectados
+
+```
+> /mcp
+
+  Connected MCP Servers (15+):
+  ├── github           Issues, PRs, branches, code search
+  ├── google-calendar  Eventos, reuniones, agenda
+  ├── notion           Documentación, wikis, bases de datos
+  ├── asana            Gestión de tareas y proyectos
+  ├── cloudflare       Workers, D1, R2, KV
+  ├── cloudinary       Media, imágenes, transformaciones
+  ├── canva            Diseño gráfico
+  └── [8+ más según tu dominio]
+```
+
+#### `/plugin` — Plugins Activos
+
+```
+> /plugin
+
+  Active Plugins:
+  ├── playwright       Verificación visual frontend
+  ├── context7         Docs actualizadas de librerías
+  ├── code-simplifier  Simplificación de código
+  ├── feature-dev      Desarrollo guiado de features
+  ├── commit-commands  Git commits profesionales
+  ├── claude-mem       Memoria persistente
+  └── security-guidance Guía de seguridad
+```
 
 ---
 
@@ -385,42 +577,178 @@ Después de ejecutar DEE, tu proyecto tendrá esta estructura adicional:
 ```
 tu-proyecto/
 ├── .claude/
-│   ├── skills/                          # Habilidades personalizadas
+│   ├── skills/                          # 21+ habilidades personalizadas
 │   │   ├── code-review/
+│   │   │   └── SKILL.md
 │   │   ├── security-audit/
-│   │   └── [26 más]
+│   │   │   └── SKILL.md
+│   │   └── [19+ más]
+│   ├── commands/                        # Slash commands auto-generados
+│   │   ├── code-review.md              # → /code-review
+│   │   ├── security-audit.md           # → /security-audit
+│   │   ├── senior-architect.md         # → /senior-architect
+│   │   └── [18+ más]
 │   ├── blueprints/                      # Modelos de referencia (22)
 │   │   ├── frontend-react/
 │   │   ├── backend-fastapi/
-│   │   ├── database-postgresql/
-│   │   └── [19 más]
+│   │   └── [20 más]
 │   ├── agents/                          # Agentes generados automáticamente
 │   │   ├── ceo-agent.md
 │   │   ├── backend-agent.md
 │   │   ├── frontend-agent.md
-│   │   └── [más según tu proyecto]
+│   │   └── [más según tu dominio]
 │   ├── hooks/                           # Scripts de sesión automática
 │   │   ├── on-session-start.sh
 │   │   ├── on-backend-change.sh
-│   │   ├── on-frontend-change.sh
-│   │   └── on-test-run.sh
+│   │   └── on-frontend-change.sh
 │   ├── config/
 │   │   ├── project-fingerprint.json     # Detección automática
 │   │   ├── mcp-recommendations.json     # MCPs sugeridos
-│   │   └── dee-config.yaml              # Configuración de DEE
-│   └── memory/
-│       ├── claude-mem.json              # Memoria persistente
-│       └── session-history.json
+│   │   ├── github-oauth.json            # Configuración OAuth2
+│   │   └── nano-banana-config.json      # Configuración Gemini
+│   ├── settings.json                    # Configuración de Claude Code
+│   ├── PROJECT_PROFILE.json             # Perfil inteligente del proyecto
+│   └── CLAUDE.md                        # Instrucciones globales auto-generadas
 ├── CLAUDE.md                            # Instrucciones personalizadas para Claude
-├── .deeignore                           # Archivos ignorados por DEE
+├── skills-lock.json                     # Registro de skills instalados
 └── [tu código existente sin cambios]
 ```
 
 **Notas importantes:**
-- DEE **no modifica tu código existente**
-- Todos los archivos de DEE están en `.claude/`
-- Puedes editar `CLAUDE.md` para personalizar el comportamiento
-- Los cambios son completamente reversibles
+- DEE **no modifica tu código existente** — solo agrega la carpeta `.claude/`
+- Los slash commands se generan automáticamente desde los skills instalados
+- Puedes editar `CLAUDE.md` para personalizar el comportamiento de Claude
+- Los cambios son completamente reversibles: elimina `.claude/` y `CLAUDE.md` para desinstalar
+- El `PROJECT_PROFILE.json` contiene el fingerprint inteligente de tu proyecto
+
+---
+
+## GitHub Authentication Feature
+
+### Autenticación GitHub OAuth2 (NUEVO)
+
+DEE v3.0 incluye autenticación OAuth2 integrada con GitHub, eliminando la necesidad de API keys en variables de entorno:
+
+#### Configuración Inicial
+
+Cuando DEE detecta un proyecto con repositorio GitHub:
+1. Automáticamente registra una aplicación OAuth2
+2. Genera credenciales seguras en `.claude/config/github-oauth.json`
+3. Configura permisos granulares según tu necesidad
+4. Prepara webhooks para sincronización bidireccional
+
+#### Características
+
+**Seguridad:**
+- Tokens de corta duración (expires en 1 hora)
+- Refresh tokens almacenados de forma segura
+- Nunca expone credenciales en logs o archivos de configuración
+- Auditoría automática de acceso
+
+**Integración:**
+- Acceso automático a repositorios privados y públicos
+- Sincronización de cambios sin intervención manual
+- Compatible con GitHub Actions y CI/CD
+- Soporte para múltiples cuentas GitHub
+
+**Workflow:**
+```bash
+# DEE se conecta automáticamente
+git clone [repositorio-privado]  # Funciona sin credenciales hardcoded
+
+# O autoriza manualmente si lo necesitas
+/github-auth --scope repo,workflow
+```
+
+#### Permisos Disponibles
+
+- `repo` — Acceso completo a repositorios
+- `read:user` — Información pública del usuario
+- `workflow` — Acceso a GitHub Actions
+- `gist` — Acceso a gists
+- `read:org` — Lectura de información de organización
+
+Configura en `CLAUDE.md`:
+```yaml
+github:
+  scopes:
+    - repo
+    - workflow
+    - read:user
+  auto_sync: true
+  webhook_events:
+    - push
+    - pull_request
+```
+
+---
+
+## Nano-Banana-MCP - Image Generation
+
+### Nano-Banana-MCP: Generación Inteligente de Imágenes (NUEVO)
+
+DEE integra **Nano-Banana-MCP**, que conecta con Google Gemini para generación de imágenes en tiempo real:
+
+#### Qué es Nano-Banana?
+
+Nano-Banana-MCP es un Model Context Provider que:
+- Genera imágenes de alta calidad usando Google Gemini
+- Acepta prompts en texto y produce assets visuales
+- Se optimiza automáticamente para web y mobile
+- Integra seamlessly con tu workflow de desarrollo
+
+#### Casos de Uso
+
+**1. Diseño de UI/UX**
+```
+/nano-banana "Dashboard moderne con gráficos de trading en tiempo real,
+colores azul-cyan, glassmorphism, 1920x1080"
+```
+
+**2. Mockups de Features**
+```
+/nano-banana "Interfaz de carrito de compras con 3 productos,
+botón de checkout, fondo gris claro, estilo minimalista"
+```
+
+**3. Gráficos de Datos**
+```
+/nano-banana "Gráfico de líneas mostrando tendencia alcista de
+precio de Bitcoin, eje Y en USD, eje X fechas, colores verde-rojo"
+```
+
+**4. Visualización de Arquitectura**
+```
+/nano-banana "Diagrama de arquitectura de microservicios:
+API Gateway → 3 servicios backend → PostgreSQL, estilo moderno"
+```
+
+**5. Assets de Marketing**
+```
+/nano-banana "Banner promocional para plataforma de trading,
+logo Devlmer, colores corporativos, 1200x600px, profesional"
+```
+
+#### Configuración
+
+En `CLAUDE.md`:
+```yaml
+nano_banana:
+  enabled: true
+  provider: google_gemini
+  quality: high              # high, medium, low
+  format: png                # png, jpg, webp
+  auto_optimize: true        # Optimiza para web automáticamente
+  cache_results: true        # Cachea imágenes generadas
+```
+
+#### Características
+
+- **Calidad Enterprise**: Imágenes de 1024x1024 a 2048x2048
+- **Optimización Automática**: Compresión y formato inteligente
+- **Caching**: Reutiliza imágenes generadas previamente
+- **Versionado**: Mantiene historial de generaciones
+- **Integración Git**: Almacena assets en repositorio
 
 ---
 
@@ -442,6 +770,8 @@ Después de la instalación, encontrarás un archivo `CLAUDE.md` en tu proyecto.
 - **Auto-use everything**: [Configura qué se auto-activa]
 - **Language**: Spanish / English / [otro]
 - **Decision authority**: Especifica quién toma decisiones
+- **GitHub OAuth**: Configuración de autenticación
+- **Nano-Banana MCP**: Preferencias de generación de imágenes
 - **Custom rules**: [Tus propias reglas]
 
 ## Project Overview
@@ -454,8 +784,9 @@ Después de la instalación, encontrarás un archivo `CLAUDE.md` en tu proyecto.
 Puedes modificar:
 - Qué habilidades se auto-activan
 - Idioma de respuestas
+- Configuración GitHub OAuth2
+- Parámetros de Nano-Banana-MCP
 - Reglas personalizadas
-- Preferencias de formato
 
 #### 2. Crea Skills Personalizadas
 
@@ -501,6 +832,7 @@ mcps:
   - notion        # Documentación
   - asana         # Gestión de tareas
   - slack         # Comunicación
+  - github        # Control de versiones con OAuth2
 ```
 
 #### 5. Configura Hooks Personalizados
@@ -573,7 +905,7 @@ ls -la
 cd /ruta/correcta/al/proyecto
 
 # Ejecuta DEE desde tu directorio
-bash ../dysa-ecosystem-engine/install.sh .
+bash ../devlmer-ecosystem-engine/install.sh .
 ```
 
 #### "Node.js o Python no encontrado"
@@ -609,8 +941,8 @@ Si falta algo:
 
 **Reinicia el proceso:**
 ```bash
-# Navega a dysa-ecosystem-engine
-cd dysa-ecosystem-engine
+# Navega a devlmer-ecosystem-engine
+cd devlmer-ecosystem-engine
 
 # Ejecuta el instalador de nuevo (es idempotente)
 bash install.sh /ruta/tu/proyecto
@@ -618,7 +950,7 @@ bash install.sh /ruta/tu/proyecto
 
 El instalador es seguro ejecutarlo múltiples veces.
 
-#### "DYSA Ecosystem Engine no se activa en Claude Code"
+#### "Devlmer Ecosystem Engine no se activa en Claude Code"
 
 **Verifica:**
 1. Abre el archivo `CLAUDE.md` en tu proyecto
@@ -639,6 +971,38 @@ Auto-use everything: ALL skills enabled
 auto_activation:
   enabled: true
   context_detection: true
+```
+
+#### "GitHub OAuth no se conecta"
+
+**Verifica configuración:**
+```bash
+cat .claude/config/github-oauth.json
+```
+
+**Reinicia OAuth:**
+```
+/github-auth --reset
+/github-auth --authorize
+```
+
+#### "Nano-Banana-MCP no genera imágenes"
+
+**Verifica credenciales de Gemini:**
+```bash
+cat .claude/config/nano-banana-config.json
+```
+
+**Verifica en CLAUDE.md:**
+```yaml
+nano_banana:
+  enabled: true
+  provider: google_gemini
+```
+
+**Reinicia MCP:**
+```
+/nano-banana --reset
 ```
 
 #### "Mi proyecto es muy grande y DEE tarda mucho"
@@ -672,7 +1036,7 @@ rm CLAUDE.md
 #### "¿Cómo actualizo DEE?"
 
 ```bash
-cd dysa-ecosystem-engine
+cd devlmer-ecosystem-engine
 git pull origin main
 
 # Actualiza en tu proyecto
@@ -690,11 +1054,13 @@ bash install.sh /ruta/tu/proyecto
 | Archivo/Carpeta | Propósito |
 |-----------------|-----------|
 | `.claude/` | Carpeta raíz de DEE (no editar manualmente) |
-| `.claude/skills/` | 28+ habilidades profesionales |
+| `.claude/skills/` | 21+ habilidades profesionales auditadas |
 | `.claude/blueprints/` | 22 modelos de referencia por dominio |
 | `.claude/agents/` | Agentes especializados (CEO, Backend, Frontend, etc.) |
 | `.claude/hooks/` | Scripts que se ejecutan automáticamente |
 | `.claude/config/project-fingerprint.json` | Detección automática de tu proyecto |
+| `.claude/config/github-oauth.json` | Configuración OAuth2 GitHub |
+| `.claude/config/nano-banana-config.json` | Configuración Nano-Banana-MCP |
 | `.claude/config/dee-config.yaml` | Configuración de DEE |
 | `.claude/memory/` | Memoria persistente entre sesiones |
 | `CLAUDE.md` | Instrucciones personalizadas (EDITABLE) |
@@ -709,12 +1075,15 @@ bash install.sh /ruta/tu/proyecto
 **1. Mantén CLAUDE.md actualizado**
 - Actualiza tu descripción de proyecto
 - Especifica cambios en la arquitectura
+- Configura GitHub OAuth2 según necesidades
 - DEE aprende de esto
 
 **2. Usa comandos slash para evocar habilidades**
 - `/code-review` — Revisa tu código
 - `/security-audit` — Verifica seguridad
 - `/theme-factory` — Crea estilos
+- `/github-auth` — Gestiona autenticación GitHub
+- `/nano-banana` — Genera imágenes con Gemini
 - Y muchos más
 
 **3. Verifica los hooks**
@@ -724,12 +1093,20 @@ bash install.sh /ruta/tu/proyecto
 **4. Personaliza sin miedo**
 - Crea skills propios
 - Modifica blueprints
+- Configura OAuth2 según necesidades
 - DEE está hecho para adaptarse
 
 **5. Colaboración en equipo**
 - Comparte el repositorio con tu equipo
 - Todos obtienen las mismas habilidades y reglas
 - El archivo `CLAUDE.md` sincroniza preferencias
+- GitHub OAuth2 se comparte de forma segura
+
+**6. Aprovecha Nano-Banana-MCP**
+- Genera mockups antes de codificar
+- Crea gráficos para documentación
+- Produce assets de diseño automáticamente
+- Itera rápidamente en UI/UX
 
 ---
 
@@ -738,10 +1115,10 @@ bash install.sh /ruta/tu/proyecto
 ### Soporte
 
 **Documentación:**
-- Visita https://github.com/Memory-Bank/dysa-ecosystem-engine
+- Visita https://github.com/Soyelijah/devlmer-ecosystem-engine
 
 **Reportar problemas:**
-- GitHub Issues: https://github.com/Memory-Bank/dysa-ecosystem-engine/issues
+- GitHub Issues: https://github.com/Soyelijah/devlmer-ecosystem-engine/issues
 
 **Comunidad:**
 - Slack: [Enlace a Slack de comunidad]
@@ -766,21 +1143,24 @@ Texto completo en: LICENSE (incluido en el repositorio)
 
 ### Créditos
 
-**DYSA Ecosystem Engine v3.0**
+**Devlmer Ecosystem Engine v3.0**
 
 Creado y mantenido por:
-- **Pierre Solier** (DYSA) — Conceptualización, diseño, desarrollo
+- **Pierre Solier** (Devlmer) — Conceptualización, diseño, desarrollo
 
 **Agradecimientos especiales a:**
 - El equipo de Anthropic por Claude Code y la capacidad de MCPs
+- Google por Gemini AI (Nano-Banana-MCP)
+- GitHub por OAuth2 y webhooks
 - Comunidad open source por herramientas inspiradoras
 - Usuarios tempranos que enviaron feedback
 
 **Tecnologías base:**
 - Claude AI (Anthropic)
+- Google Gemini (Nano-Banana-MCP)
 - Node.js & npm
 - Python 3
-- Git
+- Git & GitHub OAuth2
 
 ---
 
@@ -789,13 +1169,13 @@ Creado y mantenido por:
 ### Preguntas Frecuentes
 
 **P: ¿DEE funciona offline?**
-R: No. DEE requiere conexión a internet porque se comunica con Claude API y MCPs. Sin embargo, una vez que una sesión está en ejecución, algunos componentes pueden funcionar offline.
+R: No. DEE requiere conexión a internet porque se comunica con Claude API, GitHub OAuth2, y MCPs (incluyendo Nano-Banana-MCP). Sin embargo, una vez que una sesión está en ejecución, algunos componentes pueden funcionar offline.
 
 **P: ¿Es seguro instalar DEE?**
-R: Sí. DEE no modifica tu código existente. Todo se instala en `.claude/`. Puedes desinstalar eliminando esa carpeta.
+R: Sí. DEE no modifica tu código existente. Todo se instala en `.claude/`. Puedes desinstalar eliminando esa carpeta. GitHub OAuth2 utiliza tokens seguros de corta duración.
 
 **P: ¿Puedo usar DEE en equipos?**
-R: Sí. Comparte el repositorio entero con tu equipo. Todos obtendrán las mismas habilidades, blueprints y configuración.
+R: Sí. Comparte el repositorio entero con tu equipo. Todos obtendrán las mismas habilidades, blueprints y configuración. GitHub OAuth2 se configura por usuario.
 
 **P: ¿Funciona con proyectos existentes?**
 R: Sí. DEE funciona con cualquier proyecto existente. No necesita estar vacío.
@@ -810,7 +1190,7 @@ bash install.sh ~/proyecto3
 Cada proyecto tendrá su propio `.claude/` con configuración independiente.
 
 **P: ¿Puedo customizar completamente DEE?**
-R: Sí. Edita `CLAUDE.md`, crea skills propios, modifica blueprints. DEE está diseñado para adaptarse.
+R: Sí. Edita `CLAUDE.md`, crea skills propios, modifica blueprints, configura GitHub y Nano-Banana. DEE está diseñado para adaptarse.
 
 **P: ¿Qué hago si DEE no detecta correctamente mi proyecto?**
 R: Edita `.claude/config/project-fingerprint.json` manualmente o actualiza `CLAUDE.md` con la información correcta.
@@ -820,6 +1200,12 @@ R: Técnicamente sí, pero no obtendrías los beneficios completos. DEE funciona
 
 **P: ¿Se puede ejecutar DEE desde CI/CD?**
 R: Sí. El instalador es compatible con pipelines de CI/CD. Consulta la documentación avanzada para detalles.
+
+**P: ¿Cómo funciona GitHub OAuth2 en DEE?**
+R: DEE configura automáticamente una aplicación OAuth2 en tu cuenta GitHub. Los tokens se almacenan de forma segura en `.claude/config/github-oauth.json` con expiración automática.
+
+**P: ¿Puedo usar Nano-Banana-MCP sin Gemini API?**
+R: No, Nano-Banana-MCP requiere configuración de Google Gemini. DEE te guiará en la configuración inicial.
 
 ---
 
@@ -853,6 +1239,18 @@ bash install.sh /ruta/proyecto --skills code-review,security-audit
 bash install.sh /ruta/proyecto --generate-report
 ```
 
+#### Configurar GitHub OAuth2 avanzado
+
+```bash
+/github-auth --scope repo,workflow --organization myorg
+```
+
+#### Nano-Banana-MCP con parámetros avanzados
+
+```bash
+/nano-banana --prompt "..." --size 2048x2048 --quality ultra --style realistic
+```
+
 Consulta `./install.sh --help` para todas las opciones.
 
 ---
@@ -874,16 +1272,19 @@ Usa esta checklist para asegurar que todo está listo:
 - [ ] Mensaje de éxito recibido
 - [ ] Proyecto abierto en Claude Code
 - [ ] CLAUDE.md revisado y personalizado
+- [ ] GitHub OAuth2 configurado (opcional)
+- [ ] Nano-Banana-MCP verificado (opcional)
 - [ ] Primer skill invocado (ej: `/code-review`)
 
 Si todos los elementos tienen check, estás listo para empezar.
 
 ---
 
-**Última actualización:** April 2026
-**Versión actual:** DEE v3.0
-**Repositorio:** https://github.com/Memory-Bank/dysa-ecosystem-engine
+**Última actualización:** Abril 2026
+**Versión actual:** DEE v3.0 by Devlmer
+**Repositorio:** https://github.com/Soyelijah/devlmer-ecosystem-engine
+**Lema:** Intelligent ecosystems for every project
 
 ---
 
-*Created with care by DYSA for developers who want enterprise-grade tooling without the complexity.*
+*Created with excellence by Pierre Solier (Devlmer) for developers who demand enterprise-grade tooling, intelligent automation, and seamless collaboration without compromise.*

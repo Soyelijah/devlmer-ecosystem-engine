@@ -1,6 +1,11 @@
 ---
 name: mcp-builder
 description: Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK).
+metadata:
+  version: 1.0.0
+  author: Devlmer / Pierre Solier
+  creator: Devlmer
+  branding: Professional MCP server development for AI integration
 license: Complete terms in LICENSE.txt
 ---
 

@@ -1,6 +1,11 @@
 ---
 name: senior-security
 description: Comprehensive security engineering skill for application security, penetration testing, security architecture, and compliance auditing. Includes security assessment tools, threat modeling, crypto implementation, and security automation. Use when designing security architecture, conducting penetration tests, implementing cryptography, or performing security audits.
+metadata:
+  version: 1.0.0
+  author: Devlmer / Pierre Solier
+  creator: Devlmer
+  branding: Enterprise-grade security engineering and compliance
 ---
 
 # Senior Security

@@ -2,8 +2,10 @@
 name: seo-optimizer
 description: "Enterprise SEO Optimization Engine — Technical SEO audits, on-page optimization, keyword research, content scoring, schema markup generation, Core Web Vitals analysis, sitemap management, and competitive gap analysis. Triggers: 'SEO', 'search optimization', 'keywords', 'meta tags', 'sitemap', 'schema markup', 'page speed', 'Core Web Vitals', 'search ranking', 'organic traffic', 'backlinks', 'structured data', 'robots.txt', 'canonical', 'crawlability'."
 metadata:
-  version: 1.0.0
-  author: DYSA / Pierre Solier
+  version: 1.1.0
+  author: Devlmer / Pierre Solier
+  creator: Devlmer
+  branding: Enterprise-grade search optimization for institutional clients
 ---
 
 # SEO Optimization Engine
@@ -184,15 +186,78 @@ Disallow: /private/
 Sitemap: https://example.com/sitemap.xml
 ```
 
-### 7. Performance Optimization Scripts
+### 7. Actionable SEO Checklist — Step-by-Step
+
+**Quick SEO Wins (0-2 hours):**
+
+1. **Title & Meta Audit**
+   - [ ] List all pages and current title tags
+   - [ ] Audit against pattern: [Primary Keyword] - [Brand Name] (50-60 chars)
+   - [ ] Update titles missing keywords or exceeding length
+   - [ ] Verify all titles are unique
+
+2. **Meta Description Update**
+   - [ ] Extract current descriptions from each page
+   - [ ] Rewrite to: [Value Prop] + [Keyword] + [CTA] (150-160 chars)
+   - [ ] Add CTAs: "Learn more", "Discover", "See how"
+   - [ ] Test in search results preview tool
+
+3. **Heading Structure Fix**
+   - [ ] Scan pages for multiple H1 tags or missing H1
+   - [ ] Consolidate to single H1 with primary keyword
+   - [ ] Verify H2s use secondary keywords
+   - [ ] Ensure logical hierarchy (H3 under H2, etc.)
+
+**Medium Effort (2-8 hours):**
+
+4. **Schema Markup Implementation**
+   - [ ] Add Organization schema to homepage
+   - [ ] Add BreadcrumbList to all pages
+   - [ ] Add Article schema to blog posts
+   - [ ] Add Product schema to product pages
+   - [ ] Validate all markup with Google's Rich Results Test
+
+5. **Image Optimization**
+   - [ ] Audit all images for alt text
+   - [ ] Write descriptive alts: [object] + [keyword] + [context]
+   - [ ] Convert large images to WebP (save as PNG fallback)
+   - [ ] Add `loading="lazy"` to below-fold images
+   - [ ] Verify files are <200KB each
+
+6. **Internal Linking Strategy**
+   - [ ] Identify pillar pages (main topics)
+   - [ ] Map cluster pages (subtopics)
+   - [ ] Add 3-5 internal links per 1000 words
+   - [ ] Use descriptive anchor text with keywords
+   - [ ] Ensure no orphaned pages
+
+**Advanced (8+ hours):**
+
+7. **Core Web Vitals Optimization**
+   - [ ] Run Lighthouse on all critical pages
+   - [ ] Identify LCP (Largest Contentful Paint) blocker
+   - [ ] Defer non-critical JavaScript
+   - [ ] Implement image lazy loading
+   - [ ] Add `font-display: swap` to web fonts
+   - [ ] Re-test and document improvements
+
+8. **Content Gaps & Keyword Mapping**
+   - [ ] Research competitor keywords (use tools: SEMrush, Ahrefs)
+   - [ ] Identify keywords you DON'T rank for
+   - [ ] Create content roadmap for 30/60/90 days
+   - [ ] Prioritize by search volume and conversion intent
+
+### 8. Performance Optimization Scripts
 
 ```python
 # Lighthouse audit automation
-# Image optimization pipeline
+# Image optimization pipeline (WebP/AVIF conversion)
 # Bundle analysis for JS/CSS
 # Lazy loading implementation
 # Critical CSS extraction
 # Service worker for caching
+# Sitemap auto-generation
+# Internal link crawler & validator
 ```
 
 ## Automatic Triggers
