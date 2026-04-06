@@ -2425,87 +2425,222 @@ calculate_duration() {
 
 show_summary() {
     local duration=$(calculate_duration)
-
-    log_section "INSTALLATION SUMMARY"
-
-    echo ""
-    echo -e "${BOLD}Bundled Skills:${RESET}"
-    echo -e "  ${GREEN}✓ Copied:${RESET} ${SKILLS_INSTALLED}"
-
-    if [[ ${EXTERNAL_SKILLS_INSTALLED} -gt 0 ]] || [[ ${SKILLS_FAILED} -gt 0 ]]; then
-        echo ""
-        echo -e "${BOLD}External Skills:${RESET}"
-        echo -e "  ${GREEN}✓ Installed:${RESET} ${EXTERNAL_SKILLS_INSTALLED}"
-        if [[ ${SKILLS_FAILED} -gt 0 ]]; then
-            echo -e "  ${RED}✗ Failed:${RESET} ${SKILLS_FAILED}"
-        fi
-    fi
-
-    if [[ ${MCPS_INSTALLED} -gt 0 ]] || [[ ${MCPS_FAILED} -gt 0 ]]; then
-        echo ""
-        echo -e "${BOLD}MCPs (Model Context Protocols):${RESET}"
-        echo -e "  ${GREEN}✓ Installed:${RESET} ${MCPS_INSTALLED}"
-        if [[ ${MCPS_FAILED} -gt 0 ]]; then
-            echo -e "  ${RED}✗ Failed:${RESET} ${MCPS_FAILED}"
-        fi
-    fi
-
-    if [[ ${AGENTS_CONFIGURED} -gt 0 ]] || [[ ${AGENTS_FAILED} -gt 0 ]]; then
-        echo ""
-        echo -e "${BOLD}Agents:${RESET}"
-        echo -e "  ${GREEN}✓ Configured:${RESET} ${AGENTS_CONFIGURED}"
-        if [[ ${AGENTS_FAILED} -gt 0 ]]; then
-            echo -e "  ${RED}✗ Failed:${RESET} ${AGENTS_FAILED}"
-        fi
-    fi
+    local total_errors=$((SKILLS_FAILED + MCPS_FAILED + AGENTS_FAILED))
+    local total_installed=$((SKILLS_INSTALLED + EXTERNAL_SKILLS_INSTALLED + MCPS_INSTALLED + AGENTS_CONFIGURED + CONFIG_FILES_CREATED + SCRIPTS_COPIED))
 
     echo ""
-    echo -e "${BOLD}GitHub Authentication:${RESET}"
-    if [[ ${GITHUB_AUTHENTICATED} -eq 1 ]]; then
-        echo -e "  ${GREEN}✓ Status:${RESET} Authenticated"
-        echo -e "  ${CYAN}Config:${RESET} ${HOME}/.devlmer/github-auth.json"
+    echo -e "${BOLD}${CYAN}╔══════════════════════════════════════════════════════════════════╗${RESET}"
+    echo -e "${BOLD}${CYAN}║             DEVLMER ECOSYSTEM ENGINE — INSTALLATION REPORT      ║${RESET}"
+    echo -e "${BOLD}${CYAN}╚══════════════════════════════════════════════════════════════════╝${RESET}"
+    echo ""
+
+    # ── Section 1: Project Detection ──
+    echo -e "${BOLD}${MAGENTA}┌─ PROJECT DETECTION ──────────────────────────────────────────────┐${RESET}"
+    local profile_path="${TARGET_DIR}/.claude/PROJECT_PROFILE.json"
+    if [[ -f "${profile_path}" ]] && command -v python3 >/dev/null 2>&1; then
+        python3 -c "
+import json, sys
+try:
+    with open('${profile_path}', 'r') as f:
+        profile = json.load(f)
+    fp = profile.get('fingerprint', {})
+    domain = fp.get('domain', 'unknown')
+    confidence = fp.get('confidence', 0)
+    techs = fp.get('technologies', [])
+    frameworks = fp.get('frameworks', [])
+    languages = fp.get('languages', [])
+    infra = fp.get('infrastructure', [])
+    deps = profile.get('parsed_dependencies', {})
+
+    print(f'  Domain:      {domain.replace(\"_\", \" \").title()}')
+    print(f'  Confidence:  {int(confidence * 100)}%')
+    if languages:
+        print(f'  Languages:   {\", \".join(languages[:8])}')
+    if frameworks:
+        print(f'  Frameworks:  {\", \".join(frameworks[:8])}')
+    if techs:
+        print(f'  Tech stack:  {\", \".join(techs[:10])}')
+    if infra:
+        print(f'  Infra:       {\", \".join(infra[:6])}')
+    if deps:
+        total_deps = sum(len(v) if isinstance(v, (list, dict)) else 0 for v in deps.values())
+        print(f'  Dependencies parsed: {total_deps} packages across {len(deps)} manifest(s)')
+except Exception as e:
+    print(f'  ⚠ Could not parse profile: {e}')
+" 2>/dev/null || echo -e "  ${YELLOW}⚠ Profile generated but could not be read${RESET}"
     else
-        echo -e "  ${YELLOW}○ Status:${RESET} Not authenticated"
+        echo -e "  ${DIM}No project profile generated (new/empty project)${RESET}"
     fi
-
-    echo ""
-    echo -e "${BOLD}Nano-Banana-MCP:${RESET}"
-    if [[ ${NANO_BANANA_INSTALLED} -eq 1 ]]; then
-        echo -e "  ${GREEN}✓ Status:${RESET} Installed & Configured"
-        echo -e "  ${CYAN}Config:${RESET} ${HOME}/.devlmer/nano-banana-config.json"
-    else
-        echo -e "  ${YELLOW}○ Status:${RESET} Not installed"
-    fi
-
-    echo ""
-    echo -e "${BOLD}Configuration:${RESET}"
-    echo -e "  ${GREEN}✓ Config files:${RESET} ${CONFIG_FILES_CREATED}"
-    echo -e "  ${GREEN}✓ Scripts copied:${RESET} ${SCRIPTS_COPIED}"
-
-    echo ""
-    echo -e "${BOLD}Installation Details:${RESET}"
-    echo -e "  ${CYAN}Target directory:${RESET} ${TARGET_DIR}"
-    echo -e "  ${CYAN}Mode:${RESET} ${MODE}"
-    echo -e "  ${CYAN}Platform:${RESET} ${DEE_OS} (${DEE_ARCH})"
-    echo -e "  ${CYAN}Package manager:${RESET} ${DEE_PKG_MGR}"
-    echo -e "  ${CYAN}Shell:${RESET} ${BASH_VERSION:-${ZSH_VERSION:-unknown}}"
-    echo -e "  ${CYAN}GNU tools:${RESET} $([ ${DEE_GNU_TOOLS} -eq 1 ] && echo 'yes' || echo 'no (BSD)')"
-    echo -e "  ${CYAN}Duration:${RESET} ${duration}"
-
-    echo ""
-    echo -e "${BOLD}${GREEN}Installation Complete!${RESET}"
+    echo -e "${BOLD}${MAGENTA}└──────────────────────────────────────────────────────────────────┘${RESET}"
     echo ""
 
-    if [[ -f "${TARGET_DIR}/.claude/CLAUDE.md" ]]; then
-        echo -e "${CYAN}Next steps:${RESET}"
-        echo -e "  1. Review configuration: ${TARGET_DIR}/CLAUDE.md"
-        echo -e "  2. Verify skills: ls ${TARGET_DIR}/.claude/skills/"
-        echo -e "  3. Check project profile: ${TARGET_DIR}/.claude/PROJECT_PROFILE.json"
-        if [[ ${GITHUB_AUTHENTICATED} -eq 1 ]]; then
-            echo -e "  4. Review GitHub auth: ${HOME}/.devlmer/github-auth.json"
+    # ── Section 2: Installed Components ──
+    echo -e "${BOLD}${GREEN}┌─ INSTALLED COMPONENTS ───────────────────────────────────────────┐${RESET}"
+    echo ""
+
+    # Skills
+    echo -e "  ${BOLD}Skills (AI capabilities)${RESET}"
+    if [[ ${SKILLS_INSTALLED} -gt 0 ]]; then
+        echo -e "    ${GREEN}✓${RESET} ${SKILLS_INSTALLED} bundled skills installed"
+        # List actual skill names
+        if [[ -d "${TARGET_DIR}/.claude/skills" ]]; then
+            local skill_list=""
+            for skill_dir in "${TARGET_DIR}/.claude/skills"/*/; do
+                if [[ -f "${skill_dir}SKILL.md" ]]; then
+                    local sname=$(basename "${skill_dir}")
+                    if [[ -n "${skill_list}" ]]; then
+                        skill_list="${skill_list}, ${sname}"
+                    else
+                        skill_list="${sname}"
+                    fi
+                fi
+            done
+            if [[ -n "${skill_list}" ]]; then
+                echo -e "    ${DIM}${skill_list}${RESET}"
+            fi
         fi
-        echo ""
     fi
+    if [[ ${EXTERNAL_SKILLS_INSTALLED} -gt 0 ]]; then
+        echo -e "    ${GREEN}✓${RESET} ${EXTERNAL_SKILLS_INSTALLED} external skills installed"
+    fi
+    if [[ ${SKILLS_FAILED} -gt 0 ]]; then
+        echo -e "    ${RED}✗${RESET} ${SKILLS_FAILED} skills failed"
+    fi
+    echo ""
+
+    # Slash Commands
+    local cmd_count=0
+    if [[ -d "${TARGET_DIR}/.claude/commands" ]]; then
+        cmd_count=$(find "${TARGET_DIR}/.claude/commands" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+    fi
+    echo -e "  ${BOLD}Slash Commands${RESET}"
+    if [[ ${cmd_count} -gt 0 ]]; then
+        echo -e "    ${GREEN}✓${RESET} ${cmd_count} commands available (type / in Claude Code)"
+    else
+        echo -e "    ${DIM}○ No commands generated${RESET}"
+    fi
+    echo ""
+
+    # Agents
+    echo -e "  ${BOLD}Agents (specialized AI workers)${RESET}"
+    if [[ ${AGENTS_CONFIGURED} -gt 0 ]]; then
+        echo -e "    ${GREEN}✓${RESET} ${AGENTS_CONFIGURED} agents configured"
+        if [[ -d "${TARGET_DIR}/.claude/agents" ]]; then
+            local agent_list=""
+            for agent_file in "${TARGET_DIR}/.claude/agents"/*.md; do
+                if [[ -f "${agent_file}" ]]; then
+                    local aname=$(basename "${agent_file}" .md)
+                    if [[ -n "${agent_list}" ]]; then
+                        agent_list="${agent_list}, ${aname}"
+                    else
+                        agent_list="${aname}"
+                    fi
+                fi
+            done
+            if [[ -n "${agent_list}" ]]; then
+                echo -e "    ${DIM}${agent_list}${RESET}"
+            fi
+        fi
+    else
+        echo -e "    ${DIM}○ No agents configured${RESET}"
+    fi
+    if [[ ${AGENTS_FAILED} -gt 0 ]]; then
+        echo -e "    ${RED}✗${RESET} ${AGENTS_FAILED} agents failed"
+    fi
+    echo ""
+
+    # MCPs
+    echo -e "  ${BOLD}MCPs (external tool integrations)${RESET}"
+    if [[ ${MCPS_INSTALLED} -gt 0 ]]; then
+        echo -e "    ${GREEN}✓${RESET} ${MCPS_INSTALLED} MCPs configured in settings.json"
+    fi
+    if [[ ${MCPS_FAILED} -gt 0 ]]; then
+        echo -e "    ${RED}✗${RESET} ${MCPS_FAILED} MCPs failed"
+    fi
+    if [[ ${MCPS_INSTALLED} -eq 0 ]] && [[ ${MCPS_FAILED} -eq 0 ]]; then
+        echo -e "    ${DIM}○ No MCPs installed (project didn't require any)${RESET}"
+    fi
+    echo ""
+
+    # Hooks
+    local hooks_active=0
+    if [[ -f "${TARGET_DIR}/.claude/settings.json" ]]; then
+        hooks_active=$(python3 -c "
+import json
+try:
+    with open('${TARGET_DIR}/.claude/settings.json') as f:
+        s = json.load(f)
+    hooks = s.get('hooks', {})
+    count = sum(len(v) for v in hooks.values() if isinstance(v, list))
+    print(count)
+except:
+    print(0)
+" 2>/dev/null || echo "0")
+    fi
+    echo -e "  ${BOLD}Hooks (auto-verification)${RESET}"
+    if [[ ${hooks_active} -gt 0 ]]; then
+        echo -e "    ${GREEN}✓${RESET} ${hooks_active} hook(s) active (SessionStart, PostToolUse)"
+    else
+        echo -e "    ${DIM}○ No hooks configured${RESET}"
+    fi
+    echo ""
+
+    echo -e "${BOLD}${GREEN}└──────────────────────────────────────────────────────────────────┘${RESET}"
+    echo ""
+
+    # ── Section 3: Configuration Files ──
+    echo -e "${BOLD}${BLUE}┌─ CONFIGURATION FILES ────────────────────────────────────────────┐${RESET}"
+    local files_to_check=(
+        "CLAUDE.md:Project instructions for Claude Code (root)"
+        ".claude/settings.json:Claude Code settings (hooks + MCPs)"
+        ".claude/PROJECT_PROFILE.json:Project fingerprint & detection data"
+    )
+    for entry in "${files_to_check[@]}"; do
+        local fpath="${entry%%:*}"
+        local fdesc="${entry#*:}"
+        if [[ -f "${TARGET_DIR}/${fpath}" ]]; then
+            local fsize=$(wc -c < "${TARGET_DIR}/${fpath}" | tr -d ' ')
+            echo -e "  ${GREEN}✓${RESET} ${fpath} ${DIM}(${fsize} bytes)${RESET} — ${fdesc}"
+        else
+            echo -e "  ${YELLOW}○${RESET} ${fpath} — ${fdesc} ${DIM}(not created)${RESET}"
+        fi
+    done
+    echo -e "${BOLD}${BLUE}└──────────────────────────────────────────────────────────────────┘${RESET}"
+    echo ""
+
+    # ── Section 4: Integrations ──
+    echo -e "${BOLD}${YELLOW}┌─ INTEGRATIONS ────────────────────────────────────────────────────┐${RESET}"
+    echo -e "  ${BOLD}GitHub:${RESET}  $([ ${GITHUB_AUTHENTICATED} -eq 1 ] && echo -e "${GREEN}✓ Authenticated${RESET}" || echo -e "${DIM}○ Not connected${RESET}")"
+    echo -e "  ${BOLD}Nano-Banana:${RESET} $([ ${NANO_BANANA_INSTALLED:-0} -eq 1 ] && echo -e "${GREEN}✓ Installed${RESET} ${DIM}(Gemini image gen)${RESET}" || echo -e "${DIM}○ Not installed${RESET}")"
+    echo -e "${BOLD}${YELLOW}└──────────────────────────────────────────────────────────────────┘${RESET}"
+    echo ""
+
+    # ── Section 5: System Info ──
+    echo -e "${BOLD}${DIM}┌─ SYSTEM ──────────────────────────────────────────────────────────┐${RESET}"
+    echo -e "  ${DIM}Target:    ${TARGET_DIR}${RESET}"
+    echo -e "  ${DIM}Platform:  ${DEE_OS} (${DEE_ARCH})${RESET}"
+    echo -e "  ${DIM}Duration:  ${duration}${RESET}"
+    echo -e "  ${DIM}Errors:    ${total_errors}${RESET}"
+    echo -e "${BOLD}${DIM}└──────────────────────────────────────────────────────────────────┘${RESET}"
+    echo ""
+
+    # ── Final Status ──
+    if [[ ${total_errors} -eq 0 ]]; then
+        echo -e "${BOLD}${GREEN}  ✅ Installation completed successfully — ${total_installed} components installed${RESET}"
+    else
+        echo -e "${BOLD}${YELLOW}  ⚠️  Installation completed with ${total_errors} error(s) — ${total_installed} components installed${RESET}"
+    fi
+    echo ""
+
+    # ── Next Steps ──
+    echo -e "${BOLD}${CYAN}  Next steps:${RESET}"
+    echo -e "    1. Open your project in Claude Code"
+    echo -e "    2. Type ${BOLD}/${RESET} to see available slash commands"
+    echo -e "    3. Claude will auto-detect your project and use the right skills"
+    if [[ -f "${TARGET_DIR}/.claude/mcp-env-setup.sh" ]]; then
+        echo -e "    4. Configure API keys: ${CYAN}bash \"${TARGET_DIR}/.claude/setup-wizard.sh\" \"${TARGET_DIR}\"${RESET}"
+    fi
+    echo ""
 }
 
 show_product_info() {
