@@ -2251,7 +2251,7 @@ offer_setup_wizard() {
     echo -e "  o hacerlo después cuando quieras."
     echo ""
     echo -e "  ${CYAN}1${RESET}) ${BOLD}Configurar ahora${RESET} — Asistente paso a paso (recomendado)"
-    echo -e "  ${CYAN}2${RESET}) ${BOLD}Después${RESET} — Ejecuta: ${DIM}bash setup-wizard.sh ${TARGET_DIR}${RESET}"
+    echo -e "  ${CYAN}2${RESET}) ${BOLD}Después${RESET} — Ejecuta: ${DIM}bash \"${TARGET_DIR}/.claude/setup-wizard.sh\" \"${TARGET_DIR}\"${RESET}"
     echo ""
     local wizard_choice=""
     safe_read wizard_choice "  ¿Configurar API keys ahora? [1/2]:" 30 "2"
@@ -2266,7 +2266,7 @@ offer_setup_wizard() {
     else
         echo ""
         echo -e "  ${GREEN}✓${RESET} Sin problema. Cuando quieras, ejecuta:"
-        echo -e "  ${CYAN}  bash setup-wizard.sh ${TARGET_DIR}${RESET}"
+        echo -e "  ${CYAN}  bash \"${TARGET_DIR}/.claude/setup-wizard.sh\" \"${TARGET_DIR}\"${RESET}"
         echo ""
     fi
 }
