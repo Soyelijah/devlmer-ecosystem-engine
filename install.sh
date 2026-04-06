@@ -611,8 +611,15 @@ setup_directories() {
     log_step "Setting up directory structure..."
 
     if [[ ! -d "${TARGET_DIR}" ]]; then
-        log_error "Target directory does not exist: ${TARGET_DIR}"
-        return 1
+        log_info "Target directory does not exist: ${TARGET_DIR}"
+        log_step "Creating target directory..."
+        if mkdir -p "${TARGET_DIR}" 2>/dev/null; then
+            log_success "Created: ${TARGET_DIR}"
+        else
+            log_error "Cannot create directory: ${TARGET_DIR}"
+            log_info "Check permissions or create it manually and re-run."
+            return 1
+        fi
     fi
 
     # Create .claude directory structure
@@ -1131,7 +1138,7 @@ install_external_skills() {
         while [[ ${attempt} -lt ${max_retries} ]] && [[ ${installed} -eq 0 ]]; do
             attempt=$((attempt + 1))
 
-            if run_with_timeout 60 npx claude-code-templates@latest "${skill}" --yes 2>/dev/null; then
+            if (cd "${TARGET_DIR}" && run_with_timeout 60 npx claude-code-templates@latest "${skill}" --yes 2>/dev/null); then
                 EXTERNAL_SKILLS_INSTALLED=$((EXTERNAL_SKILLS_INSTALLED + 1))
                 log_success "Installed: ${skill}"
                 installed=1
