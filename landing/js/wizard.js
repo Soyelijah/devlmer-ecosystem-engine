@@ -395,8 +395,8 @@ function selectTerminal(el, termId) {
 
     // Generate the one-liner
     const codeEl = document.getElementById('onelinerCode');
-    const cmd = `git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh ${p}`;
-    codeEl.innerHTML = `<span class="ol-prompt">$ </span><span class="ol-cmd">git clone</span> <span class="ol-url">${REPO_URL}</span> <span class="ol-path">/tmp/dee</span> <span class="ol-cmd">&&</span> <span class="ol-cmd">bash</span> <span class="ol-path">/tmp/dee/install.sh</span> <span class="ol-path">${p}</span>`;
+    const cmd = `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
+    codeEl.innerHTML = `<span class="ol-prompt">$ </span><span class="ol-cmd">git clone</span> <span class="ol-url">${REPO_URL}</span> <span class="ol-path">/tmp/dee</span> <span class="ol-cmd">&&</span> <span class="ol-cmd">bash</span> <span class="ol-path">/tmp/dee/install.sh</span> <span class="ol-path">"${p}"</span>`;
 
     // Render steps
     const stepsEl = document.getElementById('onelinerSteps');
@@ -427,7 +427,7 @@ function selectTerminal(el, termId) {
 
 function copyOneliner() {
     const p = wizardState.path || '~/projects/my-app';
-    const cmd = `git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh ${p}`;
+    const cmd = `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
 
     navigator.clipboard.writeText(cmd).then(() => {
         const btn = document.getElementById('onelinerCopyBtn');
@@ -616,9 +616,9 @@ function getInstallCommand() {
     const p = wizardState.path || '/ruta/a/tu/proyecto';
 
     if (wizardState.method === 'cli') {
-        return `git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh ${p}`;
+        return `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
     } else {
-        return `# 1. Descarga desde:\n#    ${ZIP_URL}\n# 2. Descomprime y ejecuta:\ncd devlmer-ecosystem-engine-main && bash install.sh ${p}`;
+        return `# 1. Descarga desde:\n#    ${ZIP_URL}\n# 2. Descomprime y ejecuta:\ncd devlmer-ecosystem-engine-main && bash install.sh "${p}"`;
     }
 }
 
@@ -703,9 +703,9 @@ function copyFinalCommand() {
     let cmd;
 
     if (wizardState.method === 'cli') {
-        cmd = `git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh ${p}`;
+        cmd = `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
     } else {
-        cmd = `curl -L -o dee.zip ${ZIP_URL} && unzip dee.zip && cd devlmer-ecosystem-engine-main && bash install.sh ${p}`;
+        cmd = `curl -L -o dee.zip ${ZIP_URL} && unzip dee.zip && cd devlmer-ecosystem-engine-main && bash install.sh "${p}"`;
     }
 
     navigator.clipboard.writeText(cmd).then(() => {
