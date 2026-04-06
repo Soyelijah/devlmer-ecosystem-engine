@@ -1077,23 +1077,36 @@ install_copywriting_skill() {
 install_external_skills() {
     log_section "INSTALLING EXTERNAL SKILLS"
 
-    local skills=(
-        "development/senior-frontend"
-        "development/senior-backend"
-        "development/senior-architect"
-        "development/senior-fullstack"
-        "development/code-reviewer"
-        "development/skill-creator"
-        "development/webapp-testing"
-        "development/senior-security"
-        "development/mcp-builder"
-        "development/senior-prompt-engineer"
-        "development/brainstorming"
-        "development/git-commit-helper"
-        "creative-design/ui-ux-pro-max"
-        "creative-design/ui-design-system"
-        "creative-design/mobile-design"
+    # External skills map to bundled skills. If bundled skills were already
+    # installed successfully, skip external installation entirely to avoid
+    # redundant downloads and interactive prompts from claude-code-templates.
+    local expected_skills=(
+        "senior-frontend" "senior-backend" "senior-architect" "senior-fullstack"
+        "code-reviewer" "skill-creator" "webapp-testing" "senior-security"
+        "mcp-builder" "senior-prompt-engineer" "brainstorming" "git-commit-helper"
+        "ui-ux-pro-max" "ui-design-system" "mobile-design"
     )
+
+    local missing=0
+    local missing_list=""
+    for skill_name in "${expected_skills[@]}"; do
+        if [[ ! -d "${TARGET_DIR}/.claude/skills/${skill_name}" ]]; then
+            missing=$((missing + 1))
+            missing_list="${missing_list}  - ${skill_name}\n"
+        fi
+    done
+
+    if [[ ${missing} -eq 0 ]]; then
+        log_success "All ${#expected_skills[@]} skills already installed from bundled package"
+        EXTERNAL_SKILLS_INSTALLED=${#expected_skills[@]}
+        return 0
+    fi
+
+    log_info "${missing} skills not found — attempting external installation..."
+    if [[ -n "${missing_list}" ]]; then
+        log_verbose "Missing skills:"
+        echo -e "${missing_list}"
+    fi
 
     if ! command -v npx >/dev/null 2>&1; then
         log_warning "npm/npx not found. Skipping external skill installations."
@@ -1102,15 +1115,12 @@ install_external_skills() {
     fi
 
     # --- GitHub Rate Limit Protection ---
-    # If user provided a --github-token, set it as env var so npm/npx
-    # authenticates with GitHub API (avoids 60 req/hr anonymous limit → 5000 req/hr)
     local original_gh_token="${GITHUB_TOKEN:-}"
     if [[ -n "${GITHUB_TOKEN}" ]]; then
         export GITHUB_TOKEN="${GITHUB_TOKEN}"
-        # npm uses this env var for GitHub package registry auth
         export NODE_AUTH_TOKEN="${GITHUB_TOKEN}"
         log_info "Using GitHub token for authenticated API access (5000 req/hr limit)"
-    elif [[ -n "${GITHUB_PAT}" ]]; then
+    elif [[ -n "${GITHUB_PAT:-}" ]]; then
         export GITHUB_TOKEN="${GITHUB_PAT}"
         export NODE_AUTH_TOKEN="${GITHUB_PAT}"
         log_info "Using GitHub PAT for authenticated API access"
@@ -1119,44 +1129,32 @@ install_external_skills() {
         log_info "If rate-limited, re-run with: --github-token ghp_xxxxx"
     fi
 
-    log_info "Installing ${#skills[@]} external skills from claude-code-templates..."
-    echo ""
-
     # Protect settings.json from being overwritten by external tools
-    # claude-code-templates may try mkdir on paths where a file already exists
     if [[ -f "${TARGET_DIR}/.claude/settings.json" ]]; then
         cp "${TARGET_DIR}/.claude/settings.json" "${TARGET_DIR}/.claude/settings.json.pre-external.bak" 2>/dev/null || true
     fi
 
-    local max_retries=2
-
-    for skill in "${skills[@]}"; do
-        local retry_delay=2
-        local installed=0
-        local attempt=0
-
-        while [[ ${attempt} -lt ${max_retries} ]] && [[ ${installed} -eq 0 ]]; do
-            attempt=$((attempt + 1))
-
-            if (cd "${TARGET_DIR}" && run_with_timeout 60 npx claude-code-templates@latest "${skill}" --yes 2>/dev/null); then
-                EXTERNAL_SKILLS_INSTALLED=$((EXTERNAL_SKILLS_INSTALLED + 1))
-                log_success "Installed: ${skill}"
-                installed=1
-            else
-                if [[ ${attempt} -lt ${max_retries} ]]; then
-                    log_verbose "Retrying ${skill} in ${retry_delay}s (attempt ${attempt}/${max_retries})..."
-                    sleep ${retry_delay}
-                    retry_delay=$((retry_delay * 2))  # Exponential backoff
-                fi
-            fi
-        done
-
-        if [[ ${installed} -eq 0 ]]; then
-            log_warning "Failed to install: ${skill} (after ${max_retries} attempts)"
-            SKILLS_FAILED=$((SKILLS_FAILED + 1))
+    # Install only missing skills, using stdin redirect to suppress interactive prompts
+    for skill_name in "${expected_skills[@]}"; do
+        if [[ -d "${TARGET_DIR}/.claude/skills/${skill_name}" ]]; then
+            continue  # Already installed
         fi
 
-        # Small delay between installs to respect rate limits
+        local skill_path="development/${skill_name}"
+        # creative-design category skills
+        case "${skill_name}" in
+            ui-ux-pro-max|ui-design-system|mobile-design)
+                skill_path="creative-design/${skill_name}"
+                ;;
+        esac
+
+        if (cd "${TARGET_DIR}" && echo "n" | run_with_timeout 45 npx claude-code-templates@latest "${skill_path}" --yes </dev/null 2>/dev/null); then
+            EXTERNAL_SKILLS_INSTALLED=$((EXTERNAL_SKILLS_INSTALLED + 1))
+            log_success "Installed: ${skill_name}"
+        else
+            log_warning "Failed to install: ${skill_name}"
+            SKILLS_FAILED=$((SKILLS_FAILED + 1))
+        fi
         sleep 1
     done
 
@@ -1166,7 +1164,6 @@ install_external_skills() {
     # Restore settings.json if external tools damaged it
     if [[ -f "${TARGET_DIR}/.claude/settings.json.pre-external.bak" ]]; then
         if [[ ! -f "${TARGET_DIR}/.claude/settings.json" ]] || [[ -d "${TARGET_DIR}/.claude/settings.json" ]]; then
-            # settings.json was deleted or replaced by a directory — restore from backup
             rm -rf "${TARGET_DIR}/.claude/settings.json" 2>/dev/null || true
             mv "${TARGET_DIR}/.claude/settings.json.pre-external.bak" "${TARGET_DIR}/.claude/settings.json"
             log_verbose "Restored settings.json from pre-external backup"
@@ -1178,12 +1175,8 @@ install_external_skills() {
     echo ""
     if [[ ${SKILLS_FAILED} -gt 0 ]]; then
         log_warning "External skills: ${EXTERNAL_SKILLS_INSTALLED} succeeded, ${SKILLS_FAILED} failed"
-        if [[ -z "${original_gh_token}" ]]; then
-            log_info "Tip: Re-run with --github-token to avoid GitHub rate limits"
-            log_info "     Or wait 1 hour and run: bash install.sh . --skills-only"
-        fi
     else
-        log_success "All external skills installed successfully (${EXTERNAL_SKILLS_INSTALLED})"
+        log_success "All skills installed successfully"
     fi
 }
 
