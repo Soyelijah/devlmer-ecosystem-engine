@@ -156,6 +156,22 @@ cmd_update() {
     fi
 
     fetch_latest
+
+    # ── Self-update: update the dee CLI binary itself ──
+    local new_dee="${TMP_DIR}/bin/dee"
+    local installed_dee
+    installed_dee=$(command -v dee 2>/dev/null || echo "${HOME}/.local/bin/dee")
+    if [[ -f "${new_dee}" && -f "${installed_dee}" ]]; then
+        local new_ver old_ver
+        new_ver=$(grep '^VERSION=' "${new_dee}" 2>/dev/null | head -1 | cut -d'"' -f2)
+        old_ver=$(grep '^VERSION=' "${installed_dee}" 2>/dev/null | head -1 | cut -d'"' -f2)
+        if [[ -n "${new_ver}" && "${new_ver}" != "${old_ver}" ]]; then
+            cp "${new_dee}" "${installed_dee}"
+            chmod +x "${installed_dee}"
+            log_success "CLI updated: v${old_ver} → v${new_ver}"
+        fi
+    fi
+
     bash "${TMP_DIR}/update.sh" "${target}"
 }
 
