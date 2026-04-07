@@ -447,8 +447,8 @@
     "mcps": {
       "recommended": [
         {"name": "stripe", "search_terms": ["stripe", "subscription"], "reason": "Course payments"},
-        {"name": "mux", "search_terms": ["mux", "video"], "reason": "Video streaming"},
-        {"name": "sendgrid", "search_terms": ["sendgrid", "email"], "reason": "Student notifications"}
+        {"name": "sendgrid", "search_terms": ["sendgrid", "email"], "reason": "Student notifications"},
+        {"name": "cloudinary", "search_terms": ["cloudinary", "media"], "reason": "Video & media management"}
       ]
     },
     "agents": {
