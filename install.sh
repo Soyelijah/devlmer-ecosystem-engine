@@ -1036,25 +1036,31 @@ copy_bundled_skills() {
     # Strip YAML frontmatter from SKILL.md files (Claude Code expects pure Markdown)
     # Frontmatter is the block between the first --- and second --- at the top
     if command -v python3 >/dev/null 2>&1; then
-        python3 << 'STRIP_FM'
+        local stripped_count
+        stripped_count=$(TARGET_DIR="${TARGET_DIR}" python3 << 'STRIP_FM'
 import os, glob
 skills_dir = os.path.join(os.environ.get('TARGET_DIR', '.'), '.claude/skills')
+count = 0
 for md in glob.glob(os.path.join(skills_dir, '*/SKILL.md')):
     try:
         with open(md, 'r') as f:
             content = f.read()
         if content.startswith('---'):
-            # Find the closing ---
             end = content.find('---', 3)
             if end != -1:
-                # Skip past the closing --- and any trailing newline
                 cleaned = content[end + 3:].lstrip('\n')
-                with open(md, 'w') as f:
-                    f.write(cleaned)
+                if cleaned:
+                    with open(md, 'w') as f:
+                        f.write(cleaned)
+                    count += 1
     except Exception:
         pass
+print(count)
 STRIP_FM
-        log_verbose "Stripped YAML frontmatter from SKILL.md files"
+        )
+        if [[ "${stripped_count}" -gt 0 ]] 2>/dev/null; then
+            log_verbose "Stripped YAML frontmatter from ${stripped_count} SKILL.md files"
+        fi
     fi
 
     if [[ ${skill_count} -gt 0 ]]; then
