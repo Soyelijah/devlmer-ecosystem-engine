@@ -1,18 +1,30 @@
+<div align="center">
+
+# ⚡ Devlmer Ecosystem Engine
+
+### Intelligent Ecosystems for Every Project
+
+[![Version](https://img.shields.io/badge/version-3.1.1-0052FF?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/tag/v3.1.1)
+[![License](https://img.shields.io/badge/license-MIT-00D4AA?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE)
+[![Skills](https://img.shields.io/badge/skills-62-FF6B35?style=for-the-badge&logo=stackblitz&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/tree/main/skills)
+[![Domains](https://img.shields.io/badge/domains-22-8B5CF6?style=for-the-badge&logo=target&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/blueprints/ecosystems.json)
+[![MCPs](https://img.shields.io/badge/MCPs-31-00B4D8?style=for-the-badge&logo=puzzle&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/blueprints/ecosystems.json)
+[![Issues](https://img.shields.io/github/issues/Soyelijah/devlmer-ecosystem-engine?style=for-the-badge&logo=github&logoColor=white&color=FFB800)](https://github.com/Soyelijah/devlmer-ecosystem-engine/issues)
+
+<br>
+
+**Created by [Pierre Solier](https://github.com/Soyelijah) · Devlmer**
+
+</div>
+
 ---
-# Devlmer Ecosystem Engine v3.1
-## Installation & User Guide (Spanish)
 
-[![Version 3.1.1](https://img.shields.io/badge/version-3.1.1-blue.svg)](https://github.com/Soyelijah/devlmer-ecosystem-engine)
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![62 Skills](https://img.shields.io/badge/bundled%20skills-62-orange.svg)]()
-[![Enterprise Grade](https://img.shields.io/badge/quality-enterprise%20grade-purple.svg)]()
-
-**Versión:** 3.1.1 — The Enterprise Standard
-**Autor:** Pierre Solier (Devlmer)
-**Licencia:** MIT
-**Marca:** Devlmer
-**Lema:** Intelligent ecosystems for every project
-**Última actualización:** Abril 2026
+| | |
+|---|---|
+| **Versión** | 3.1.1 — The Enterprise Standard |
+| **Autor** | Pierre Solier (Devlmer) |
+| **Licencia** | [MIT](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE) |
+| **Última actualización** | Abril 2026 |
 
 ---
 
@@ -1099,27 +1111,27 @@ bash install.sh /ruta/tu/proyecto
 ### Soporte
 
 **Documentación:**
-- Visita https://github.com/Soyelijah/devlmer-ecosystem-engine
+- [Repositorio principal](https://github.com/Soyelijah/devlmer-ecosystem-engine)
 
 **Reportar problemas:**
-- GitHub Issues: https://github.com/Soyelijah/devlmer-ecosystem-engine/issues
+- [GitHub Issues](https://github.com/Soyelijah/devlmer-ecosystem-engine/issues)
 
-**Comunidad:**
-- Slack: [Enlace a Slack de comunidad]
-- Discord: [Enlace a Discord de comunidad]
+**Contacto:**
+- GitHub: [@Soyelijah](https://github.com/Soyelijah)
 
 ---
 
 ## License
 
-MIT License
+[MIT License](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE) — Copyright &copy; 2024–2026 Pierre Solier
 
 Puedes usar, modificar y distribuir DEE libremente, siempre que:
-- Reconozcas a los autores originales
-- Incluyas una copia de la licencia MIT
+
+- Reconozcas al autor original (Pierre Solier / Devlmer)
+- Incluyas una copia de la [licencia MIT](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE)
 - No vendas DEE como tuyo propio
 
-Texto completo en: LICENSE (incluido en el repositorio)
+Texto completo en: [`LICENSE`](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE)
 
 ---
 
@@ -1129,23 +1141,16 @@ Texto completo en: LICENSE (incluido en el repositorio)
 
 **Devlmer Ecosystem Engine v3.1.1**
 
-Creado y mantenido por:
-- **Pierre Solier** (Devlmer) — Conceptualización, diseño, desarrollo
+Diseñado, desarrollado y mantenido íntegramente por:
 
-**Agradecimientos especiales a:**
-- El equipo de Anthropic por Claude Code y la capacidad de MCPs
-- Google por Gemini AI (Nano-Banana-MCP)
-- GitHub por control de versiones y APIs
-- Comunidad open source por herramientas inspiradoras
-- Usuarios tempranos que enviaron feedback
+- **Pierre Solier** — Fundador & CEO de [Devlmer](https://github.com/Soyelijah)
+  - Arquitectura del sistema y motor de detección de ecosistemas
+  - 62 skills profesionales y 31 integraciones MCP
+  - CLI (`dee`), instalador, wizard interactivo y landing page
+  - Infraestructura CI/CD, testing y documentación
 
-**Tecnologías base:**
-- Claude AI (Anthropic)
-- Google Gemini (Nano-Banana-MCP)
-- Node.js & npm
-- Python 3
-- Git
-- GitHub CLI (opcional, para integración)
+**Stack tecnológico:**
+- Bash, Python 3, Node.js, Git, GitHub CLI
 
 ---
 
@@ -1273,11 +1278,21 @@ Si todos los elementos tienen check, estás listo para empezar.
 
 ---
 
-**Última actualización:** Abril 2026
-**Versión actual:** DEE v3.1.1 by Devlmer
-**Repositorio:** https://github.com/Soyelijah/devlmer-ecosystem-engine
-**Lema:** Intelligent ecosystems for every project
-
 ---
 
-*Created with excellence by Pierre Solier (Devlmer) for developers who demand enterprise-grade tooling, intelligent automation, and seamless collaboration without compromise.*
+<div align="center">
+
+#### ⚡ Devlmer Ecosystem Engine v3.1.1
+
+**[Repositorio](https://github.com/Soyelijah/devlmer-ecosystem-engine)** · **[Issues](https://github.com/Soyelijah/devlmer-ecosystem-engine/issues)** · **[Releases](https://github.com/Soyelijah/devlmer-ecosystem-engine/releases)** · **[Licencia](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE)**
+
+Copyright &copy; 2024–2026 **[Pierre Solier](https://github.com/Soyelijah)** · All rights reserved under the [MIT License](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE).
+
+Devlmer Ecosystem Engine is a registered trademark of Pierre Solier. Unauthorized use is prohibited.
+
+[![Built by Devlmer](https://img.shields.io/badge/Built%20by-Devlmer-0052FF?style=flat-square&logo=rocket&logoColor=white)](https://github.com/Soyelijah)
+[![Enterprise Grade](https://img.shields.io/badge/Enterprise-Grade-00D4AA?style=flat-square&logo=verified&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine)
+
+*Intelligent ecosystems for every project.*
+
+</div>
