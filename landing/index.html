@@ -80,10 +80,10 @@
                     Un comando. Detección automática de tu stack. 21+ skills profesionales, 23+ MCPs, agents, hooks y slash commands — todo configurado en segundos.
                 </p>
 
-                <div class="install-command" onclick="scrollToSection('installation')">
-                    <span class="install-command-text">rm -rf /tmp/dee && git clone ... && bash install.sh ~/mi-proyecto</span>
-                    <button class="copy-btn" onclick="event.stopPropagation(); scrollToSection('installation')">
-                        <i class="fas fa-rocket"></i> Ver pasos
+                <div class="install-command" onclick="copyToClipboard('curl -fsSL https://raw.githubusercontent.com/Soyelijah/devlmer-ecosystem-engine/main/install-cli.sh | bash')">
+                    <span class="install-command-text">curl -fsSL https://raw.githubusercontent.com/.../install-cli.sh | bash</span>
+                    <button class="copy-btn" onclick="event.stopPropagation(); copyToClipboard('curl -fsSL https://raw.githubusercontent.com/Soyelijah/devlmer-ecosystem-engine/main/install-cli.sh | bash')">
+                        <i class="fas fa-copy"></i> Copiar
                     </button>
                 </div>
 
@@ -484,30 +484,25 @@
     <section class="section installation" id="installation">
         <div class="container">
             <h2 class="section-title">Instalación</h2>
-            <p class="section-subtitle">De cero a ecosistema profesional en un solo paso</p>
+            <p class="section-subtitle">Dos pasos: instala el CLI y luego configura tu proyecto</p>
 
             <div class="install-steps">
                 <div class="install-step reveal">
-                    <div class="install-step-num">Paso 1 — Ejecuta un comando</div>
-                    <h4>Copia este one-liner en tu terminal. Reemplaza la ruta con la de tu proyecto.</h4>
-                    <div class="code-block"># Instalar en un proyecto específico:
-rm -rf /tmp/dee && git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/install.sh ~/Projects/mi-app
-
-# O en el directorio actual:
-rm -rf /tmp/dee && git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/install.sh .</div>
+                    <div class="install-step-num">Paso 1 — Instala el CLI</div>
+                    <h4>Un comando instala <code>dee</code> globalmente en tu sistema. Solo se hace una vez.</h4>
+                    <div class="code-block">curl -fsSL https://raw.githubusercontent.com/Soyelijah/devlmer-ecosystem-engine/main/install-cli.sh | bash</div>
+                    <p style="margin-top: 12px; color: rgba(255,255,255,0.5); font-size: 0.85rem;">Compatible con macOS (Intel y Apple Silicon) y Linux. Detecta tu sistema automáticamente.</p>
                 </div>
 
                 <div class="install-step reveal">
-                    <div class="install-step-num">Paso 2 — Todo es automático</div>
-                    <h4>El engine detecta tu stack, instala todo y muestra un reporte completo</h4>
-                    <div class="code-block"># Tarda menos de 30 segundos — todo automático:
-# ✓ Fingerprinting: detecta lenguajes, frameworks, dominio
-# ✓ Skills: instala 21+ skills con contenido enterprise
-# ✓ MCPs: configura 23+ servidores pre-configurados
-# ✓ Agents: crea agents especializados para tu dominio
-# ✓ Hooks: SessionStart (dashboard) + PostToolUse (auto-verify)
-# ✓ CLI: instala el comando global 'dee'
-# ✓ Slash commands: registra /comando por cada skill</div>
+                    <div class="install-step-num">Paso 2 — Configura tu proyecto</div>
+                    <h4>Usa <code>dee install</code> en cualquier proyecto para generar su ecosistema</h4>
+                    <div class="code-block"># Instalar en un proyecto específico:
+dee install ~/Projects/mi-app
+
+# O en la carpeta actual:
+dee install</div>
+                    <p style="margin-top: 12px; color: rgba(255,255,255,0.5); font-size: 0.85rem;">Detecta tu stack, instala 21+ skills, 23+ MCPs, agents, hooks y slash commands en menos de 30 segundos.</p>
                 </div>
 
                 <div class="install-step reveal">
@@ -521,7 +516,7 @@ bash ".claude/setup-wizard.sh" ~/Projects/mi-app</div>
 
                 <div class="install-step reveal">
                     <div class="install-step-num">Paso 4 — Abre Claude Code y explora</div>
-                    <h4>Tu ecosistema se activa automáticamente</h4>
+                    <h4>Tu ecosistema se activa automáticamente al abrir el proyecto</h4>
                     <div class="code-block">cd ~/Projects/mi-app && claude
 
 # Al abrir se muestra el dashboard automático:
@@ -535,10 +530,18 @@ bash ".claude/setup-wizard.sh" ~/Projects/mi-app</div>
 #   /dee-doctor  → Health check con score 0-100
 #
 # Desde la terminal:
-#   dee status   → Ver qué hay instalado
+#   dee help     → Ver todos los comandos disponibles
 #   dee doctor   → Diagnóstico completo
 #   dee update   → Actualizar a la última versión</div>
                 </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 32px;">
+                <p style="color: rgba(255,255,255,0.4); font-size: 0.85rem;">
+                    <i class="fas fa-info-circle"></i>
+                    También puedes instalar sin el CLI:
+                    <code style="color: rgba(0, 212, 170, 0.7); background: rgba(0, 212, 170, 0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">rm -rf /tmp/dee && git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/install.sh ~/Projects/mi-app</code>
+                </p>
             </div>
         </div>
     </section>
