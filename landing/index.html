@@ -559,40 +559,42 @@
     <section class="section" id="update" style="background: linear-gradient(135deg, rgba(0, 212, 170, 0.04) 0%, rgba(0, 82, 255, 0.02) 100%);">
         <div class="container">
             <h2 class="section-title">Actualizar Instalación Existente</h2>
-            <p class="section-subtitle">Actualiza skills, commands y hooks sin perder tu configuración</p>
+            <p class="section-subtitle">Un comando corto — como brew o npm</p>
 
             <div class="install-steps">
                 <div class="install-step reveal">
-                    <div class="install-step-num">Actualización Rápida — Un Solo Comando</div>
-                    <h4>Actualiza todo sin perder tus API keys, MCPs ni configuración personalizada</h4>
+                    <div class="install-step-num">Opción 1 — CLI dee (recomendado)</div>
+                    <h4>El instalador agrega el comando <code>dee</code> globalmente. Solo escribe:</h4>
+                    <div class="code-block">dee update</div>
+                    <h4 style="margin-top: 12px;">Otros comandos disponibles:</h4>
+                    <div class="code-block">dee status               # Ver qué hay instalado
+dee doctor               # Health check y diagnóstico
+dee update ~/otro-app    # Actualizar otro proyecto
+dee install ~/nuevo-app  # Instalar en proyecto nuevo
+dee uninstall            # Desinstalar del proyecto actual
+dee version              # Ver versión instalada</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">Opción 2 — One-liner (si no tienes el CLI)</div>
+                    <h4>Si por alguna razón no se instaló el CLI, usa el one-liner:</h4>
                     <div class="code-block">rm -rf /tmp/dee && git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/update.sh "/path/to/your/project"</div>
                 </div>
 
                 <div class="install-step reveal">
-                    <div class="install-step-num">¿Qué se actualiza?</div>
-                    <h4>Solo se actualizan los componentes del ecosistema — tu código no se toca</h4>
+                    <div class="install-step-num">¿Qué se actualiza vs qué se preserva?</div>
+                    <h4>Tu configuración personal nunca se pierde</h4>
                     <div class="code-block"># ✅ Se actualiza:
 #   • Skills (contenido profesional mejorado)
-#   • Slash commands (nuevos comandos como /dee-demo, /dee-doctor)
+#   • Slash commands (/dee-demo, /dee-doctor, /dee-status...)
 #   • Hooks (SessionStart y PostToolUse mejorados)
 #   • Scripts de detección de proyecto
 #
 # 🔒 Se preserva:
-#   • Tus API keys y credenciales (mcp-env-setup.sh)
-#   • Tu configuración de MCPs (settings.json → mcpServers)
+#   • Tus API keys y credenciales
+#   • Tu configuración de MCPs
 #   • Tu CLAUDE.md personalizado
-#   • Tus agents configurados
-#   • Tu PROJECT_PROFILE.json</div>
-                </div>
-
-                <div class="install-step reveal">
-                    <div class="install-step-num">¿Cuándo actualizar?</div>
-                    <h4>Cuando quieras recibir mejoras en skills, nuevos commands o bug fixes</h4>
-                    <div class="code-block"># Después de actualizar, verifica con:
-cd /tu/proyecto && claude
-# Escribe: /dee-status    → Dashboard completo
-# Escribe: /dee-doctor    → Health check del ecosistema
-# Escribe: /dee-demo      → Tour interactivo</div>
+#   • Tus agents y PROJECT_PROFILE.json</div>
                 </div>
             </div>
         </div>

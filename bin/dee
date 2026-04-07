@@ -1,0 +1,428 @@
+#!/usr/bin/env bash
+# ============================================================================
+# dee — Devlmer Ecosystem Engine CLI v3.0
+#
+# Global command for managing DEE installations.
+# Installed to ~/.local/bin/dee by the installer.
+#
+# Usage:
+#   dee update [path]        Update an existing installation
+#   dee install [path]       Install ecosystem on a project
+#   dee status [path]        Show installation status
+#   dee doctor [path]        Run health check
+#   dee version              Show version info
+#   dee help                 Show this help
+#   dee uninstall [path]     Remove ecosystem from a project
+# ============================================================================
+
+set -euo pipefail
+
+VERSION="3.0.0"
+REPO_URL="https://github.com/Soyelijah/devlmer-ecosystem-engine.git"
+TMP_DIR="/tmp/dee-$$"
+
+# ── Colors ──
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+BOLD='\033[1m'
+DIM='\033[2m'
+RESET='\033[0m'
+
+# ── Helpers ──
+log_info()    { echo -e "  ${CYAN}ℹ${RESET} $1"; }
+log_success() { echo -e "  ${GREEN}✓${RESET} $1"; }
+log_warning() { echo -e "  ${YELLOW}⚠${RESET} $1"; }
+log_error()   { echo -e "  ${RED}✗${RESET} $1"; }
+
+cleanup() { rm -rf "${TMP_DIR}" 2>/dev/null || true; }
+trap cleanup EXIT
+
+# Resolve project path — if not given, try current directory
+resolve_path() {
+    local path="${1:-$(pwd)}"
+    path="${path/#\~/$HOME}"
+    if [[ -d "${path}" ]]; then
+        path="$(cd "${path}" && pwd)"
+    fi
+    echo "${path%/}"
+}
+
+# Clone latest repo to tmp
+fetch_latest() {
+    log_info "Downloading latest version..."
+    rm -rf "${TMP_DIR}"
+    if git clone --depth 1 --quiet "${REPO_URL}" "${TMP_DIR}" 2>/dev/null; then
+        log_success "Latest version ready"
+    else
+        log_error "Failed to download. Check your internet connection."
+        exit 1
+    fi
+}
+
+# Check if a project has DEE installed
+has_dee() {
+    local path="$1"
+    [[ -d "${path}/.claude" ]] && [[ -d "${path}/.claude/skills" ]]
+}
+
+show_header() {
+    echo ""
+    echo -e "${BOLD}${CYAN}  dee${RESET} ${DIM}— Devlmer Ecosystem Engine v${VERSION}${RESET}"
+    echo ""
+}
+
+# ============================================================================
+# COMMANDS
+# ============================================================================
+
+cmd_help() {
+    show_header
+    cat << EOF
+${BOLD}USAGE${RESET}
+    dee <command> [path]
+
+${BOLD}COMMANDS${RESET}
+    ${GREEN}install${RESET} [path]     Install ecosystem on a project (default: current dir)
+    ${GREEN}update${RESET}  [path]     Update skills, commands & hooks (preserves config)
+    ${GREEN}status${RESET}  [path]     Show what's installed
+    ${GREEN}doctor${RESET}  [path]     Health check & diagnostics
+    ${GREEN}uninstall${RESET} [path]   Remove ecosystem from a project
+    ${GREEN}version${RESET}            Show version
+    ${GREEN}help${RESET}               Show this help
+
+${BOLD}EXAMPLES${RESET}
+    dee install                    # Install in current directory
+    dee install ~/Projects/my-app  # Install in specific project
+    dee update                     # Update current project
+    dee update ~/Projects/my-app   # Update specific project
+    dee status                     # Check current project
+    dee doctor                     # Run health check
+
+${BOLD}FIRST TIME?${RESET}
+    cd /your/project && dee install
+
+${BOLD}ALREADY INSTALLED?${RESET}
+    dee update
+
+EOF
+}
+
+cmd_version() {
+    echo -e "${BOLD}dee${RESET} v${VERSION} — Devlmer Ecosystem Engine"
+    echo -e "${DIM}https://github.com/Soyelijah/devlmer-ecosystem-engine${RESET}"
+}
+
+cmd_install() {
+    local target
+    target=$(resolve_path "${1:-}")
+    show_header
+
+    if has_dee "${target}"; then
+        log_warning "DEE already installed at: ${target}"
+        echo ""
+        echo -e "  Use ${BOLD}dee update${RESET} to update, or ${BOLD}dee install --force${RESET} to reinstall."
+        echo ""
+
+        if [[ "${2:-}" == "--force" ]] || [[ "${1:-}" == "--force" ]]; then
+            log_info "Force reinstall requested..."
+        else
+            return 0
+        fi
+    fi
+
+    fetch_latest
+    echo ""
+    log_info "Installing to: ${target}"
+    echo ""
+    bash "${TMP_DIR}/install.sh" "${target}"
+}
+
+cmd_update() {
+    local target
+    target=$(resolve_path "${1:-}")
+    show_header
+
+    if ! has_dee "${target}"; then
+        log_error "No DEE installation found at: ${target}"
+        echo ""
+        echo -e "  Use ${BOLD}dee install${RESET} to install first."
+        echo ""
+        return 1
+    fi
+
+    fetch_latest
+    bash "${TMP_DIR}/update.sh" "${target}"
+}
+
+cmd_status() {
+    local target
+    target=$(resolve_path "${1:-}")
+    show_header
+
+    if ! has_dee "${target}"; then
+        log_error "No DEE installation found at: ${target}"
+        echo ""
+        echo -e "  Use ${BOLD}dee install${RESET} to install first."
+        echo ""
+        return 1
+    fi
+
+    # Count components
+    local skills=0 commands=0 agents=0 mcps=0 hooks=0
+    skills=$(find "${target}/.claude/skills" -name 'SKILL.md' 2>/dev/null | wc -l | tr -d ' ')
+    commands=$(find "${target}/.claude/commands" -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
+    agents=$(find "${target}/.claude/agents" -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
+
+    if [[ -f "${target}/.claude/settings.json" ]] && command -v python3 >/dev/null 2>&1; then
+        mcps=$(python3 -c "import json; s=json.load(open('${target}/.claude/settings.json')); print(len(s.get('mcpServers',{})))" 2>/dev/null || echo 0)
+        hooks=$(python3 -c "import json; s=json.load(open('${target}/.claude/settings.json')); print(sum(len(v) for v in s.get('hooks',{}).values() if isinstance(v,list)))" 2>/dev/null || echo 0)
+    fi
+
+    # Domain
+    local domain="unknown"
+    if [[ -f "${target}/.claude/PROJECT_PROFILE.json" ]] && command -v python3 >/dev/null 2>&1; then
+        domain=$(python3 -c "import json; p=json.load(open('${target}/.claude/PROJECT_PROFILE.json')); print(p.get('fingerprint',{}).get('domain','unknown').replace('_',' ').title())" 2>/dev/null || echo "unknown")
+    fi
+
+    echo -e "  ${BOLD}Project:${RESET}  $(basename "${target}")"
+    echo -e "  ${BOLD}Path:${RESET}     ${target}"
+    echo -e "  ${BOLD}Domain:${RESET}   ${domain}"
+    echo ""
+    echo -e "  ${BOLD}Components:${RESET}"
+    echo -e "    ${GREEN}${skills}${RESET} skills  ${GREEN}${commands}${RESET} commands  ${GREEN}${agents}${RESET} agents  ${GREEN}${mcps}${RESET} MCPs  ${GREEN}${hooks}${RESET} hooks"
+    echo ""
+
+    # Config files
+    echo -e "  ${BOLD}Config:${RESET}"
+    for f in "CLAUDE.md" ".claude/settings.json" ".claude/PROJECT_PROFILE.json"; do
+        if [[ -f "${target}/${f}" ]]; then
+            local size=$(wc -c < "${target}/${f}" | tr -d ' ')
+            echo -e "    ${GREEN}✓${RESET} ${f} ${DIM}(${size}b)${RESET}"
+        else
+            echo -e "    ${RED}✗${RESET} ${f} ${DIM}(missing)${RESET}"
+        fi
+    done
+    echo ""
+
+    echo -e "  ${CYAN}Tip:${RESET} Run ${BOLD}dee doctor${RESET} for a full health check"
+    echo ""
+}
+
+cmd_doctor() {
+    local target
+    target=$(resolve_path "${1:-}")
+    show_header
+
+    if ! has_dee "${target}"; then
+        log_error "No DEE installation found at: ${target}"
+        return 1
+    fi
+
+    local score=100
+    local issues=0
+
+    echo -e "  ${BOLD}Running diagnostics on:${RESET} ${target}"
+    echo ""
+
+    # Core files
+    echo -e "  ${BOLD}Core Files${RESET}"
+    for f in "CLAUDE.md" ".claude/settings.json" ".claude/PROJECT_PROFILE.json"; do
+        if [[ -f "${target}/${f}" ]]; then
+            echo -e "    ${GREEN}✓${RESET} ${f}"
+        else
+            echo -e "    ${RED}✗${RESET} ${f} — missing"
+            score=$((score - 5))
+            issues=$((issues + 1))
+        fi
+    done
+    echo ""
+
+    # Skills quality
+    echo -e "  ${BOLD}Skills${RESET}"
+    local total_skills=0 good_skills=0 stub_skills=0 frontmatter_skills=0
+    for skill_dir in "${target}/.claude/skills"/*/; do
+        local smd="${skill_dir}SKILL.md"
+        if [[ -f "${smd}" ]]; then
+            total_skills=$((total_skills + 1))
+            local size=$(wc -c < "${smd}" | tr -d ' ')
+            if [[ ${size} -lt 200 ]]; then
+                stub_skills=$((stub_skills + 1))
+            else
+                good_skills=$((good_skills + 1))
+            fi
+            if head -1 "${smd}" | grep -q "^---"; then
+                frontmatter_skills=$((frontmatter_skills + 1))
+            fi
+        fi
+    done
+    echo -e "    ${GREEN}✓${RESET} ${good_skills}/${total_skills} skills with real content"
+    if [[ ${stub_skills} -gt 0 ]]; then
+        echo -e "    ${YELLOW}⚠${RESET} ${stub_skills} stub skills (< 200 bytes)"
+        score=$((score - stub_skills))
+        issues=$((issues + 1))
+    fi
+    if [[ ${frontmatter_skills} -gt 0 ]]; then
+        echo -e "    ${RED}✗${RESET} ${frontmatter_skills} with YAML frontmatter (compatibility issue)"
+        score=$((score - frontmatter_skills * 2))
+        issues=$((issues + 1))
+    fi
+    echo ""
+
+    # MCPs
+    echo -e "  ${BOLD}MCPs${RESET}"
+    if [[ -f "${target}/.claude/settings.json" ]] && command -v python3 >/dev/null 2>&1; then
+        python3 -c "
+import json
+s = json.load(open('${target}/.claude/settings.json'))
+mcps = s.get('mcpServers', {})
+ready = 0
+needs_key = 0
+for name, cfg in mcps.items():
+    env = cfg.get('env', {})
+    has_placeholder = any('your_' in str(v).lower() or 'xxx' in str(v).lower() or v == '' for v in env.values()) if env else False
+    if env and has_placeholder:
+        needs_key += 1
+    else:
+        ready += 1
+print(f'    \033[0;32m✓\033[0m {ready} ready')
+if needs_key > 0:
+    print(f'    \033[1;33m⚠\033[0m {needs_key} need API keys')
+print(f'    Total: {len(mcps)} servers')
+" 2>/dev/null
+    else
+        echo -e "    ${DIM}Cannot check (no settings.json or python3)${RESET}"
+    fi
+    echo ""
+
+    # Hooks
+    echo -e "  ${BOLD}Hooks${RESET}"
+    if [[ -f "${target}/.claude/settings.json" ]] && command -v python3 >/dev/null 2>&1; then
+        local has_session=$(python3 -c "import json; s=json.load(open('${target}/.claude/settings.json')); print('yes' if 'SessionStart' in s.get('hooks',{}) else 'no')" 2>/dev/null)
+        local has_post=$(python3 -c "import json; s=json.load(open('${target}/.claude/settings.json')); print('yes' if 'PostToolUse' in s.get('hooks',{}) else 'no')" 2>/dev/null)
+
+        if [[ "${has_session}" == "yes" ]]; then
+            echo -e "    ${GREEN}✓${RESET} SessionStart — project intelligence on startup"
+        else
+            echo -e "    ${RED}✗${RESET} SessionStart — missing"
+            score=$((score - 10))
+            issues=$((issues + 1))
+        fi
+        if [[ "${has_post}" == "yes" ]]; then
+            echo -e "    ${GREEN}✓${RESET} PostToolUse — auto-verify code edits"
+        else
+            echo -e "    ${RED}✗${RESET} PostToolUse — missing"
+            score=$((score - 10))
+            issues=$((issues + 1))
+        fi
+    fi
+    echo ""
+
+    # Score
+    [[ ${score} -lt 0 ]] && score=0
+    local grade_color="${GREEN}" grade_label="HEALTHY"
+    if [[ ${score} -lt 90 ]]; then grade_color="${GREEN}"; grade_label="GOOD"; fi
+    if [[ ${score} -lt 70 ]]; then grade_color="${YELLOW}"; grade_label="NEEDS ATTENTION"; fi
+    if [[ ${score} -lt 50 ]]; then grade_color="${RED}"; grade_label="CRITICAL"; fi
+
+    echo -e "  ${BOLD}Score: ${grade_color}${score}/100 — ${grade_label}${RESET}"
+    if [[ ${issues} -gt 0 ]]; then
+        echo -e "  ${DIM}${issues} issue(s) found${RESET}"
+    fi
+    echo ""
+
+    if [[ ${issues} -gt 0 ]]; then
+        echo -e "  ${CYAN}Fix:${RESET} Run ${BOLD}dee update${RESET} to update all components"
+        echo ""
+    fi
+}
+
+cmd_uninstall() {
+    local target
+    target=$(resolve_path "${1:-}")
+    show_header
+
+    if ! has_dee "${target}"; then
+        log_error "No DEE installation found at: ${target}"
+        return 1
+    fi
+
+    echo -e "  ${YELLOW}This will remove the Devlmer Ecosystem Engine from:${RESET}"
+    echo -e "  ${target}"
+    echo ""
+    echo -e "  ${BOLD}What will be removed:${RESET}"
+    echo -e "    • .claude/skills/       (all skills)"
+    echo -e "    • .claude/commands/     (slash commands)"
+    echo -e "    • .claude/agents/       (agents)"
+    echo -e "    • .claude/settings.json (hooks + MCPs)"
+    echo -e "    • .claude/PROJECT_PROFILE.json"
+    echo ""
+    echo -e "  ${BOLD}What will NOT be removed:${RESET}"
+    echo -e "    • CLAUDE.md (may contain your custom content)"
+    echo -e "    • .claude/mcp-env-setup.sh (your API keys)"
+    echo -e "    • Your project code"
+    echo ""
+
+    read -t 30 -p "  Remove? [y/N]: " confirm || confirm="n"
+
+    if [[ "${confirm}" =~ ^[yY] ]]; then
+        rm -rf "${target}/.claude/skills" "${target}/.claude/commands" "${target}/.claude/agents"
+        rm -f "${target}/.claude/settings.json" "${target}/.claude/PROJECT_PROFILE.json"
+
+        # Clean CLAUDE.md Devlmer section (keep user content)
+        if [[ -f "${target}/CLAUDE.md" ]] && command -v python3 >/dev/null 2>&1; then
+            python3 -c "
+import re
+with open('${target}/CLAUDE.md', 'r') as f:
+    content = f.read()
+if content.strip().startswith('# CLAUDE.md') and 'Devlmer' in content[:200]:
+    # Entire file is DEE-generated
+    import os
+    os.remove('${target}/CLAUDE.md')
+else:
+    # Remove just the Devlmer section
+    cleaned = re.sub(r'## Devlmer Ecosystem Engine.*?(?=\n## (?!Devlmer)|$)', '', content, flags=re.DOTALL).rstrip()
+    with open('${target}/CLAUDE.md', 'w') as f:
+        f.write(cleaned + '\n')
+" 2>/dev/null
+        fi
+
+        echo ""
+        log_success "Ecosystem removed from: ${target}"
+        echo -e "  ${DIM}Your API keys are still in .claude/mcp-env-setup.sh${RESET}"
+        echo ""
+    else
+        echo ""
+        log_info "Cancelled"
+        echo ""
+    fi
+}
+
+# ============================================================================
+# MAIN — Route to command
+# ============================================================================
+
+main() {
+    local cmd="${1:-help}"
+
+    case "${cmd}" in
+        install)    cmd_install "${2:-}" "${3:-}" ;;
+        update)     cmd_update "${2:-}" ;;
+        status)     cmd_status "${2:-}" ;;
+        doctor)     cmd_doctor "${2:-}" ;;
+        uninstall)  cmd_uninstall "${2:-}" ;;
+        version|-v|--version)  cmd_version ;;
+        help|-h|--help)        cmd_help ;;
+        *)
+            log_error "Unknown command: ${cmd}"
+            echo ""
+            echo -e "  Run ${BOLD}dee help${RESET} for usage"
+            echo ""
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"

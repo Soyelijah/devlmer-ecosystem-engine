@@ -2711,6 +2711,55 @@ except:
         echo -e "    4. Configure API keys: ${CYAN}bash \"${TARGET_DIR}/.claude/setup-wizard.sh\" \"${TARGET_DIR}\"${RESET}"
     fi
     echo ""
+    echo -e "${BOLD}${CYAN}  dee CLI:${RESET}"
+    echo -e "    ${GREEN}dee update${RESET}      Update skills & commands (preserves config)"
+    echo -e "    ${GREEN}dee status${RESET}      Show what's installed"
+    echo -e "    ${GREEN}dee doctor${RESET}      Health check & diagnostics"
+    echo ""
+}
+
+install_dee_cli() {
+    log_step "Installing 'dee' CLI command..."
+
+    local cli_source="${SCRIPT_DIR}/bin/dee"
+    if [[ ! -f "${cli_source}" ]]; then
+        log_verbose "dee CLI not found in bundle (optional)"
+        return 0
+    fi
+
+    # Install to ~/.local/bin (no sudo needed, standard on Linux/macOS)
+    local bin_dir="${HOME}/.local/bin"
+    mkdir -p "${bin_dir}"
+    cp "${cli_source}" "${bin_dir}/dee"
+    chmod +x "${bin_dir}/dee"
+
+    # Check if ~/.local/bin is in PATH
+    if echo "${PATH}" | grep -q "${bin_dir}"; then
+        log_success "dee CLI installed — run ${BOLD}dee help${RESET} from anywhere"
+    else
+        log_success "dee CLI installed to ${bin_dir}/dee"
+        # Add to PATH in shell config
+        local shell_rc=""
+        if [[ -f "${HOME}/.zshrc" ]]; then
+            shell_rc="${HOME}/.zshrc"
+        elif [[ -f "${HOME}/.bashrc" ]]; then
+            shell_rc="${HOME}/.bashrc"
+        elif [[ -f "${HOME}/.bash_profile" ]]; then
+            shell_rc="${HOME}/.bash_profile"
+        fi
+
+        if [[ -n "${shell_rc}" ]]; then
+            if ! grep -q '\.local/bin' "${shell_rc}" 2>/dev/null; then
+                echo '' >> "${shell_rc}"
+                echo '# Devlmer Ecosystem Engine CLI' >> "${shell_rc}"
+                echo 'export PATH="${HOME}/.local/bin:${PATH}"' >> "${shell_rc}"
+                log_info "Added ~/.local/bin to PATH in $(basename "${shell_rc}")"
+                log_info "Run: ${CYAN}source ${shell_rc}${RESET} or open a new terminal"
+            fi
+        else
+            log_warning "Add to PATH manually: export PATH=\"\${HOME}/.local/bin:\${PATH}\""
+        fi
+    fi
 }
 
 show_product_info() {
@@ -2890,6 +2939,10 @@ main() {
         echo ""
         log_info "Most features should still work. Check ${LOG_FILE} for details."
     fi
+
+    # Install dee CLI globally
+    install_dee_cli
+    echo ""
 
     # Product info
     show_product_info
