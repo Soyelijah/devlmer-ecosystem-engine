@@ -530,9 +530,10 @@ bash ".claude/setup-wizard.sh" ~/Projects/mi-app</div>
 #   /dee-doctor  → Health check con score 0-100
 #
 # Desde la terminal:
-#   dee help     → Ver todos los comandos disponibles
-#   dee doctor   → Diagnóstico completo
-#   dee update   → Actualizar a la última versión</div>
+#   dee help        → Ver todos los comandos disponibles
+#   dee doctor      → Diagnóstico completo
+#   dee update      → Actualizar ecosistema del proyecto
+#   dee self-update → Actualizar el CLI a la última versión</div>
                 </div>
             </div>
 
@@ -556,18 +557,22 @@ bash ".claude/setup-wizard.sh" ~/Projects/mi-app</div>
                 <div class="install-step reveal">
                     <div class="install-step-num">CLI dee — Recomendado</div>
                     <h4>El instalador agrega el comando <code>dee</code> globalmente. Un solo comando para todo:</h4>
-                    <div class="code-block"># Actualizar el proyecto actual:
+                    <div class="code-block"># Actualizar el ecosistema del proyecto actual:
 dee update
 
 # Actualizar un proyecto específico:
 dee update ~/Projects/mi-app
+
+# Actualizar el CLI dee a la última versión:
+dee self-update
 
 # Otros comandos del CLI:
 dee status               # Ver componentes instalados
 dee doctor               # Health check y diagnóstico
 dee install ~/nuevo-app  # Instalar en proyecto nuevo
 dee uninstall            # Desinstalar del proyecto actual
-dee version              # Ver versión instalada</div>
+dee version              # Ver versión instalada
+dee help                 # Ver todos los comandos disponibles</div>
                 </div>
 
                 <div class="install-step reveal">
@@ -579,13 +584,16 @@ dee version              # Ver versión instalada</div>
                 <div class="install-step reveal">
                     <div class="install-step-num">¿Qué se actualiza vs qué se preserva?</div>
                     <h4>Tu configuración personal nunca se pierde</h4>
-                    <div class="code-block"># ✅ Se actualiza:
+                    <div class="code-block"># ✅ dee update → actualiza el ecosistema del proyecto:
 #   Skills (contenido profesional mejorado)
 #   Slash commands
 #   Hooks (SessionStart y PostToolUse)
 #   Scripts de detección de proyecto
+#   CLI dee (se auto-actualiza si hay nueva versión)
 #
-# 🔒 Se preserva:
+# ✅ dee self-update → actualiza solo el CLI dee
+#
+# 🔒 Se preserva siempre:
 #   Tus API keys y credenciales
 #   Tu configuración de MCPs
 #   Tu CLAUDE.md personalizado
@@ -795,14 +803,14 @@ dee version              # Ver versión instalada</div>
                         <div class="method-card selected" data-method="cli" onclick="selectMethod(this)">
                             <span class="method-badge recommended">Recomendado</span>
                             <div class="method-icon"><i class="fas fa-terminal"></i></div>
-                            <h4>CLI — Un comando</h4>
-                            <p>Clona y ejecuta automáticamente desde tu terminal.</p>
+                            <h4>CLI Installer (curl)</h4>
+                            <p>Instala el CLI <code>dee</code> con curl y luego configura tu proyecto.</p>
                         </div>
                         <div class="method-card" data-method="manual" onclick="selectMethod(this)">
                             <span class="method-badge alt">Alternativa</span>
-                            <div class="method-icon"><i class="fas fa-file-archive"></i></div>
-                            <h4>Descarga manual</h4>
-                            <p>Descarga el .zip desde GitHub y ejecuta install.sh.</p>
+                            <div class="method-icon"><i class="fas fa-code-branch"></i></div>
+                            <h4>One-liner (git clone)</h4>
+                            <p>Clona el repositorio e instala directamente sin el CLI global.</p>
                         </div>
                     </div>
                 </div>

@@ -13,6 +13,7 @@ const wizardState = {
 };
 
 const REPO_URL = 'https://github.com/Soyelijah/devlmer-ecosystem-engine.git';
+const INSTALL_CURL = 'curl -fsSL https://raw.githubusercontent.com/Soyelijah/devlmer-ecosystem-engine/main/install-cli.sh | bash';
 const ZIP_URL = 'https://github.com/Soyelijah/devlmer-ecosystem-engine/archive/refs/heads/main.zip';
 
 function openWizard() {
@@ -393,27 +394,50 @@ function selectTerminal(el, termId) {
     const isMac = os === 'macos';
     hint.innerHTML = `Pega con <kbd>${isMac ? '⌘V' : 'Ctrl+V'}</kbd> en ${term.name}`;
 
-    // Generate the one-liner
+    // Generate the commands (2-step: install CLI + install ecosystem)
     const codeEl = document.getElementById('onelinerCode');
-    const cmd = `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
-    codeEl.innerHTML = `<span class="ol-prompt">$ </span><span class="ol-cmd">rm -rf</span> <span class="ol-path">/tmp/dee</span> <span class="ol-cmd">&&</span> <span class="ol-cmd">git clone</span> <span class="ol-url">${REPO_URL}</span> <span class="ol-path">/tmp/dee</span> <span class="ol-cmd">&&</span> <span class="ol-cmd">bash</span> <span class="ol-path">/tmp/dee/install.sh</span> <span class="ol-path">"${p}"</span>`;
+    if (wizardState.method === 'cli') {
+        const cmd1 = INSTALL_CURL;
+        const cmd2 = `dee install "${p}"`;
+        codeEl.innerHTML = `<span class="ol-comment"># Paso 1: Instalar el CLI</span>\n<span class="ol-prompt">$ </span><span class="ol-cmd">curl -fsSL</span> <span class="ol-url">https://raw.githubusercontent.com/Soyelijah/devlmer-ecosystem-engine/main/install-cli.sh</span> <span class="ol-cmd">| bash</span>\n\n<span class="ol-comment"># Paso 2: Instalar ecosistema en tu proyecto</span>\n<span class="ol-prompt">$ </span><span class="ol-cmd">dee install</span> <span class="ol-path">"${p}"</span>`;
+    } else {
+        const cmd = `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
+        codeEl.innerHTML = `<span class="ol-prompt">$ </span><span class="ol-cmd">rm -rf</span> <span class="ol-path">/tmp/dee</span> <span class="ol-cmd">&&</span> <span class="ol-cmd">git clone</span> <span class="ol-url">${REPO_URL}</span> <span class="ol-path">/tmp/dee</span> <span class="ol-cmd">&&</span> <span class="ol-cmd">bash</span> <span class="ol-path">/tmp/dee/install.sh</span> <span class="ol-path">"${p}"</span>`;
+    }
 
     // Render steps
     const stepsEl = document.getElementById('onelinerSteps');
-    stepsEl.innerHTML = `
-        <div class="oneliner-step">
-            <div class="step-num">1</div>
-            <div class="step-text"><strong>Copia</strong>Click en el botón de abajo</div>
-        </div>
-        <div class="oneliner-step">
-            <div class="step-num">2</div>
-            <div class="step-text"><strong>Abre ${term.name}</strong>${term.shortcut}</div>
-        </div>
-        <div class="oneliner-step">
-            <div class="step-num">3</div>
-            <div class="step-text"><strong>Pega y Enter</strong>${isMac ? '⌘V' : 'Ctrl+V'} → Enter</div>
-        </div>
-    `;
+    if (wizardState.method === 'cli') {
+        stepsEl.innerHTML = `
+            <div class="oneliner-step">
+                <div class="step-num">1</div>
+                <div class="step-text"><strong>Abre ${term.name}</strong>${term.shortcut}</div>
+            </div>
+            <div class="oneliner-step">
+                <div class="step-num">2</div>
+                <div class="step-text"><strong>Instala el CLI</strong>Pega el primer comando con ${isMac ? '⌘V' : 'Ctrl+V'}</div>
+            </div>
+            <div class="oneliner-step">
+                <div class="step-num">3</div>
+                <div class="step-text"><strong>Instala el ecosistema</strong>Ejecuta <code>dee install "${p}"</code></div>
+            </div>
+        `;
+    } else {
+        stepsEl.innerHTML = `
+            <div class="oneliner-step">
+                <div class="step-num">1</div>
+                <div class="step-text"><strong>Copia</strong>Click en el botón de abajo</div>
+            </div>
+            <div class="oneliner-step">
+                <div class="step-num">2</div>
+                <div class="step-text"><strong>Abre ${term.name}</strong>${term.shortcut}</div>
+            </div>
+            <div class="oneliner-step">
+                <div class="step-num">3</div>
+                <div class="step-text"><strong>Pega y Enter</strong>${isMac ? '⌘V' : 'Ctrl+V'} → Enter</div>
+            </div>
+        `;
+    }
 
     // Update footer btn
     const nextBtn = document.getElementById('wizardBtnNext');
@@ -427,7 +451,12 @@ function selectTerminal(el, termId) {
 
 function copyOneliner() {
     const p = wizardState.path || '~/projects/my-app';
-    const cmd = `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
+    let cmd;
+    if (wizardState.method === 'cli') {
+        cmd = `# Paso 1: Instalar el CLI\n${INSTALL_CURL}\n\n# Paso 2: Instalar ecosistema\ndee install "${p}"`;
+    } else {
+        cmd = `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
+    }
 
     navigator.clipboard.writeText(cmd).then(() => {
         const btn = document.getElementById('onelinerCopyBtn');
@@ -470,29 +499,50 @@ async function startSimulation() {
 
     const lines = [
         { text: '', delay: 200 },
-        { text: '<span class="xt-cyan xt-bold">⚡ Devlmer Ecosystem Engine — Auto-Installer</span>', delay: 80 },
-        { text: '<span class="xt-cyan">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>', delay: 40 },
+        { text: '<span class="xt-cyan xt-bold">⚡ DEVLMER ECOSYSTEM ENGINE — Instalador del CLI</span>', delay: 80 },
+        { text: '<span class="xt-cyan">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>', delay: 40 },
         { text: '', delay: 150 },
-        { text: '<span class="xt-prompt">▶</span> <span class="xt-cmd">Clonando repositorio...</span>', delay: 600, typing: true },
-        { text: '<span class="xt-dim">  Cloning into \'/tmp/dee\'...</span>', delay: 400 },
-        { text: '<span class="xt-dim">  remote: Enumerating objects: 165, done.</span>', delay: 200 },
-        { text: '<span class="xt-dim">  remote: Counting objects: 100% (165/165), done.</span>', delay: 200 },
-        { text: '<span class="xt-dim">  Receiving objects: 100% (165/165), 284.5 KiB, done.</span>', delay: 300 },
-        { text: '<span class="xt-success">✓ Repositorio clonado</span>', delay: 150 },
+        { text: '<span class="xt-prompt">◆</span> <span class="xt-cmd">SISTEMA</span>', delay: 300 },
+        { text: '  <span class="xt-success">✓</span> macOS 15.3 · Apple Silicon (arm64)', delay: 200 },
+        { text: '  <span class="xt-success">✓</span> Shell: zsh → ~/.zshrc', delay: 150 },
         { text: '', delay: 100 },
-        { text: '<span class="xt-prompt">▶</span> <span class="xt-cmd">Ejecutando instalador...</span>', delay: 500, typing: true },
+        { text: '<span class="xt-prompt">◆</span> <span class="xt-cmd">REQUISITOS</span>', delay: 300 },
+        { text: '  <span class="xt-success">✓</span> git 2.43', delay: 150 },
+        { text: '  <span class="xt-success">✓</span> python 3.12', delay: 150 },
+        { text: '  <span class="xt-success">✓</span> bash 5.2', delay: 150 },
+        { text: '  <span class="xt-success">✓</span> claude code detectado', delay: 150 },
+        { text: '', delay: 100 },
+        { text: '<span class="xt-prompt">◆</span> <span class="xt-cmd">INSTALACIÓN</span>', delay: 300, typing: true },
+        { text: '  <span class="xt-success">✓</span> Última versión descargada', delay: 400 },
+        { text: '  <span class="xt-success">✓</span> CLI instalado en ~/.local/bin/dee', delay: 200 },
+        { text: '  <span class="xt-success">✓</span> Configuración guardada en ~/.dee', delay: 200 },
+        { text: '', delay: 100 },
+        { text: '<span class="xt-prompt">◆</span> <span class="xt-cmd">CONFIGURACIÓN</span>', delay: 300 },
+        { text: '  <span class="xt-success">✓</span> PATH agregado a ~/.zshrc', delay: 200 },
+        { text: '', delay: 100 },
+        { text: '<span class="xt-prompt">◆</span> <span class="xt-cmd">VERIFICACIÓN</span>', delay: 300 },
+        { text: '  <span class="xt-success">✓</span> Verificado: <span class="xt-cyan xt-bold">dee</span> v3.0.0 funciona correctamente', delay: 300 },
+        { text: '', delay: 200 },
+        { text: '<span class="xt-success xt-bold">╔══════════════════════════════════════════════╗</span>', delay: 50 },
+        { text: '<span class="xt-success xt-bold">║  ✓ dee v3.0.0 instalado correctamente        ║</span>', delay: 50 },
+        { text: '<span class="xt-success xt-bold">╚══════════════════════════════════════════════╝</span>', delay: 200 },
+        { text: '', delay: 150 },
+        { text: '  <span class="xt-dim">Siguiente paso: instala el ecosistema en tu proyecto:</span>', delay: 100 },
+        { text: '  <span class="xt-cyan">$</span> <span class="xt-bold">dee install ~/Projects/mi-app</span>', delay: 150 },
+        { text: '', delay: 300 },
+        { text: '<span class="xt-prompt">▶</span> <span class="xt-cmd">Instalando ecosistema...</span>', delay: 500, typing: true },
         { text: '', delay: 100 },
         { text: '<span class="xt-cyan xt-bold">╔══════════════════════════════════════════╗</span>', delay: 50 },
         { text: '<span class="xt-cyan xt-bold">║  DEVLMER ECOSYSTEM ENGINE v3.0           ║</span>', delay: 50 },
-        { text: '<span class="xt-cyan xt-bold">║  Professional Toolsets for Claude Code    ║</span>', delay: 50 },
+        { text: '<span class="xt-cyan xt-bold">║  Ecosistemas Inteligentes · Claude Code   ║</span>', delay: 50 },
         { text: '<span class="xt-cyan xt-bold">╚══════════════════════════════════════════╝</span>', delay: 200 },
         { text: '', delay: 100 },
-        { text: '<span class="xt-info">[1/7]</span> Detecting platform...', delay: 300 },
-        { text: '  <span class="xt-success">✓</span> macOS arm64 detected (Bash 5.2)', delay: 200 },
-        { text: '<span class="xt-info">[2/7]</span> Scanning project...', delay: 400, typing: true },
+        { text: '<span class="xt-info">[1/7]</span> Detectando plataforma...', delay: 300 },
+        { text: '  <span class="xt-success">✓</span> macOS arm64 detectado (Bash 5.2)', delay: 200 },
+        { text: '<span class="xt-info">[2/7]</span> Analizando proyecto...', delay: 400, typing: true },
         { text: '  <span class="xt-success">✓</span> Fingerprint: <span class="xt-cyan">React + FastAPI (Trading Platform)</span>', delay: 300 },
-        { text: '  <span class="xt-dim">  Confidence: 94% | Domain: fintech</span>', delay: 200 },
-        { text: '<span class="xt-info">[3/7]</span> Installing 21 professional skills...', delay: 200, typing: true },
+        { text: '  <span class="xt-dim">  Confianza: 94% | Dominio: fintech</span>', delay: 200 },
+        { text: '<span class="xt-info">[3/7]</span> Instalando 21 skills profesionales...', delay: 200, typing: true },
         { text: '', delay: 50 },
         { progress: true, items: [
             'senior-architect', 'senior-frontend', 'senior-backend',
@@ -504,26 +554,26 @@ async function startSimulation() {
             'mcp-builder', 'skill-creator', 'project-intelligence',
             'webapp-testing'
         ]},
-        { text: '  <span class="xt-success">✓</span> 21/21 skills installed', delay: 200 },
-        { text: '<span class="xt-info">[4/7]</span> Configuring 23 MCP integrations...', delay: 300, typing: true },
+        { text: '  <span class="xt-success">✓</span> 21/21 skills instalados', delay: 200 },
+        { text: '<span class="xt-info">[4/7]</span> Configurando 23 integraciones MCP...', delay: 300, typing: true },
         { text: '  <span class="xt-success">✓</span> GitHub, Playwright, Cloudflare, Notion...', delay: 200 },
-        { text: '<span class="xt-info">[5/7]</span> Setting up hooks...', delay: 300 },
+        { text: '<span class="xt-info">[5/7]</span> Configurando hooks...', delay: 300 },
         { text: '  <span class="xt-success">✓</span> PreToolUse, PostToolUse, SessionStart', delay: 200 },
-        { text: '<span class="xt-info">[6/7]</span> Generating CLAUDE.md...', delay: 400 },
-        { text: '  <span class="xt-success">✓</span> Auto-configured for <span class="xt-cyan">fintech</span> domain', delay: 200 },
-        { text: '<span class="xt-info">[7/7]</span> Running verification...', delay: 500, typing: true },
-        { text: '  <span class="xt-success">✓</span> All components verified', delay: 300 },
+        { text: '<span class="xt-info">[6/7]</span> Generando CLAUDE.md...', delay: 400 },
+        { text: '  <span class="xt-success">✓</span> Auto-configurado para dominio <span class="xt-cyan">fintech</span>', delay: 200 },
+        { text: '<span class="xt-info">[7/7]</span> Ejecutando verificación...', delay: 500, typing: true },
+        { text: '  <span class="xt-success">✓</span> Todos los componentes verificados', delay: 300 },
         { text: '', delay: 100 },
         { text: '<span class="xt-success xt-bold">═══════════════════════════════════════════</span>', delay: 50 },
-        { text: '<span class="xt-success xt-bold">  ✓ Installation complete! (58s)</span>', delay: 50 },
+        { text: '<span class="xt-success xt-bold">  ✓ Ecosistema instalado correctamente (12s)</span>', delay: 50 },
         { text: '<span class="xt-success xt-bold">═══════════════════════════════════════════</span>', delay: 100 },
         { text: '', delay: 50 },
-        { text: '  <span class="xt-cyan">Project:</span>  ' + p, delay: 100 },
-        { text: '  <span class="xt-cyan">Skills:</span>   21 installed', delay: 80 },
-        { text: '  <span class="xt-cyan">MCPs:</span>     23 configured', delay: 80 },
-        { text: '  <span class="xt-cyan">Hooks:</span>    3 active', delay: 80 },
+        { text: '  <span class="xt-cyan">Proyecto:</span>  ' + p, delay: 100 },
+        { text: '  <span class="xt-cyan">Skills:</span>    21 instalados', delay: 80 },
+        { text: '  <span class="xt-cyan">MCPs:</span>      23 configurados', delay: 80 },
+        { text: '  <span class="xt-cyan">Hooks:</span>     3 activos', delay: 80 },
         { text: '', delay: 150 },
-        { text: '  <span class="xt-dim">Open Claude Code in your project to start.</span>', delay: 100 },
+        { text: '  <span class="xt-dim">Abre Claude Code en tu proyecto para comenzar.</span>', delay: 100 },
         { text: '', delay: 50 },
     ];
 
@@ -600,7 +650,7 @@ async function renderProgressBlock(container, items) {
         container.scrollTop = container.scrollHeight;
         await sleep(80 + Math.random() * 60);
     }
-    wrapper.innerHTML = `<span class="xt-dim">[${'█'.repeat(20)}]</span> <span class="xt-success">100%</span> <span class="xt-success">All skills installed</span>`;
+    wrapper.innerHTML = `<span class="xt-dim">[${'█'.repeat(20)}]</span> <span class="xt-success">100%</span> <span class="xt-success">Todos los skills instalados</span>`;
 }
 
 function replaySimulation() {
@@ -616,9 +666,9 @@ function getInstallCommand() {
     const p = wizardState.path || '/ruta/a/tu/proyecto';
 
     if (wizardState.method === 'cli') {
-        return `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
+        return `# Paso 1: Instalar el CLI\n${INSTALL_CURL}\n\n# Paso 2: Instalar ecosistema en tu proyecto\ndee install "${p}"`;
     } else {
-        return `# 1. Descarga desde:\n#    ${ZIP_URL}\n# 2. Descomprime y ejecuta:\ncd devlmer-ecosystem-engine-main && bash install.sh "${p}"`;
+        return `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
     }
 }
 
@@ -633,17 +683,16 @@ function renderTerminal() {
 
     if (wizardState.method === 'cli') {
         lines = [
-            { type: 'comment', text: '# Clona el repositorio e instala en un solo comando' },
+            { type: 'comment', text: '# Paso 1: Instalar el CLI (solo se hace una vez)' },
             { type: 'cmd', parts: [
-                { text: 'git clone ', cls: 'cmd' },
-                { text: REPO_URL, cls: 'url-val' },
-                { text: ' /tmp/dee', cls: 'path-val' }
+                { text: 'curl -fsSL ', cls: 'cmd' },
+                { text: 'https://raw.githubusercontent.com/Soyelijah/devlmer-ecosystem-engine/main/install-cli.sh', cls: 'url-val' },
+                { text: ' | bash', cls: 'cmd' }
             ]},
             { type: 'blank' },
-            { type: 'comment', text: '# Ejecuta el instalador' },
+            { type: 'comment', text: '# Paso 2: Instalar ecosistema en tu proyecto' },
             { type: 'cmd', parts: [
-                { text: 'bash ', cls: 'cmd' },
-                { text: '/tmp/dee/install.sh ', cls: 'path-val' },
+                { text: 'dee install ', cls: 'cmd' },
                 { text: p, cls: 'path-val' }
             ]},
         ];
@@ -703,9 +752,9 @@ function copyFinalCommand() {
     let cmd;
 
     if (wizardState.method === 'cli') {
-        cmd = `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
+        cmd = `# Paso 1: Instalar el CLI\n${INSTALL_CURL}\n\n# Paso 2: Instalar ecosistema\ndee install "${p}"`;
     } else {
-        cmd = `curl -L -o dee.zip ${ZIP_URL} && unzip dee.zip && cd devlmer-ecosystem-engine-main && bash install.sh "${p}"`;
+        cmd = `rm -rf /tmp/dee && git clone ${REPO_URL} /tmp/dee && bash /tmp/dee/install.sh "${p}"`;
     }
 
     navigator.clipboard.writeText(cmd).then(() => {
