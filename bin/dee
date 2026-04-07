@@ -153,21 +153,6 @@ ${BOLD}🔍 DIAGNÓSTICO${RESET}
 
 ${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}
 
-${BOLD}🚀 PUBLICACIÓN (para desarrolladores de DEE)${RESET}
-
-    ${GREEN}dee release${RESET} [versión]
-        Asistente interactivo para publicar una nueva versión.
-        Te pregunta paso a paso: número de versión, título,
-        qué cambió (nuevo, cambiado, corregido, eliminado).
-        Genera el CHANGELOG, crea el tag, sube a GitHub y
-        publica el Release automáticamente.
-
-        Ejemplos:
-          dee release                     Modo interactivo (recomendado)
-          dee release 3.1.0               Saltar directo a la versión
-
-${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}
-
 ${BOLD}ℹ️  INFORMACIÓN${RESET}
 
     ${GREEN}dee version${RESET}
