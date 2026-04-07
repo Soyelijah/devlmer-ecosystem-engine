@@ -81,34 +81,120 @@ show_header() {
 cmd_help() {
     show_header
     cat << EOF
-${BOLD}USAGE${RESET}
-    dee <command> [path]
+${BOLD}USO${RESET}
+    dee <comando> [ruta]
 
-${BOLD}COMMANDS${RESET}
-    ${GREEN}install${RESET} [path]     Install ecosystem on a project (default: current dir)
-    ${GREEN}update${RESET}  [path]     Update skills, commands & hooks (preserves config)
-    ${GREEN}status${RESET}  [path]     Show what's installed
-    ${GREEN}doctor${RESET}  [path]     Health check & diagnostics
-    ${GREEN}uninstall${RESET} [path]   Remove ecosystem from a project
-    ${GREEN}release${RESET}  <version>   Create a new release (tag + GitHub release)
-    ${GREEN}self-update${RESET}         Update the dee CLI itself to latest version
-    ${GREEN}version${RESET}            Show version
-    ${GREEN}help${RESET}               Show this help
+    Si no pones una ruta, se usa la carpeta donde estés parado.
 
-${BOLD}EXAMPLES${RESET}
-    dee install                    # Install in current directory
-    dee install ~/Projects/my-app  # Install in specific project
-    dee update                     # Update current project
-    dee update ~/Projects/my-app   # Update specific project
-    dee status                     # Check current project
-    dee doctor                     # Run health check
-    dee release 3.1.0              # Create release v3.1.0
+${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}
 
-${BOLD}FIRST TIME?${RESET}
-    cd /your/project && dee install
+${BOLD}📦 INSTALACIÓN Y DESINSTALACIÓN${RESET}
 
-${BOLD}ALREADY INSTALLED?${RESET}
-    dee update
+    ${GREEN}dee install${RESET} [ruta]
+        Instala el ecosistema completo en un proyecto.
+        Detecta tu stack, instala skills, MCPs, agents, hooks
+        y slash commands. Solo necesitas hacerlo una vez por proyecto.
+
+        Ejemplos:
+          dee install                     Instalar en la carpeta actual
+          dee install ~/Projects/mi-app   Instalar en un proyecto específico
+
+    ${GREEN}dee uninstall${RESET} [ruta]
+        Elimina el ecosistema de un proyecto. Tus API keys se
+        conservan por seguridad. Pide confirmación antes de borrar.
+
+        Ejemplo:
+          dee uninstall                   Desinstalar de la carpeta actual
+
+${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}
+
+${BOLD}🔄 ACTUALIZACIÓN${RESET}
+
+    ${GREEN}dee update${RESET} [ruta]
+        Actualiza un proyecto a la última versión: skills nuevos,
+        hooks mejorados y slash commands. Tu configuración personal
+        (API keys, MCPs, CLAUDE.md) NO se toca.
+        También actualiza el propio CLI si hay versión nueva.
+
+        Ejemplos:
+          dee update                      Actualizar proyecto actual
+          dee update ~/Projects/mi-app    Actualizar otro proyecto
+
+    ${GREEN}dee self-update${RESET}
+        Actualiza SOLO el programa dee (este CLI) a la última versión.
+        No necesitas estar dentro de un proyecto. Útil cuando
+        quieres los últimos comandos sin tocar ningún proyecto.
+
+        Alias: ${DIM}dee upgrade${RESET}, ${DIM}dee selfupdate${RESET}
+
+        Ejemplo:
+          dee self-update                 Actualizar dee desde cualquier lugar
+
+${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}
+
+${BOLD}🔍 DIAGNÓSTICO${RESET}
+
+    ${GREEN}dee status${RESET} [ruta]
+        Muestra qué hay instalado en un proyecto: cuántos skills,
+        commands, agents y MCPs tienes, qué dominio se detectó,
+        y el tamaño de los archivos de configuración.
+
+        Ejemplo:
+          dee status                      Ver estado del proyecto actual
+
+    ${GREEN}dee doctor${RESET} [ruta]
+        Revisa la salud de tu instalación con un score de 0 a 100.
+        Verifica que los archivos existan, que los skills tengan
+        contenido real, que los hooks funcionen y que los MCPs
+        estén configurados. Te dice exactamente qué arreglar.
+
+        Ejemplo:
+          dee doctor                      Diagnóstico del proyecto actual
+
+${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}
+
+${BOLD}🚀 PUBLICACIÓN (para desarrolladores de DEE)${RESET}
+
+    ${GREEN}dee release${RESET} [versión]
+        Asistente interactivo para publicar una nueva versión.
+        Te pregunta paso a paso: número de versión, título,
+        qué cambió (nuevo, cambiado, corregido, eliminado).
+        Genera el CHANGELOG, crea el tag, sube a GitHub y
+        publica el Release automáticamente.
+
+        Ejemplos:
+          dee release                     Modo interactivo (recomendado)
+          dee release 3.1.0               Saltar directo a la versión
+
+${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}
+
+${BOLD}ℹ️  INFORMACIÓN${RESET}
+
+    ${GREEN}dee version${RESET}
+        Muestra la versión instalada de dee.
+
+        Alias: ${DIM}dee -v${RESET}, ${DIM}dee --version${RESET}
+
+    ${GREEN}dee help${RESET}
+        Muestra esta ayuda.
+
+        Alias: ${DIM}dee -h${RESET}, ${DIM}dee --help${RESET}
+
+${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}
+
+${BOLD}🎯 ¿POR DÓNDE EMPIEZO?${RESET}
+
+    ${CYAN}Primera vez:${RESET}
+      cd ~/tu-proyecto && dee install
+
+    ${CYAN}Ya lo tienes instalado:${RESET}
+      dee update
+
+    ${CYAN}Quieres ver cómo está todo:${RESET}
+      dee doctor
+
+    ${CYAN}Quieres la última versión del CLI:${RESET}
+      dee self-update
 
 EOF
 }
