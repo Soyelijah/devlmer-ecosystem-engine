@@ -45,6 +45,7 @@
                     <li><a href="#qué-es">¿Qué es?</a></li>
                     <li><a href="#cómo-funciona">Cómo Funciona</a></li>
                     <li><a href="#skills">Skills</a></li>
+                    <li><a href="#update">Actualizar</a></li>
                     <li><a href="#por-qué">Por Qué</a></li>
                 </ul>
                 <div class="cta-nav">
@@ -527,23 +528,71 @@
 
                 <div class="install-step reveal">
                     <div class="install-step-num">Paso 4 — Abre Claude Code</div>
-                    <h4>Tus skills aparecen como <code>/slash-commands</code> nativos</h4>
+                    <h4>El ecosistema se activa automáticamente al abrir tu proyecto</h4>
                     <div class="code-block">cd /your/project && claude
-# Escribe / para ver todos tus skills instalados:
-#   /senior-architect  /code-reviewer  /copywriting
-#   /senior-security   /mobile-design  /brainstorming ...
-# Escribe /skills para ver la lista completa
-# Escribe /mcp para ver los MCPs conectados
-# Escribe /plugin para ver los plugins activos</div>
+
+# 🧠 DEVLMER ECOSYSTEM ENGINE v3.0
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 📊 Project: my-app | Domain: Saas
+# ⚡ 22 skills | 24 commands | 14 agents | 22 MCPs
+#
+# 💡 Quick start: /dee-demo | /dee-status | /dee-doctor
+#    Type / to see all available commands</div>
                 </div>
 
                 <div class="install-step reveal">
-                    <div class="install-step-num">Paso 5 — ¡Desarrolla con Superpoderes!</div>
-                    <h4>Claude ahora tiene contexto profundo de tu proyecto y herramientas especializadas</h4>
-                    <div class="code-block"># Claude lee tu CLAUDE.md y PROJECT_PROFILE.json automáticamente
-# Activa skills según el contexto de lo que estés haciendo
-# Los agents especializados trabajan en paralelo
-# Los MCPs conectan con servicios reales (Supabase, Stripe, GitHub...)</div>
+                    <div class="install-step-num">Paso 5 — Explora tu Ecosistema</div>
+                    <h4>3 comandos esenciales para empezar</h4>
+                    <div class="code-block"># /dee-demo    → Tour interactivo de 5 pasos (¡empieza aquí!)
+# /dee-status  → Dashboard visual de todo lo instalado
+# /dee-doctor  → Health check con score 0-100 y diagnóstico
+#
+# Después, usa cualquier skill con /nombre:
+#   /senior-architect  /code-reviewer  /copywriting
+#   /senior-security   /mobile-design  /brainstorming ...</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ACTUALIZAR INSTALACIÓN EXISTENTE ==================== -->
+    <section class="section" id="update" style="background: linear-gradient(135deg, rgba(0, 212, 170, 0.04) 0%, rgba(0, 82, 255, 0.02) 100%);">
+        <div class="container">
+            <h2 class="section-title">Actualizar Instalación Existente</h2>
+            <p class="section-subtitle">Actualiza skills, commands y hooks sin perder tu configuración</p>
+
+            <div class="install-steps">
+                <div class="install-step reveal">
+                    <div class="install-step-num">Actualización Rápida — Un Solo Comando</div>
+                    <h4>Actualiza todo sin perder tus API keys, MCPs ni configuración personalizada</h4>
+                    <div class="code-block">rm -rf /tmp/dee && git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/update.sh "/path/to/your/project"</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">¿Qué se actualiza?</div>
+                    <h4>Solo se actualizan los componentes del ecosistema — tu código no se toca</h4>
+                    <div class="code-block"># ✅ Se actualiza:
+#   • Skills (contenido profesional mejorado)
+#   • Slash commands (nuevos comandos como /dee-demo, /dee-doctor)
+#   • Hooks (SessionStart y PostToolUse mejorados)
+#   • Scripts de detección de proyecto
+#
+# 🔒 Se preserva:
+#   • Tus API keys y credenciales (mcp-env-setup.sh)
+#   • Tu configuración de MCPs (settings.json → mcpServers)
+#   • Tu CLAUDE.md personalizado
+#   • Tus agents configurados
+#   • Tu PROJECT_PROFILE.json</div>
+                </div>
+
+                <div class="install-step reveal">
+                    <div class="install-step-num">¿Cuándo actualizar?</div>
+                    <h4>Cuando quieras recibir mejoras en skills, nuevos commands o bug fixes</h4>
+                    <div class="code-block"># Después de actualizar, verifica con:
+cd /tu/proyecto && claude
+# Escribe: /dee-status    → Dashboard completo
+# Escribe: /dee-doctor    → Health check del ecosistema
+# Escribe: /dee-demo      → Tour interactivo</div>
                 </div>
             </div>
         </div>
