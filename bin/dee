@@ -91,6 +91,7 @@ ${BOLD}COMMANDS${RESET}
     ${GREEN}doctor${RESET}  [path]     Health check & diagnostics
     ${GREEN}uninstall${RESET} [path]   Remove ecosystem from a project
     ${GREEN}release${RESET}  <version>   Create a new release (tag + GitHub release)
+    ${GREEN}self-update${RESET}         Update the dee CLI itself to latest version
     ${GREEN}version${RESET}            Show version
     ${GREEN}help${RESET}               Show this help
 
@@ -115,6 +116,51 @@ EOF
 cmd_version() {
     echo -e "${BOLD}dee${RESET} v${VERSION} — Devlmer Ecosystem Engine"
     echo -e "${DIM}https://github.com/Soyelijah/devlmer-ecosystem-engine${RESET}"
+}
+
+cmd_self_update() {
+    show_header
+    log_info "Buscando última versión del CLI..."
+
+    local tmp="/tmp/dee-self-$$"
+    rm -rf "${tmp}"
+    if ! git clone --depth 1 --quiet "${REPO_URL}" "${tmp}" 2>/dev/null; then
+        log_error "No se pudo descargar. Revisa tu conexión a internet."
+        rm -rf "${tmp}"
+        exit 1
+    fi
+
+    local new_dee="${tmp}/bin/dee"
+    if [[ ! -f "${new_dee}" ]]; then
+        log_error "No se encontró bin/dee en el repositorio."
+        rm -rf "${tmp}"
+        exit 1
+    fi
+
+    local new_ver old_ver
+    new_ver=$(grep '^VERSION=' "${new_dee}" 2>/dev/null | head -1 | cut -d'"' -f2)
+    old_ver="${VERSION}"
+
+    if [[ "${new_ver}" == "${old_ver}" ]]; then
+        log_success "Ya tienes la última versión: v${old_ver}"
+        rm -rf "${tmp}"
+        echo ""
+        return 0
+    fi
+
+    # Find where dee is installed
+    local installed_dee
+    installed_dee=$(command -v dee 2>/dev/null || echo "${HOME}/.local/bin/dee")
+
+    cp "${new_dee}" "${installed_dee}"
+    chmod +x "${installed_dee}"
+    rm -rf "${tmp}"
+
+    echo ""
+    log_success "CLI actualizado: v${old_ver} → v${new_ver}"
+    echo ""
+    echo -e "  ${DIM}Ubicación: ${installed_dee}${RESET}"
+    echo ""
 }
 
 cmd_install() {
@@ -865,6 +911,7 @@ main() {
         doctor)     cmd_doctor "${2:-}" ;;
         uninstall)  cmd_uninstall "${2:-}" ;;
         release)    cmd_release "${2:-}" ;;
+        self-update|selfupdate|upgrade)  cmd_self_update ;;
         version|-v|--version)  cmd_version ;;
         help|-h|--help)        cmd_help ;;
         *)
