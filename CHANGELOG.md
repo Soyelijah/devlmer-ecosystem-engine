@@ -9,21 +9,17 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ## [3.1.1] - 2026-04-07
 
 ### Agregado
--   [0;36m?[0m Describe cada cosa nueva [2m(una por línea, línea vacía para terminar)[0m
--     [2m•[0m     [2m•[0m 41 skills nuevas, enterprise CLI installer, 22 dominios, config templates
+- 41 skills nuevas, enterprise CLI installer, 22 dominios, config templates
 
 ### Cambiado
--   [0;36m?[0m Describe cada cambio [2m(una por línea, línea vacía para terminar)[0m
--     [2m•[0m     [2m•[0m     [2m•[0m Landing y wizard actualizados con nuevo método curl | bash
+- Landing y wizard actualizados con nuevo método curl | bash
 - Estadísticas actualizadas a 62 skills y 22 dominios
 
 ### Corregido
--   [0;36m?[0m Describe cada fix [2m(una por línea, línea vacía para terminar)[0m
--     [2m•[0m     [2m•[0m     [2m•[0m Wizard generaba comando antiguo git clone en vez de curl
+- Wizard generaba comando antiguo git clone en vez de curl
 - Duplicado de tarjeta DevTools en landing
 
 ---
-
 
 ## [3.1.0] - 2026-04-07
 

@@ -575,9 +575,9 @@ ask() {
     local default="${2:-}"
     local reply
     if [[ -n "${default}" ]]; then
-        echo -ne "  ${CYAN}?${RESET} ${prompt} ${DIM}(${default})${RESET}: "
+        echo -ne "  ${CYAN}?${RESET} ${prompt} ${DIM}(${default})${RESET}: " >&2
     else
-        echo -ne "  ${CYAN}?${RESET} ${prompt}: "
+        echo -ne "  ${CYAN}?${RESET} ${prompt}: " >&2
     fi
     read -r reply
     echo "${reply:-${default}}"
@@ -586,10 +586,10 @@ ask() {
 # Helper: read multi-line items (one per line, empty line to finish)
 ask_items() {
     local prompt="$1"
-    echo -e "  ${CYAN}?${RESET} ${prompt} ${DIM}(una por línea, línea vacía para terminar)${RESET}"
+    echo -e "  ${CYAN}?${RESET} ${prompt} ${DIM}(una por línea, línea vacía para terminar)${RESET}" >&2
     local items=()
     while true; do
-        echo -ne "    ${DIM}•${RESET} "
+        echo -ne "    ${DIM}•${RESET} " >&2
         read -r line
         if [[ -z "${line}" ]]; then
             break
