@@ -632,6 +632,11 @@ setup_directories() {
         "${TARGET_DIR}/.claude/hooks"
         "${TARGET_DIR}/.claude/config"
         "${TARGET_DIR}/.claude/logs"
+        "${TARGET_DIR}/.claude/memory"
+        "${TARGET_DIR}/.claude/scripts"
+        "${TARGET_DIR}/.claude/blueprints"
+        "${TARGET_DIR}/.claude/commands"
+        "${TARGET_DIR}/.claude/agents"
         "${HOME}/.devlmer"
     )
     for d in "${dirs[@]}"; do
@@ -2091,6 +2096,54 @@ CMDEOF
 }
 
 # ============================================================================
+# COPY CONFIG TEMPLATES & SCRIPTS
+# ============================================================================
+
+copy_config_templates() {
+    log_step "Copying configuration templates and scripts..."
+
+    local config_dir="${TARGET_DIR}/.claude/config"
+    local scripts_dir="${TARGET_DIR}/.claude/scripts"
+    local blueprints_dir="${TARGET_DIR}/.claude/blueprints"
+    local count=0
+
+    # Copy dee-config.yaml if not exists
+    if [[ -f "${SCRIPT_DIR}/.claude/config/dee-config.yaml" ]] && [[ ! -f "${config_dir}/dee-config.yaml" ]]; then
+        cp "${SCRIPT_DIR}/.claude/config/dee-config.yaml" "${config_dir}/" 2>/dev/null && count=$((count + 1))
+    fi
+
+    # Copy github-config.json if not exists
+    if [[ -f "${SCRIPT_DIR}/.claude/config/github-config.json" ]] && [[ ! -f "${config_dir}/github-config.json" ]]; then
+        cp "${SCRIPT_DIR}/.claude/config/github-config.json" "${config_dir}/" 2>/dev/null && count=$((count + 1))
+    fi
+
+    # Copy nano-banana-config.json if not exists
+    if [[ -f "${SCRIPT_DIR}/.claude/config/nano-banana-config.json" ]] && [[ ! -f "${config_dir}/nano-banana-config.json" ]]; then
+        cp "${SCRIPT_DIR}/.claude/config/nano-banana-config.json" "${config_dir}/" 2>/dev/null && count=$((count + 1))
+    fi
+
+    # Copy create-skill.sh script
+    if [[ -f "${SCRIPT_DIR}/.claude/scripts/create-skill.sh" ]]; then
+        mkdir -p "${scripts_dir}" 2>/dev/null
+        cp "${SCRIPT_DIR}/.claude/scripts/create-skill.sh" "${scripts_dir}/" 2>/dev/null && count=$((count + 1))
+        chmod +x "${scripts_dir}/create-skill.sh" 2>/dev/null
+    fi
+
+    # Copy ecosystems.json blueprint
+    if [[ -f "${SCRIPT_DIR}/blueprints/ecosystems.json" ]]; then
+        mkdir -p "${blueprints_dir}" 2>/dev/null
+        cp "${SCRIPT_DIR}/blueprints/ecosystems.json" "${blueprints_dir}/" 2>/dev/null && count=$((count + 1))
+    fi
+
+    # Copy .deeignore to project root if not exists
+    if [[ -f "${SCRIPT_DIR}/.deeignore" ]] && [[ ! -f "${TARGET_DIR}/.deeignore" ]]; then
+        cp "${SCRIPT_DIR}/.deeignore" "${TARGET_DIR}/" 2>/dev/null && count=$((count + 1))
+    fi
+
+    log_success "Copied ${count} config templates and scripts"
+}
+
+# ============================================================================
 # GLOBAL CONFIGURATION
 # ============================================================================
 
@@ -2899,6 +2952,7 @@ main() {
 
         run_step "Blueprints" copy_blueprints
         run_step "Scripts" copy_scripts
+        run_step "Config templates" copy_config_templates
         run_step "Hooks" setup_hooks
         run_step "Slash commands" generate_slash_commands
         run_step "CLAUDE.md" create_global_claude_md

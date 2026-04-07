@@ -542,19 +542,31 @@ async function startSimulation() {
         { text: '<span class="xt-info">[2/7]</span> Analizando proyecto...', delay: 400, typing: true },
         { text: '  <span class="xt-success">✓</span> Fingerprint: <span class="xt-cyan">React + FastAPI (Trading Platform)</span>', delay: 300 },
         { text: '  <span class="xt-dim">  Confianza: 94% | Dominio: fintech</span>', delay: 200 },
-        { text: '<span class="xt-info">[3/7]</span> Instalando 21 skills profesionales...', delay: 200, typing: true },
+        { text: '<span class="xt-info">[3/7]</span> Instalando 62 skills profesionales...', delay: 200, typing: true },
         { text: '', delay: 50 },
         { progress: true, items: [
             'senior-architect', 'senior-frontend', 'senior-backend',
-            'senior-security', 'code-reviewer', 'senior-fullstack',
+            'senior-security', 'security-audit', 'code-reviewer', 'senior-fullstack',
+            'refactor', 'unit-test-generator', 'documentation', 'api-integration',
+            'docker-deploy', 'commit-commands', 'db-migration',
             'senior-prompt-engineer', 'ui-ux-pro-max', 'ui-design-system',
+            'frontend-design', 'ux-copy', 'brand-guidelines', 'theme-factory',
+            'canvas-design', 'dashboard-audit', 'performance-optimization',
             'copywriting', 'seo-optimizer', 'brand-identity',
             'brainstorming', 'file-organizer', 'mobile-design',
             'marketing-graphic-design', 'git-commit-helper',
+            'data-validation', 'k8s-validation', 'risk-assessment',
+            'ml-validation', 'dependency-graph', 'workspace-tools',
+            'data-pipeline', 'schema-management', 'payment-validation',
+            'contract-validation', 'content-validation', 'websocket-validation',
+            'inventory-management', 'real-time-testing', 'mobile-testing',
+            'enterprise-search', 'internal-comms', 'slack-gif-creator',
+            'algorithmic-art', 'docx', 'pdf', 'xlsx', 'pptx', 'schedule',
+            'productivity-memory', 'productivity-tasks',
             'mcp-builder', 'skill-creator', 'project-intelligence',
             'webapp-testing'
         ]},
-        { text: '  <span class="xt-success">✓</span> 21/21 skills instalados', delay: 200 },
+        { text: '  <span class="xt-success">✓</span> 62/62 skills instalados', delay: 200 },
         { text: '<span class="xt-info">[4/7]</span> Configurando 23 integraciones MCP...', delay: 300, typing: true },
         { text: '  <span class="xt-success">✓</span> GitHub, Playwright, Cloudflare, Notion...', delay: 200 },
         { text: '<span class="xt-info">[5/7]</span> Configurando hooks...', delay: 300 },
@@ -569,7 +581,7 @@ async function startSimulation() {
         { text: '<span class="xt-success xt-bold">═══════════════════════════════════════════</span>', delay: 100 },
         { text: '', delay: 50 },
         { text: '  <span class="xt-cyan">Proyecto:</span>  ' + p, delay: 100 },
-        { text: '  <span class="xt-cyan">Skills:</span>    21 instalados', delay: 80 },
+        { text: '  <span class="xt-cyan">Skills:</span>    62 instalados', delay: 80 },
         { text: '  <span class="xt-cyan">MCPs:</span>      23 configurados', delay: 80 },
         { text: '  <span class="xt-cyan">Hooks:</span>     3 activos', delay: 80 },
         { text: '', delay: 150 },
@@ -650,7 +662,7 @@ async function renderProgressBlock(container, items) {
         container.scrollTop = container.scrollHeight;
         await sleep(80 + Math.random() * 60);
     }
-    wrapper.innerHTML = `<span class="xt-dim">[${'█'.repeat(20)}]</span> <span class="xt-success">100%</span> <span class="xt-success">Todos los skills instalados</span>`;
+    wrapper.innerHTML = `<span class="xt-dim">[${'█'.repeat(20)}]</span> <span class="xt-success">100%</span> <span class="xt-success">62 skills instalados</span>`;
 }
 
 function replaySimulation() {
