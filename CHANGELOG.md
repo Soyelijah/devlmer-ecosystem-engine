@@ -6,6 +6,36 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ---
 
+## [3.1.0] - 2026-04-07
+
+### Agregado
+- **41 skills nuevas** — Total expandido de 21 a 62 skills enterprise con contenido profesional real:
+  - **Dev** (8): `security-audit`, `refactor`, `unit-test-generator`, `documentation`, `api-integration`, `docker-deploy`, `commit-commands`, `db-migration`
+  - **Design** (7): `frontend-design`, `ux-copy`, `brand-guidelines`, `theme-factory`, `canvas-design`, `dashboard-audit`, `performance-optimization`
+  - **Infra** (7): `data-validation`, `k8s-validation`, `risk-assessment`, `ml-validation`, `dependency-graph`, `workspace-tools`, `db-migration`
+  - **Domain** (7): `data-pipeline`, `contract-validation`, `content-validation`, `schema-management`, `payment-validation`, `inventory-management`, `websocket-validation`
+  - **Testing** (2): `mobile-testing`, `real-time-testing`
+  - **Enterprise** (4): `enterprise-search`, `internal-comms`, `slack-gif-creator`, `algorithmic-art`
+  - **Docs** (4): `docx`, `pdf`, `xlsx`, `pptx`
+  - **Productivity** (3): `schedule`, `productivity-memory`, `productivity-tasks`
+- **5 slash commands nuevos**: `security-audit`, `api-integration`, `theme-factory`, `github-auth`, `nano-banana`
+- **Config templates**: `dee-config.yaml`, `github-config.json`, `nano-banana-config.json`, `create-skill.sh`, `ecosystems.json`, `.deeignore`
+- **Enterprise CLI installer** (`install-cli.sh`): Instalación via `curl -fsSL ... | bash` con detección de OS, verificación de dependencias, colores enterprise y spinner animado.
+- **8 dominios nuevos en blueprints**: Legal, Logistics, Marketing, HR Platform, API Platform, Real Estate, Web3, Mobile App — total 22 dominios.
+- **`copy_config_templates()`** en `install.sh`: Copia automática de archivos de configuración al directorio del proyecto.
+
+### Cambiado
+- **Landing page**: Estadísticas actualizadas (62 skills, 22 dominios, 70+ comandos), 22 tarjetas de dominio, grid de skills expandido.
+- **Wizard de instalación** (`wizard.js`): Método principal cambiado a `curl | bash`, simulación traducida al español, conteos actualizados a 62 skills.
+- **`install.sh`**: Nuevos directorios (`memory/`, `scripts/`, `blueprints/`, `commands/`, `agents/`) y paso de config templates.
+
+### Corregido
+- Fix: Wizard generaba comando de instalación antiguo (`git clone`) en lugar del nuevo método `curl | bash`.
+- Fix: Tarjeta de dominio DevTools duplicada en landing.
+- Fix: Skill `copywriting` tenía directorio anidado duplicado y symlink roto.
+
+---
+
 ## [3.0.0] - 2026-04-06
 
 ### Agregado
@@ -76,6 +106,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ---
 
+[3.1.0]: https://github.com/Soyelijah/devlmer-ecosystem-engine/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/Soyelijah/devlmer-ecosystem-engine/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/Soyelijah/devlmer-ecosystem-engine/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/tag/v1.0.0

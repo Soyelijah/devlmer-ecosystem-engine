@@ -17,7 +17,7 @@
 
 set -euo pipefail
 
-VERSION="3.0.0"
+VERSION="3.1.0"
 REPO_URL="https://github.com/Soyelijah/devlmer-ecosystem-engine.git"
 TMP_DIR="/tmp/dee-$$"
 
