@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# dee — Devlmer Ecosystem Engine CLI v3.0
+# dee — Devlmer Ecosystem Engine CLI v3.1
 #
 # Global command for managing DEE installations.
 # Installed to ~/.local/bin/dee by the installer.

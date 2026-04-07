@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# DEVLMER ECOSYSTEM ENGINE v3.0 — UPDATE SCRIPT
+# DEVLMER ECOSYSTEM ENGINE v3.1 — UPDATE SCRIPT
 # Updates an existing installation without losing user config or API keys.
 #
 # Usage:
@@ -223,7 +223,7 @@ settings['hooks'] = {
             'hooks': [
                 {
                     'type': 'command',
-                    'command': 'PROJ_DIR=\$(pwd); PROFILE=\"\$PROJ_DIR/.claude/PROJECT_PROFILE.json\"; SKILLS=\$(find \"\$PROJ_DIR/.claude/skills\" -name \"SKILL.md\" 2>/dev/null | wc -l | tr -d \" \"); AGENTS=\$(find \"\$PROJ_DIR/.claude/agents\" -name \"*.md\" 2>/dev/null | wc -l | tr -d \" \"); CMDS=\$(find \"\$PROJ_DIR/.claude/commands\" -name \"*.md\" 2>/dev/null | wc -l | tr -d \" \"); MCPS=0; if [ -f \"\$PROJ_DIR/.claude/settings.json\" ]; then MCPS=\$(python3 -c \"import json; s=json.load(open(\\\"\$PROJ_DIR/.claude/settings.json\\\")); print(len(s.get(\\\"mcpServers\\\",{})))\" 2>/dev/null || echo 0); fi; DOMAIN=\"unknown\"; if [ -f \"\$PROFILE\" ]; then DOMAIN=\$(python3 -c \"import json; p=json.load(open(\\\"\$PROFILE\\\")); print(p.get(\\\"fingerprint\\\",{}).get(\\\"domain\\\",\\\"unknown\\\").replace(\\\"_\\\",\\\" \\\").title())\" 2>/dev/null || echo unknown); fi; echo \"\"; echo \"🧠 DEVLMER ECOSYSTEM ENGINE v3.0\"; echo \"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\"; echo \"📊 Project: \$(basename \$PROJ_DIR) | Domain: \$DOMAIN\"; echo \"⚡ \$SKILLS skills | \$CMDS commands | \$AGENTS agents | \$MCPS MCPs\"; echo \"\"; echo \"💡 Quick start: /dee-demo (tour) | /dee-status (dashboard) | /dee-doctor (health)\"; echo \"   Type / to see all available commands\"; echo \"\"'
+                    'command': 'PROJ_DIR=\$(pwd); PROFILE=\"\$PROJ_DIR/.claude/PROJECT_PROFILE.json\"; SKILLS=\$(find \"\$PROJ_DIR/.claude/skills\" -name \"SKILL.md\" 2>/dev/null | wc -l | tr -d \" \"); AGENTS=\$(find \"\$PROJ_DIR/.claude/agents\" -name \"*.md\" 2>/dev/null | wc -l | tr -d \" \"); CMDS=\$(find \"\$PROJ_DIR/.claude/commands\" -name \"*.md\" 2>/dev/null | wc -l | tr -d \" \"); MCPS=0; if [ -f \"\$PROJ_DIR/.claude/settings.json\" ]; then MCPS=\$(python3 -c \"import json; s=json.load(open(\\\"\$PROJ_DIR/.claude/settings.json\\\")); print(len(s.get(\\\"mcpServers\\\",{})))\" 2>/dev/null || echo 0); fi; DOMAIN=\"unknown\"; if [ -f \"\$PROFILE\" ]; then DOMAIN=\$(python3 -c \"import json; p=json.load(open(\\\"\$PROFILE\\\")); print(p.get(\\\"fingerprint\\\",{}).get(\\\"domain\\\",\\\"unknown\\\").replace(\\\"_\\\",\\\" \\\").title())\" 2>/dev/null || echo unknown); fi; echo \"\"; echo \"🧠 DEVLMER ECOSYSTEM ENGINE v3.1\"; echo \"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\"; echo \"📊 Project: \$(basename \$PROJ_DIR) | Domain: \$DOMAIN\"; echo \"⚡ \$SKILLS skills | \$CMDS commands | \$AGENTS agents | \$MCPS MCPs\"; echo \"\"; echo \"💡 Quick start: /dee-demo (tour) | /dee-status (dashboard) | /dee-doctor (health)\"; echo \"   Type / to see all available commands\"; echo \"\"'
                 }
             ]
         }
@@ -268,7 +268,7 @@ with open('${BACKUP_DIR}/CLAUDE.md.user', 'r') as f:
 
 # Find and replace the Devlmer section
 # Pattern: from '# CLAUDE.md — Devlmer' or '## Devlmer Ecosystem' to end of file or next top-level heading
-new_section = '''## Devlmer Ecosystem Engine v3.0
+new_section = '''## Devlmer Ecosystem Engine v3.1
 
 This project is enhanced with the Devlmer Ecosystem Engine.
 
@@ -301,7 +301,7 @@ print('CLAUDE.md updated (user content preserved)')
         # User's CLAUDE.md doesn't mention Devlmer — append section
         cat >> "${TARGET_DIR}/CLAUDE.md" << 'APPEND_UPDATE'
 
-## Devlmer Ecosystem Engine v3.0
+## Devlmer Ecosystem Engine v3.1
 
 This project is enhanced with the Devlmer Ecosystem Engine.
 

@@ -1,15 +1,15 @@
 ---
 name: project-intelligence
-description: "Enterprise Project Intelligence Engine v3.0 — Automatically fingerprints projects, analyzes metrics & KPIs, monitors health across 12 axes (testing, CI/CD, monitoring, type safety, docs, security, performance, scalability, maintainability, DX, observability, reliability), and installs complete professional ecosystems. Real-time dashboard generation with trend tracking and regressions."
+description: "Enterprise Project Intelligence Engine v3.1 — Automatically fingerprints projects, analyzes metrics & KPIs, monitors health across 12 axes (testing, CI/CD, monitoring, type safety, docs, security, performance, scalability, maintainability, DX, observability, reliability), and installs complete professional ecosystems. Real-time dashboard generation with trend tracking and regressions."
 metadata:
-  version: 3.0.0
+  version: 3.1.1
   author: Devlmer / Pierre Solier
   creator: Devlmer
   branding: Enterprise project intelligence, metrics analysis, and ecosystem orchestration
   enterprise: true
 ---
 
-# Project Intelligence Engine v3.0 — Enterprise Edition
+# Project Intelligence Engine v3.1 — Enterprise Edition
 
 You are an **enterprise-grade Project Intelligence Engine** with advanced metrics analysis, KPI tracking, and project health monitoring. You automatically detect any project's type, stack, domain, architecture, and maturity — then install the complete professional ecosystem AND analyze project health across 12 critical dimensions.
 
@@ -453,7 +453,7 @@ python3 .claude/skills/project-intelligence/scripts/generate_kpi_dashboard.py "$
 Present the comprehensive intelligence report to the user:
 
 ```
-🧠 PROJECT INTELLIGENCE ENGINE v3.0 — Complete Ecosystem Report
+🧠 PROJECT INTELLIGENCE ENGINE v3.1 — Complete Ecosystem Report
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📊 Project: {name}
@@ -639,12 +639,17 @@ Typical execution times:
 
 ## Version History
 
-### v3.0.0 (Current)
+### v3.1.1 (Current)
 - Enterprise metrics analysis
 - KPI dashboard generation
 - 12-axis health scoring
 - Trend tracking & regression detection
 - Visual health reports
+- 62 professional skills ecosystem
+- 31 MCP integrations
+
+### v3.0.0
+- Initial v3 release
 
 ### v2.9.0
 - Fingerprinting, ecosystem orchestration

@@ -25,7 +25,7 @@ You are the Devlmer Ecosystem Engine status reporter. When the user runs this co
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
-║          DEVLMER ECOSYSTEM ENGINE v3.0 — STATUS             ║
+║          DEVLMER ECOSYSTEM ENGINE v3.1 — STATUS             ║
 ╚══════════════════════════════════════════════════════════════╝
 
 📊 PROJECT: [name]

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ╔══════════════════════════════════════════════════════════════╗
-# ║  DYSA Project Intelligence Engine v3.0 — Installer          ║
+# ║  DYSA Project Intelligence Engine v3.1 — Installer          ║
 # ║  Installs the engine into any project's .claude/ directory   ║
 # ╚══════════════════════════════════════════════════════════════╝
 
@@ -12,7 +12,7 @@ TARGET_DIR="${1:-.}"
 TARGET_CLAUDE="$TARGET_DIR/.claude"
 TARGET_SKILL="$TARGET_CLAUDE/skills/project-intelligence"
 
-echo "🧠 DYSA Project Intelligence Engine v3.0 — Installer"
+echo "🧠 DYSA Project Intelligence Engine v3.1 — Installer"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "📁 Source: $ENGINE_DIR"
