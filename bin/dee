@@ -1025,4 +1025,11 @@ main() {
     esac
 }
 
-main "$@"
+# ── Entry point ──
+# Wrap in a block so bash reads the ENTIRE file into memory before executing.
+# Without this, `dee self-update` replaces the file mid-execution and bash
+# reads the new (different-length) content, causing "syntax error near '}'".
+{
+    main "$@"
+    exit $?
+}
