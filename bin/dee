@@ -251,6 +251,13 @@ cmd_self_update() {
     echo ""
     echo -e "  ${DIM}Ubicación: ${installed_dee}${RESET}"
     echo ""
+
+    # CRITICAL: exit immediately after self-update.
+    # The `cp` above replaced THIS script on disk. If we return to the caller,
+    # bash will continue reading from the NEW file at the OLD byte offset,
+    # producing garbage like "ntry: command not found" (partial "Entry").
+    # Exiting here prevents bash from reading any more bytes from the file.
+    exit 0
 }
 
 cmd_install() {
