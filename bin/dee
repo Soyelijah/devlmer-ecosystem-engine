@@ -419,97 +419,312 @@ else:
 }
 
 # ============================================================================
-# RELEASE — Create a new versioned release
+# RELEASE — Interactive release wizard
 # ============================================================================
 
+# Helper: read input with a prompt and optional default
+ask() {
+    local prompt="$1"
+    local default="${2:-}"
+    local reply
+    if [[ -n "${default}" ]]; then
+        echo -ne "  ${CYAN}?${RESET} ${prompt} ${DIM}(${default})${RESET}: "
+    else
+        echo -ne "  ${CYAN}?${RESET} ${prompt}: "
+    fi
+    read -r reply
+    echo "${reply:-${default}}"
+}
+
+# Helper: read multi-line items (one per line, empty line to finish)
+ask_items() {
+    local prompt="$1"
+    echo -e "  ${CYAN}?${RESET} ${prompt} ${DIM}(una por línea, línea vacía para terminar)${RESET}"
+    local items=()
+    while true; do
+        echo -ne "    ${DIM}•${RESET} "
+        read -r line
+        if [[ -z "${line}" ]]; then
+            break
+        fi
+        items+=("${line}")
+    done
+    printf '%s\n' "${items[@]}"
+}
+
 cmd_release() {
-    local new_version="${1:-}"
     show_header
 
-    # ── Validate version ──
-    if [[ -z "${new_version}" ]]; then
-        log_error "Version required. Usage: dee release 3.1.0"
-        echo ""
-        echo -e "  ${DIM}This will:${RESET}"
-        echo -e "  ${DIM}  1. Update version in bin/dee${RESET}"
-        echo -e "  ${DIM}  2. Check CHANGELOG.md has an entry for the version${RESET}"
-        echo -e "  ${DIM}  3. Commit changes${RESET}"
-        echo -e "  ${DIM}  4. Create git tag v<version>${RESET}"
-        echo -e "  ${DIM}  5. Push to GitHub${RESET}"
-        echo -e "  ${DIM}  6. Create GitHub Release with notes from CHANGELOG${RESET}"
-        echo ""
+    echo -e "  ${BOLD}📦 Asistente de Release${RESET}"
+    echo -e "  ${DIM}Te guiaré paso a paso para crear una nueva versión${RESET}"
+    echo ""
+
+    # ── Must be in the repo directory ──
+    local repo_root
+    repo_root=$(git rev-parse --show-toplevel 2>/dev/null || true)
+    if [[ -z "${repo_root}" ]]; then
+        log_error "No estás en un repositorio git."
+        echo -e "  ${DIM}Ejecuta este comando desde la carpeta del proyecto devlmer-ecosystem-engine${RESET}"
         exit 1
+    fi
+    cd "${repo_root}"
+
+    # ── Show current version ──
+    local current_version
+    current_version=$(grep '^VERSION=' "${repo_root}/bin/dee" 2>/dev/null | head -1 | cut -d'"' -f2)
+    local latest_tag
+    latest_tag=$(git tag -l 'v*' --sort=-v:refname 2>/dev/null | head -1)
+    echo -e "  ${DIM}Versión actual del CLI:${RESET}  v${current_version:-desconocida}"
+    echo -e "  ${DIM}Último tag en git:${RESET}       ${latest_tag:-ninguno}"
+
+    # ── Show recent commits since last tag ──
+    if [[ -n "${latest_tag}" ]]; then
+        local commit_count
+        commit_count=$(git rev-list "${latest_tag}..HEAD" --count 2>/dev/null || echo "0")
+        echo -e "  ${DIM}Commits desde ${latest_tag}:${RESET}    ${commit_count}"
+        if [[ "${commit_count}" -gt 0 ]]; then
+            echo ""
+            echo -e "  ${DIM}Últimos cambios:${RESET}"
+            git log "${latest_tag}..HEAD" --oneline --no-decorate 2>/dev/null | head -10 | while read -r line; do
+                echo -e "    ${DIM}·${RESET} ${line}"
+            done
+        fi
+    fi
+    echo ""
+
+    # ── Step 1: Ask for version ──
+    echo -e "  ${BOLD}━━━ Paso 1/4: Versión ━━━${RESET}"
+    echo ""
+
+    local new_version="${1:-}"
+    if [[ -z "${new_version}" ]]; then
+        # Suggest next versions
+        if [[ -n "${current_version}" ]]; then
+            local major minor patch
+            IFS='.' read -r major minor patch <<< "${current_version}"
+            echo -e "  ${DIM}Sugerencias basadas en v${current_version}:${RESET}"
+            echo -e "    ${GREEN}1${RESET}) v${major}.${minor}.$((patch + 1))  ${DIM}— patch (bugfixes)${RESET}"
+            echo -e "    ${GREEN}2${RESET}) v${major}.$((minor + 1)).0  ${DIM}— minor (nuevas features)${RESET}"
+            echo -e "    ${GREEN}3${RESET}) v$((major + 1)).0.0  ${DIM}— major (breaking changes)${RESET}"
+            echo ""
+        fi
+        new_version=$(ask "Nueva versión (ej: 3.1.0)")
+    fi
+
+    # Handle shortcut numbers
+    if [[ -n "${current_version}" ]]; then
+        local major minor patch
+        IFS='.' read -r major minor patch <<< "${current_version}"
+        case "${new_version}" in
+            1) new_version="${major}.${minor}.$((patch + 1))" ;;
+            2) new_version="${major}.$((minor + 1)).0" ;;
+            3) new_version="$((major + 1)).0.0" ;;
+        esac
     fi
 
     # Strip leading 'v' if present
     new_version="${new_version#v}"
 
     if ! [[ "${new_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        log_error "Invalid version format: ${new_version}"
-        echo -e "  ${DIM}Use semantic versioning: MAJOR.MINOR.PATCH (e.g., 3.1.0)${RESET}"
-        echo ""
+        log_error "Formato inválido: ${new_version}. Usa MAJOR.MINOR.PATCH (ej: 3.1.0)"
         exit 1
     fi
 
-    # ── Must be in the repo directory ──
-    local repo_root
-    repo_root=$(git rev-parse --show-toplevel 2>/dev/null || true)
-    if [[ -z "${repo_root}" ]]; then
-        log_error "Not in a git repository. Run this from the devlmer-ecosystem-engine repo."
-        exit 1
-    fi
-
-    cd "${repo_root}"
-
-    # ── Check tag doesn't exist ──
+    # Check tag doesn't exist
     if git tag -l | grep -q "^v${new_version}$"; then
-        log_error "Tag v${new_version} already exists!"
-        echo -e "  ${DIM}Use a different version number.${RESET}"
-        echo ""
+        log_error "El tag v${new_version} ya existe. Usa otra versión."
         exit 1
     fi
 
-    # ── Check CHANGELOG has entry ──
+    log_success "Versión: v${new_version}"
+    echo ""
+
+    # ── Step 2: Ask for release title ──
+    echo -e "  ${BOLD}━━━ Paso 2/4: Título del release ━━━${RESET}"
+    echo ""
+    local release_title
+    release_title=$(ask "Título corto (ej: Interactive Release Wizard)" "Release v${new_version}")
+    echo ""
+
+    # ── Step 3: Ask for changes ──
+    echo -e "  ${BOLD}━━━ Paso 3/4: ¿Qué cambió? ━━━${RESET}"
+    echo ""
+
+    local added_items="" changed_items="" fixed_items="" removed_items=""
+
+    # Agregado
+    echo -ne "  ${CYAN}?${RESET} ¿Hay cosas ${GREEN}nuevas${RESET} (Agregado)? ${DIM}(s/n)${RESET}: "
+    read -r has_added
+    if [[ "${has_added}" =~ ^[sS] ]]; then
+        added_items=$(ask_items "Describe cada cosa nueva")
+    fi
+    echo ""
+
+    # Cambiado
+    echo -ne "  ${CYAN}?${RESET} ¿Hay cosas ${YELLOW}cambiadas${RESET} (Cambiado)? ${DIM}(s/n)${RESET}: "
+    read -r has_changed
+    if [[ "${has_changed}" =~ ^[sS] ]]; then
+        changed_items=$(ask_items "Describe cada cambio")
+    fi
+    echo ""
+
+    # Corregido
+    echo -ne "  ${CYAN}?${RESET} ¿Hay ${MAGENTA}correcciones${RESET} (Corregido)? ${DIM}(s/n)${RESET}: "
+    read -r has_fixed
+    if [[ "${has_fixed}" =~ ^[sS] ]]; then
+        fixed_items=$(ask_items "Describe cada fix")
+    fi
+    echo ""
+
+    # Eliminado
+    echo -ne "  ${CYAN}?${RESET} ¿Se ${RED}eliminó${RESET} algo (Eliminado)? ${DIM}(s/n)${RESET}: "
+    read -r has_removed
+    if [[ "${has_removed}" =~ ^[sS] ]]; then
+        removed_items=$(ask_items "Describe lo eliminado")
+    fi
+    echo ""
+
+    # ── Build CHANGELOG entry ──
+    local changelog_entry=""
+    changelog_entry+="## [${new_version}] - $(date +%Y-%m-%d)"$'\n'
+    changelog_entry+=""$'\n'
+
+    if [[ -n "${added_items}" ]]; then
+        changelog_entry+="### Agregado"$'\n'
+        while IFS= read -r item; do
+            [[ -n "${item}" ]] && changelog_entry+="- ${item}"$'\n'
+        done <<< "${added_items}"
+        changelog_entry+=""$'\n'
+    fi
+
+    if [[ -n "${changed_items}" ]]; then
+        changelog_entry+="### Cambiado"$'\n'
+        while IFS= read -r item; do
+            [[ -n "${item}" ]] && changelog_entry+="- ${item}"$'\n'
+        done <<< "${changed_items}"
+        changelog_entry+=""$'\n'
+    fi
+
+    if [[ -n "${fixed_items}" ]]; then
+        changelog_entry+="### Corregido"$'\n'
+        while IFS= read -r item; do
+            [[ -n "${item}" ]] && changelog_entry+="- ${item}"$'\n'
+        done <<< "${fixed_items}"
+        changelog_entry+=""$'\n'
+    fi
+
+    if [[ -n "${removed_items}" ]]; then
+        changelog_entry+="### Eliminado"$'\n'
+        while IFS= read -r item; do
+            [[ -n "${item}" ]] && changelog_entry+="- ${item}"$'\n'
+        done <<< "${removed_items}"
+        changelog_entry+=""$'\n'
+    fi
+
+    # If nothing was entered, add a default
+    if [[ -z "${added_items}" && -z "${changed_items}" && -z "${fixed_items}" && -z "${removed_items}" ]]; then
+        changelog_entry+="### Agregado"$'\n'
+        changelog_entry+="- Release v${new_version}"$'\n'
+        changelog_entry+=""$'\n'
+    fi
+
+    # ── Step 4: Preview and confirm ──
+    echo -e "  ${BOLD}━━━ Paso 4/4: Confirmar ━━━${RESET}"
+    echo ""
+    echo -e "  ${BOLD}Vista previa del CHANGELOG:${RESET}"
+    echo -e "  ${DIM}─────────────────────────────────${RESET}"
+    echo "${changelog_entry}" | while IFS= read -r line; do
+        echo -e "  ${DIM}│${RESET} ${line}"
+    done
+    echo -e "  ${DIM}─────────────────────────────────${RESET}"
+    echo ""
+    echo -e "  ${BOLD}Se ejecutará:${RESET}"
+    echo -e "    ${DIM}1.${RESET} Actualizar CHANGELOG.md"
+    echo -e "    ${DIM}2.${RESET} Actualizar versión en bin/dee e install.sh"
+    echo -e "    ${DIM}3.${RESET} Commit + tag v${new_version}"
+    echo -e "    ${DIM}4.${RESET} Push a GitHub"
+    echo -e "    ${DIM}5.${RESET} Crear GitHub Release: ${CYAN}${release_title}${RESET}"
+    echo ""
+
+    echo -ne "  ${CYAN}?${RESET} ¿Proceder con el release v${new_version}? ${DIM}(s/n)${RESET}: "
+    read -r confirm
+    if ! [[ "${confirm}" =~ ^[sS] ]]; then
+        echo ""
+        log_info "Cancelado"
+        echo ""
+        exit 0
+    fi
+
+    echo ""
+    echo -e "  ${BOLD}🚀 Ejecutando release...${RESET}"
+    echo ""
+
+    # ── Update CHANGELOG.md ──
     if [[ -f "CHANGELOG.md" ]]; then
-        if grep -q "\[${new_version}\]" CHANGELOG.md; then
-            log_success "CHANGELOG.md has entry for ${new_version}"
-        else
-            log_error "CHANGELOG.md does NOT have an entry for [${new_version}]"
-            echo ""
-            echo -e "  ${YELLOW}Antes de hacer release, agrega una sección al CHANGELOG:${RESET}"
-            echo ""
-            echo -e "  ${DIM}## [${new_version}] - $(date +%Y-%m-%d)${RESET}"
-            echo -e "  ${DIM}### Agregado${RESET}"
-            echo -e "  ${DIM}- Tu descripción aquí${RESET}"
-            echo ""
-            exit 1
-        fi
+        # Insert new entry after the first "# Changelog" line (or after the first ---)
+        local tmp_cl="${repo_root}/.changelog_tmp"
+        local prev_version="${current_version}"
+        local link_line="[${new_version}]: https://github.com/Soyelijah/devlmer-ecosystem-engine/compare/v${prev_version}...v${new_version}"
+
+        python3 << PYEOF
+import re
+
+with open("CHANGELOG.md", "r") as f:
+    content = f.read()
+
+new_entry = """${changelog_entry}---
+"""
+
+# Insert after the first "---" separator or after "# Changelog\n"
+if "\n---\n" in content:
+    # Insert after first ---
+    pos = content.index("\n---\n") + len("\n---\n")
+    content = content[:pos] + "\n" + new_entry + "\n" + content[pos:]
+elif content.startswith("# "):
+    # Insert after first header paragraph
+    lines = content.split("\n")
+    insert_idx = 1
+    # Skip blank lines after header
+    while insert_idx < len(lines) and lines[insert_idx].strip() == "":
+        insert_idx += 1
+    # Skip subtitle lines
+    while insert_idx < len(lines) and lines[insert_idx].strip() and not lines[insert_idx].startswith("## "):
+        insert_idx += 1
+    lines.insert(insert_idx, "\n---\n\n" + new_entry)
+    content = "\n".join(lines)
+else:
+    content = "# Changelog\n\n---\n\n" + new_entry + "\n" + content
+
+# Add link at bottom if not present
+if "[${new_version}]:" not in content:
+    content = content.rstrip() + "\n${link_line}\n"
+
+with open("CHANGELOG.md", "w") as f:
+    f.write(content)
+PYEOF
+        log_success "CHANGELOG.md actualizado"
     else
-        log_warning "No CHANGELOG.md found — creating minimal one"
+        # Create from scratch
         cat > CHANGELOG.md << CLEOF
 # Changelog
 
-## [${new_version}] - $(date +%Y-%m-%d)
+---
 
-### Agregado
-- Release ${new_version}
-
+${changelog_entry}
 [${new_version}]: https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/tag/v${new_version}
 CLEOF
-        log_success "Created CHANGELOG.md"
+        log_success "CHANGELOG.md creado"
     fi
 
     # ── Update version in bin/dee ──
     local dee_file="${repo_root}/bin/dee"
     if [[ -f "${dee_file}" ]]; then
-        local old_version
-        old_version=$(grep '^VERSION=' "${dee_file}" | head -1 | cut -d'"' -f2)
-        if [[ "${old_version}" != "${new_version}" ]]; then
-            sed -i.bak "s/^VERSION=\"${old_version}\"/VERSION=\"${new_version}\"/" "${dee_file}"
+        local old_ver
+        old_ver=$(grep '^VERSION=' "${dee_file}" | head -1 | cut -d'"' -f2)
+        if [[ "${old_ver}" != "${new_version}" ]]; then
+            sed -i.bak "s/^VERSION=\"${old_ver}\"/VERSION=\"${new_version}\"/" "${dee_file}"
             rm -f "${dee_file}.bak"
-            log_success "Updated bin/dee version: ${old_version} → ${new_version}"
-        else
-            log_info "bin/dee already at v${new_version}"
+            log_success "bin/dee: v${old_ver} → v${new_version}"
         fi
     fi
 
@@ -519,118 +734,120 @@ CLEOF
         if grep -q 'DEE_VERSION=' "${install_file}"; then
             sed -i.bak "s/DEE_VERSION=\"[^\"]*\"/DEE_VERSION=\"${new_version}\"/" "${install_file}"
             rm -f "${install_file}.bak"
-            log_success "Updated install.sh version"
+            log_success "install.sh version actualizada"
         fi
     fi
 
-    # ── Check for uncommitted changes ──
-    if [[ -n "$(git status --porcelain)" ]]; then
-        echo ""
-        log_info "Committing version changes..."
-        git add -A
-        git commit -m "release: v${new_version}" --quiet
-        log_success "Changes committed"
-    else
-        log_info "No uncommitted changes"
-    fi
+    # ── Commit ──
+    git add -A
+    git commit -m "release: v${new_version} — ${release_title}" --quiet 2>/dev/null
+    log_success "Cambios commiteados"
 
-    # ── Extract release notes from CHANGELOG ──
-    local release_notes=""
-    if [[ -f "CHANGELOG.md" ]]; then
-        # Extract content between this version header and the next version header (or EOF)
-        release_notes=$(awk "/^## \[${new_version}\]/{found=1; next} /^## \[/{if(found) exit} found{print}" CHANGELOG.md)
-    fi
-
-    if [[ -z "${release_notes}" ]]; then
-        release_notes="Release v${new_version}"
-    fi
-
-    # ── Create annotated tag ──
-    git tag -a "v${new_version}" -m "Devlmer Ecosystem Engine v${new_version}" --quiet 2>/dev/null || true
-    log_success "Created tag v${new_version}"
+    # ── Tag ──
+    git tag -a "v${new_version}" -m "Devlmer Ecosystem Engine v${new_version} — ${release_title}" 2>/dev/null
+    log_success "Tag v${new_version} creado"
 
     # ── Push ──
-    echo ""
-    log_info "Pushing to GitHub..."
+    log_info "Pushing a GitHub..."
     git push origin main --quiet 2>/dev/null
     git push origin "v${new_version}" --quiet 2>/dev/null
-    log_success "Pushed to GitHub"
+    log_success "Push completo"
 
     # ── Create GitHub Release ──
-    echo ""
-    log_info "Creating GitHub Release..."
+    log_info "Creando GitHub Release..."
 
-    local release_title="v${new_version}"
-    # Try to extract a title from CHANGELOG (first ### Agregado line or similar)
-    local first_section
-    first_section=$(echo "${release_notes}" | grep "^### " | head -1 | sed 's/^### //')
-    if [[ -n "${first_section}" ]]; then
-        release_title="v${new_version} — ${first_section}"
+    # Build release body from changelog entry
+    local release_body="${changelog_entry}"
+    release_body+=$'\n'"---"$'\n'
+    release_body+=$'\n'"### Instalación"$'\n'
+    release_body+='```bash'$'\n'
+    release_body+="rm -rf /tmp/dee && git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/install.sh ~/Projects/mi-app"$'\n'
+    release_body+='```'$'\n'
+    release_body+=$'\n'"### Actualización"$'\n'
+    release_body+='```bash'$'\n'
+    release_body+="dee update"$'\n'
+    release_body+='```'$'\n'
+
+    local gh_created=false
+
+    # Try gh CLI first
+    if command -v gh &>/dev/null; then
+        if gh release create "v${new_version}" \
+            --title "v${new_version} — ${release_title}" \
+            --notes "${release_body}" 2>/dev/null; then
+            gh_created=true
+            log_success "GitHub Release creado (gh CLI)"
+        fi
     fi
 
-    # Use GitHub API to create release
-    local api_response
-    local json_body
-    json_body=$(python3 -c "
+    # Fallback: curl with token from remote
+    if [[ "${gh_created}" == "false" ]]; then
+        local token=""
+        local remote_url
+        remote_url=$(git remote get-url origin 2>/dev/null || true)
+        if [[ "${remote_url}" =~ https://([^@]+)@github.com ]]; then
+            token="${BASH_REMATCH[1]}"
+        fi
+
+        # Also check GITHUB_TOKEN env var
+        if [[ -z "${token}" && -n "${GITHUB_TOKEN:-}" ]]; then
+            token="${GITHUB_TOKEN}"
+        fi
+
+        if [[ -n "${token}" ]]; then
+            local json_body
+            json_body=$(python3 -c "
 import json, sys
-notes = sys.stdin.read()
+body = sys.stdin.read()
 print(json.dumps({
     'tag_name': 'v${new_version}',
-    'name': '${release_title}',
-    'body': notes,
+    'name': 'v${new_version} — $(echo "${release_title}" | sed "s/'/\\\\'/g")',
+    'body': body,
     'draft': False,
     'prerelease': False
 }))
-" <<< "${release_notes}" 2>/dev/null)
+" <<< "${release_body}" 2>/dev/null)
 
-    if [[ -n "${json_body}" ]]; then
-        # Try gh CLI first
-        if command -v gh &>/dev/null; then
-            gh release create "v${new_version}" \
-                --title "${release_title}" \
-                --notes "${release_notes}" 2>/dev/null \
-                && log_success "GitHub Release created with gh CLI" \
-                || log_warning "gh release failed — create manually at GitHub"
-        else
-            # Try curl with token from git remote
-            local token=""
-            local remote_url
-            remote_url=$(git remote get-url origin 2>/dev/null || true)
-            if [[ "${remote_url}" =~ https://([^@]+)@github.com ]]; then
-                token="${BASH_REMATCH[1]}"
-            fi
+            if [[ -n "${json_body}" ]]; then
+                # Detect repo from remote URL
+                local repo_slug
+                repo_slug=$(echo "${remote_url}" | sed -E 's|.*github\.com[:/]||; s|\.git$||; s|https://[^@]+@||')
+                if [[ -z "${repo_slug}" ]]; then
+                    repo_slug="Soyelijah/devlmer-ecosystem-engine"
+                fi
 
-            if [[ -n "${token}" ]]; then
                 local http_code
                 http_code=$(curl -s -o /dev/null -w "%{http_code}" \
-                    -X POST "https://api.github.com/repos/Soyelijah/devlmer-ecosystem-engine/releases" \
+                    -X POST "https://api.github.com/repos/${repo_slug}/releases" \
                     -H "Authorization: token ${token}" \
                     -H "Accept: application/vnd.github+json" \
                     -H "Content-Type: application/json" \
                     -d "${json_body}" 2>/dev/null || echo "000")
 
                 if [[ "${http_code}" == "201" ]]; then
-                    log_success "GitHub Release created via API"
+                    log_success "GitHub Release creado (API)"
                 else
-                    log_warning "Could not create GitHub Release automatically (HTTP ${http_code})"
-                    echo -e "  ${DIM}Create it manually: https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/new?tag=v${new_version}${RESET}"
+                    log_warning "No se pudo crear el Release automáticamente (HTTP ${http_code})"
+                    echo -e "  ${DIM}Créalo manualmente: https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/new?tag=v${new_version}${RESET}"
                 fi
-            else
-                log_warning "No GitHub token found — create release manually"
-                echo -e "  ${DIM}https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/new?tag=v${new_version}${RESET}"
             fi
+        else
+            log_warning "Sin token de GitHub — crea el Release manualmente"
+            echo -e "  ${DIM}https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/new?tag=v${new_version}${RESET}"
         fi
-    else
-        log_warning "Could not generate release JSON — create manually"
-        echo -e "  ${DIM}https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/new?tag=v${new_version}${RESET}"
     fi
 
-    # ── Summary ──
+    # ── Done! ──
     echo ""
-    echo -e "${BOLD}${GREEN}  ✓ Release v${new_version} complete!${RESET}"
+    echo -e "  ${BOLD}${GREEN}╔══════════════════════════════════════════════════╗${RESET}"
+    echo -e "  ${BOLD}${GREEN}║     ✓ Release v${new_version} publicado exitosamente!     ║${RESET}"
+    echo -e "  ${BOLD}${GREEN}╚══════════════════════════════════════════════════╝${RESET}"
     echo ""
-    echo -e "  ${DIM}Tag:     v${new_version}${RESET}"
-    echo -e "  ${DIM}Release: https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/tag/v${new_version}${RESET}"
+    echo -e "  ${DIM}Tag:${RESET}       v${new_version}"
+    echo -e "  ${DIM}Título:${RESET}    ${release_title}"
+    echo -e "  ${DIM}Release:${RESET}   https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/tag/v${new_version}"
+    echo ""
+    echo -e "  ${DIM}Los usuarios recibirán estos cambios con:${RESET} ${BOLD}dee update${RESET}"
     echo ""
 }
 
