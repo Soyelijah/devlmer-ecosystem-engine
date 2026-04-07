@@ -95,8 +95,8 @@ Antes de instalar DEE, necesitas tener instalado en tu computadora:
 - En Linux: `sudo apt-get install python3 python3-pip`
 
 **3. Claude Code o Cowork instalado**
-- Claude Code: Acceso desde https://claude.ai/code
-- Cowork: Aplicación de escritorio disponible en https://cowork.claude.ai
+- Claude Code: Acceso desde https://claude.ai/download
+- Cowork: Aplicación de escritorio disponible en https://claude.ai/download
 
 **4. Git**
 - Descarga desde: https://git-scm.com/
@@ -435,7 +435,7 @@ Después de instalar, **no necesitas hacer nada especial**. DEE funciona automá
 
 #### 1. Abre tu Proyecto en Claude Code o Cowork
 
-- Ve a https://claude.ai/code
+- Ve a https://claude.ai/download
 - O abre la aplicación Cowork
 - Abre tu carpeta de proyecto
 
@@ -582,15 +582,15 @@ tu-proyecto/
 │   │   ├── security-audit/
 │   │   │   └── SKILL.md
 │   │   └── [54+ más]
-│   ├── commands/                        # Slash commands auto-generados
-│   │   ├── code-review.md              # → /code-review
+│   ├── commands/                        # Slash commands (8)
 │   │   ├── security-audit.md           # → /security-audit
-│   │   ├── senior-architect.md         # → /senior-architect
-│   │   └── [5+ más]
-│   ├── blueprints/                      # Modelos de referencia (22)
-│   │   ├── frontend-react/
-│   │   ├── backend-fastapi/
-│   │   └── [20 más]
+│   │   ├── api-integration.md          # → /api-integration
+│   │   ├── dee-demo.md                 # → /dee-demo
+│   │   ├── dee-status.md               # → /dee-status
+│   │   ├── dee-doctor.md               # → /dee-doctor
+│   │   └── [3 más]
+│   ├── blueprints/                      # Dominios empresariales (22)
+│   │   └── ecosystems.json             # Blueprints por dominio
 │   ├── agents/                          # Agentes generados automáticamente
 │   │   ├── ceo-agent.md
 │   │   ├── backend-agent.md
@@ -615,7 +615,7 @@ tu-proyecto/
 
 **Notas importantes:**
 - DEE **no modifica tu código existente** — solo agrega la carpeta `.claude/`
-- Los slash commands se generan automáticamente desde los skills instalados
+- Los slash commands se instalan en `.claude/commands/` para acceso rápido a skills clave
 - Puedes editar `CLAUDE.md` para personalizar el comportamiento de Claude
 - Los cambios son completamente reversibles: elimina `.claude/` y `CLAUDE.md` para desinstalar
 - El `PROJECT_PROFILE.json` contiene el fingerprint inteligente de tu proyecto
@@ -790,20 +790,21 @@ Esto crea:
 
 #### 3. Modifica Blueprints
 
-Los blueprints (22 modelos) están en `.claude/blueprints/`. Puedes:
+Los blueprints (22 dominios) están definidos en `.claude/blueprints/ecosystems.json`. Puedes:
 
-- Copiar un blueprint existente y adaptarlo
-- Crear uno nuevo específico para tu proyecto
-- Ajustar las recomendaciones de MCP
+- Editar el JSON para ajustar skills recomendadas por dominio
+- Agregar nuevos dominios personalizados
+- Ajustar las recomendaciones de MCP por tipo de proyecto
 
-Ejemplo:
-```
-.claude/blueprints/
-├── backend-fastapi/
-│   ├── structure.md
-│   ├── dependencies.md
-│   ├── environment.md
-│   └── validation-rules.md
+Ejemplo de estructura en `ecosystems.json`:
+```json
+{
+  "fintech": {
+    "skills": ["security-audit", "api-integration", "risk-assessment"],
+    "mcps": ["stripe", "postgres"],
+    "agents": ["ceo", "backend"]
+  }
+}
 ```
 
 #### 4. Agrega MCPs Recomendados
@@ -1199,28 +1200,34 @@ R: No, Nano-Banana-MCP requiere configuración de Google Gemini. DEE te guiará 
 
 Para usuarios avanzados, DEE ofrece capacidades adicionales:
 
-#### Instalación sin interfaz gráfica
+#### Instalar solo skills (sin scan de proyecto)
 
 ```bash
-bash install.sh /ruta/proyecto --headless --auto-approve
+bash install.sh /ruta/proyecto --skills-only
 ```
 
-#### Especificar dominio manualmente
+#### Solo ejecutar fingerprinting (sin instalar skills)
 
 ```bash
-bash install.sh /ruta/proyecto --domain backend-fastapi
+bash install.sh /ruta/proyecto --scan-only
 ```
 
-#### Instalar solo skills específicas
+#### Modo verbose (más detalle en la salida)
 
 ```bash
-bash install.sh /ruta/proyecto --skills code-review,security-audit
+bash install.sh /ruta/proyecto --verbose
 ```
 
-#### Generar reporte de detección
+#### Saltar MCPs externos
 
 ```bash
-bash install.sh /ruta/proyecto --generate-report
+bash install.sh /ruta/proyecto --no-mcp
+```
+
+#### Proveer tokens directamente (sin wizard interactivo)
+
+```bash
+bash install.sh /ruta/proyecto --github-token ghp_xxxx --gemini-key AIzaSy...
 ```
 
 #### Verificar estado de GitHub CLI
