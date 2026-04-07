@@ -223,27 +223,46 @@ cmd_self_update() {
         exit 1
     fi
 
-    local new_ver old_ver
-    new_ver=$(grep '^VERSION=' "${new_dee}" 2>/dev/null | head -1 | cut -d'"' -f2)
-    old_ver="${VERSION}"
+    # Find where dee is installed
+    local installed_dee
+    installed_dee=$(command -v dee 2>/dev/null || echo "${HOME}/.local/bin/dee")
 
-    if [[ "${new_ver}" == "${old_ver}" ]]; then
-        log_success "Ya tienes la última versión: v${old_ver}"
+    # Compare by file content (checksum), not just version number
+    # This catches fixes where version didn't change but code did
+    local new_checksum old_checksum
+    if command -v md5sum &>/dev/null; then
+        new_checksum=$(md5sum "${new_dee}" 2>/dev/null | cut -d' ' -f1)
+        old_checksum=$(md5sum "${installed_dee}" 2>/dev/null | cut -d' ' -f1)
+    elif command -v md5 &>/dev/null; then
+        # macOS uses md5 instead of md5sum
+        new_checksum=$(md5 -q "${new_dee}" 2>/dev/null)
+        old_checksum=$(md5 -q "${installed_dee}" 2>/dev/null)
+    else
+        # Fallback: compare file sizes
+        new_checksum=$(wc -c < "${new_dee}" 2>/dev/null | tr -d ' ')
+        old_checksum=$(wc -c < "${installed_dee}" 2>/dev/null | tr -d ' ')
+    fi
+
+    if [[ "${new_checksum}" == "${old_checksum}" ]]; then
+        log_success "Ya tienes la última versión: v${VERSION}"
         rm -rf "${tmp}"
         echo ""
         return 0
     fi
 
-    # Find where dee is installed
-    local installed_dee
-    installed_dee=$(command -v dee 2>/dev/null || echo "${HOME}/.local/bin/dee")
+    local new_ver
+    new_ver=$(grep '^VERSION=' "${new_dee}" 2>/dev/null | head -1 | cut -d'"' -f2)
 
     cp "${new_dee}" "${installed_dee}"
     chmod +x "${installed_dee}"
     rm -rf "${tmp}"
 
     echo ""
-    log_success "CLI actualizado: v${old_ver} → v${new_ver}"
+    if [[ "${new_ver}" != "${VERSION}" ]]; then
+        log_success "CLI actualizado: v${VERSION} → v${new_ver}"
+    else
+        log_success "CLI actualizado a la última versión (v${new_ver})"
+    fi
     echo ""
     echo -e "  ${DIM}Ubicación: ${installed_dee}${RESET}"
     echo ""
@@ -294,13 +313,24 @@ cmd_update() {
     local installed_dee
     installed_dee=$(command -v dee 2>/dev/null || echo "${HOME}/.local/bin/dee")
     if [[ -f "${new_dee}" && -f "${installed_dee}" ]]; then
-        local new_ver old_ver
-        new_ver=$(grep '^VERSION=' "${new_dee}" 2>/dev/null | head -1 | cut -d'"' -f2)
-        old_ver=$(grep '^VERSION=' "${installed_dee}" 2>/dev/null | head -1 | cut -d'"' -f2)
-        if [[ -n "${new_ver}" && "${new_ver}" != "${old_ver}" ]]; then
+        # Compare by checksum, not just version (catches code fixes within same version)
+        local new_ck old_ck
+        if command -v md5 &>/dev/null; then
+            new_ck=$(md5 -q "${new_dee}" 2>/dev/null)
+            old_ck=$(md5 -q "${installed_dee}" 2>/dev/null)
+        elif command -v md5sum &>/dev/null; then
+            new_ck=$(md5sum "${new_dee}" 2>/dev/null | cut -d' ' -f1)
+            old_ck=$(md5sum "${installed_dee}" 2>/dev/null | cut -d' ' -f1)
+        else
+            new_ck=$(wc -c < "${new_dee}" 2>/dev/null | tr -d ' ')
+            old_ck=$(wc -c < "${installed_dee}" 2>/dev/null | tr -d ' ')
+        fi
+        if [[ "${new_ck}" != "${old_ck}" ]]; then
+            local new_ver
+            new_ver=$(grep '^VERSION=' "${new_dee}" 2>/dev/null | head -1 | cut -d'"' -f2)
             cp "${new_dee}" "${installed_dee}"
             chmod +x "${installed_dee}"
-            log_success "CLI updated: v${old_ver} → v${new_ver}"
+            log_success "CLI actualizado a v${new_ver:-${VERSION}}"
         fi
     fi
 
