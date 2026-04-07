@@ -505,51 +505,59 @@
 
             <div class="install-steps">
                 <div class="install-step reveal">
-                    <div class="install-step-num">Paso 1 — Ejecuta el One-Liner</div>
-                    <h4>Un solo comando: clona, detecta tu proyecto e instala todo automáticamente</h4>
-                    <div class="code-block">rm -rf /tmp/dee && git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/install.sh "/path/to/your/project"</div>
+                    <div class="install-step-num">Paso 1 — Ejecuta un solo comando</div>
+                    <h4>Copia este comando en tu terminal. Reemplaza la ruta con la de tu proyecto.</h4>
+                    <div class="code-block"># Ejemplo con ruta real:
+rm -rf /tmp/dee && git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/install.sh ~/Projects/mi-app
+
+# También funciona con la carpeta actual:
+rm -rf /tmp/dee && git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/install.sh .</div>
                 </div>
 
                 <div class="install-step reveal">
-                    <div class="install-step-num">Paso 2 — Instalación Automática</div>
+                    <div class="install-step-num">Paso 2 — Espera la instalación automática</div>
                     <h4>El engine detecta tu stack, instala skills, MCPs, agents y slash commands</h4>
-                    <div class="code-block"># Todo es automático — solo espera ~40 segundos
-# Skills, MCPs, Agents, Hooks, Commands... ¡todo incluido!</div>
+                    <div class="code-block"># Todo es automático — tarda menos de 30 segundos
+# Detecta: lenguajes, frameworks, arquitectura, dominio del proyecto
+# Instala: skills, slash commands, agents, MCPs, hooks
+# Genera: CLAUDE.md, settings.json, PROJECT_PROFILE.json</div>
                 </div>
 
                 <div class="install-step reveal">
-                    <div class="install-step-num">Paso 3 — Setup Wizard (API Keys)</div>
-                    <h4>Un asistente interactivo te guía para configurar tus credenciales</h4>
-                    <div class="code-block"># El wizard aparece al final de la instalación automáticamente
-# Modo guiado: te explica cada servicio y dónde encontrar la key
-# Modo esenciales: solo Supabase, Stripe y GitHub (lo mínimo)
-# Puedes correrlo después: bash setup-wizard.sh /tu/proyecto</div>
+                    <div class="install-step-num">Paso 3 — Configura API Keys (opcional)</div>
+                    <h4>Al final aparece un asistente que te guía para configurar tus servicios</h4>
+                    <div class="code-block"># El wizard aparece al final de la instalación
+# Te explica cada servicio y dónde encontrar la API key
+# Puedes saltarlo y configurar después con:
+bash ".claude/setup-wizard.sh" ~/Projects/mi-app</div>
                 </div>
 
                 <div class="install-step reveal">
                     <div class="install-step-num">Paso 4 — Abre Claude Code</div>
                     <h4>El ecosistema se activa automáticamente al abrir tu proyecto</h4>
-                    <div class="code-block">cd /your/project && claude
+                    <div class="code-block">cd ~/Projects/mi-app && claude
 
 # 🧠 DEVLMER ECOSYSTEM ENGINE v3.0
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 📊 Project: my-app | Domain: Saas
+# 📊 Project: mi-app | Domain: Saas
 # ⚡ 22 skills | 24 commands | 14 agents | 22 MCPs
 #
-# 💡 Quick start: /dee-demo | /dee-status | /dee-doctor
-#    Type / to see all available commands</div>
+# 💡 /dee-demo (tour) | /dee-status (dashboard) | /dee-doctor (salud)
+#    Escribe / para ver todos los comandos disponibles</div>
                 </div>
 
                 <div class="install-step reveal">
-                    <div class="install-step-num">Paso 5 — Explora tu Ecosistema</div>
-                    <h4>3 comandos esenciales para empezar</h4>
-                    <div class="code-block"># /dee-demo    → Tour interactivo de 5 pasos (¡empieza aquí!)
-# /dee-status  → Dashboard visual de todo lo instalado
-# /dee-doctor  → Health check con score 0-100 y diagnóstico
+                    <div class="install-step-num">Paso 5 — Explora y actualiza</div>
+                    <h4>3 comandos dentro de Claude Code + el CLI <code>dee</code> para gestionar desde la terminal</h4>
+                    <div class="code-block"># Dentro de Claude Code:
+#   /dee-demo    → Tour interactivo (¡empieza aquí!)
+#   /dee-status  → Dashboard de todo lo instalado
+#   /dee-doctor  → Health check con score 0-100
 #
-# Después, usa cualquier skill con /nombre:
-#   /senior-architect  /code-reviewer  /copywriting
-#   /senior-security   /mobile-design  /brainstorming ...</div>
+# Desde la terminal (CLI instalado automáticamente):
+#   dee update    → Actualizar skills y comandos
+#   dee status    → Ver qué hay instalado
+#   dee doctor    → Diagnóstico y salud del ecosistema</div>
                 </div>
             </div>
         </div>
