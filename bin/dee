@@ -349,14 +349,14 @@ cmd_status() {
     agents=$(find "${target}/.claude/agents" -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
 
     if [[ -f "${target}/.claude/settings.json" ]] && command -v python3 >/dev/null 2>&1; then
-        mcps=$(python3 -c "import json; s=json.load(open('${target}/.claude/settings.json')); print(len(s.get('mcpServers',{})))" 2>/dev/null || echo 0)
-        hooks=$(python3 -c "import json; s=json.load(open('${target}/.claude/settings.json')); print(sum(len(v) for v in s.get('hooks',{}).values() if isinstance(v,list)))" 2>/dev/null || echo 0)
+        mcps=$(python3 -c "import json; s=json.load(open('${target}/.claude/settings.json', encoding='utf-8')); print(len(s.get('mcpServers',{})))" 2>/dev/null || echo 0)
+        hooks=$(python3 -c "import json; s=json.load(open('${target}/.claude/settings.json', encoding='utf-8')); print(sum(len(v) for v in s.get('hooks',{}).values() if isinstance(v,list)))" 2>/dev/null || echo 0)
     fi
 
     # Domain
     local domain="unknown"
     if [[ -f "${target}/.claude/PROJECT_PROFILE.json" ]] && command -v python3 >/dev/null 2>&1; then
-        domain=$(python3 -c "import json; p=json.load(open('${target}/.claude/PROJECT_PROFILE.json')); print(p.get('fingerprint',{}).get('domain','unknown').replace('_',' ').title())" 2>/dev/null || echo "unknown")
+        domain=$(python3 -c "import json; p=json.load(open('${target}/.claude/PROJECT_PROFILE.json', encoding='utf-8')); print(p.get('fingerprint',{}).get('domain','unknown').replace('_',' ').title())" 2>/dev/null || echo "unknown")
     fi
 
     echo -e "  ${BOLD}Project:${RESET}  $(basename "${target}")"
@@ -448,7 +448,7 @@ cmd_doctor() {
     if [[ -f "${target}/.claude/settings.json" ]] && command -v python3 >/dev/null 2>&1; then
         python3 -c "
 import json
-s = json.load(open('${target}/.claude/settings.json'))
+s = json.load(open('${target}/.claude/settings.json', encoding='utf-8'))
 mcps = s.get('mcpServers', {})
 ready = 0
 needs_key = 0
@@ -472,8 +472,8 @@ print(f'    Total: {len(mcps)} servers')
     # Hooks
     echo -e "  ${BOLD}Hooks${RESET}"
     if [[ -f "${target}/.claude/settings.json" ]] && command -v python3 >/dev/null 2>&1; then
-        local has_session=$(python3 -c "import json; s=json.load(open('${target}/.claude/settings.json')); print('yes' if 'SessionStart' in s.get('hooks',{}) else 'no')" 2>/dev/null)
-        local has_post=$(python3 -c "import json; s=json.load(open('${target}/.claude/settings.json')); print('yes' if 'PostToolUse' in s.get('hooks',{}) else 'no')" 2>/dev/null)
+        local has_session=$(python3 -c "import json; s=json.load(open('${target}/.claude/settings.json', encoding='utf-8')); print('yes' if 'SessionStart' in s.get('hooks',{}) else 'no')" 2>/dev/null)
+        local has_post=$(python3 -c "import json; s=json.load(open('${target}/.claude/settings.json', encoding='utf-8')); print('yes' if 'PostToolUse' in s.get('hooks',{}) else 'no')" 2>/dev/null)
 
         if [[ "${has_session}" == "yes" ]]; then
             echo -e "    ${GREEN}✓${RESET} SessionStart — project intelligence on startup"
