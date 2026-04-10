@@ -249,12 +249,144 @@ Also provide a `/dee-rescan` command that re-runs `detect_project.py` in place a
 
 ---
 
+## Issue 7 — Hooks use bash-only shell commands: broken on Windows without WSL
+
+**Severity:** 🔴 Critical  
+**Files:** `.claude/settings.json` (all hooks), `scripts/orchestrate.py` (hook generator)
+
+### Problem
+
+Every hook command in `settings.json` uses Unix-only shell utilities:
+
+```bash
+find "$PROJ_DIR/.claude/skills" -name 'SKILL.md' 2>/dev/null | wc -l | tr -d ' '
+```
+
+On **Windows without WSL**, this fails silently or errors completely because:
+
+| Command | Windows equivalent | Status |
+|---------|-------------------|--------|
+| `find` | `dir /s /b` | Not compatible |
+| `wc -l` | `Measure-Object` (PowerShell) | Not compatible |
+| `tr -d ' '` | Does not exist | Not compatible |
+| `$VAR` syntax | `%VAR%` (CMD) / `$env:VAR` (PS) | Not compatible |
+| `/` path separator | `\` required in CMD | Breaks paths |
+
+The engine was tested and designed for macOS/Linux. Windows users with Claude Code Desktop (a primary target) get a broken SessionStart hook — the banner never renders, skills never load, and no error is shown to the user.
+
+**Evidence:** Observed directly on Windows 11 Pro. The SessionStart hook in `settings.json` ran but produced no output because `find` resolved to the Windows `find.exe` (string search tool, not file finder), causing the entire pipe to fail.
+
+### Fix
+
+Replace all hook shell scripts with a single Python script that runs identically on macOS, Linux, and Windows. Python is the only runtime guaranteed to be present across all three (required by `orchestrate.py` already).
+
+**New approach — one Python hook for SessionStart:**
+
+`scripts/session_start.py`:
+```python
+#!/usr/bin/env python3
+"""DEE SessionStart hook — cross-platform (macOS, Linux, Windows)"""
+import os
+import sys
+import json
+from pathlib import Path
+
+def main():
+    proj_dir = Path(os.getcwd())
+    claude_dir = proj_dir / ".claude"
+    skills_dir = claude_dir / "skills"
+    profile_path = claude_dir / "PROJECT_PROFILE.json"
+
+    # Count components using pathlib (no shell needed)
+    skills = list(skills_dir.glob("*/SKILL.md")) if skills_dir.exists() else []
+    commands_dir = claude_dir / "commands"
+    commands = list(commands_dir.glob("*.md")) if commands_dir.exists() else []
+    agents_dir = claude_dir / "agents"
+    agents = list(agents_dir.glob("*.md")) if agents_dir.exists() else []
+
+    # Read profile
+    domain = "unknown"
+    if profile_path.exists():
+        try:
+            profile = json.loads(profile_path.read_text(encoding="utf-8"))
+            domain = profile.get("fingerprint", {}).get("domain", "unknown")
+        except Exception:
+            pass
+
+    # Domain → skill selection map (load only relevant skills)
+    DOMAIN_SKILLS = {
+        "expense_management": ["senior-backend", "senior-security", "trpc-patterns", "expense-workflow", "db-migration"],
+        "fintech": ["senior-backend", "senior-security", "senior-architect", "performance-optimization"],
+        "social": ["senior-backend", "senior-frontend", "real-time-testing", "websocket-validation"],
+        "saas": ["senior-backend", "senior-frontend", "senior-architect", "code-reviewer"],
+        "ecommerce": ["senior-backend", "senior-security", "performance-optimization"],
+    }
+    selected_skills = DOMAIN_SKILLS.get(domain, ["senior-backend", "senior-security", "code-reviewer"])
+
+    # Print banner
+    print()
+    print("🧠 DEVLMER ECOSYSTEM ENGINE v3.1")
+    print("━" * 43)
+    print(f"📊 Project: {proj_dir.name} | Domain: {domain.replace('_', ' ').title()}")
+    print(f"⚡ {len(skills)} skills | {len(commands)} commands | {len(agents)} agents")
+    print()
+    print("💡 Quick start: /dee-demo | /dee-status | /dee-doctor")
+    print()
+    print("📚 AUTO-LOADED SKILLS FOR THIS SESSION:")
+
+    # Inject selected skill content
+    for skill_name in selected_skills:
+        skill_file = skills_dir / skill_name / "SKILL.md"
+        if skill_file.exists():
+            print(f"  ✅ /{skill_name}")
+            print(skill_file.read_text(encoding="utf-8"))
+
+    print("━" * 43)
+
+if __name__ == "__main__":
+    main()
+```
+
+**Updated hook in `settings.json`:**
+```json
+{
+  "type": "command",
+  "command": "python3 .claude/scripts/session_start.py 2>/dev/null || python .claude/scripts/session_start.py"
+}
+```
+
+The `python3 || python` fallback handles Windows where the executable may be `python` instead of `python3`.
+
+**Same pattern for PostToolUse hook** — replace bash conditionals with a Python script `scripts/post_tool_use.py` that reads `CLAUDE_FILE_PATH` env var (works on all platforms) and injects the right skill.
+
+### Additional Windows fixes needed in `orchestrate.py`
+
+The installer itself uses `subprocess` to run bash commands. Add OS detection:
+
+```python
+import platform
+import subprocess
+
+IS_WINDOWS = platform.system() == "Windows"
+
+def run_command(cmd: str, shell_cmd: list = None):
+    """Run a command cross-platform."""
+    if IS_WINDOWS and shell_cmd:
+        # Use PowerShell for Windows
+        return subprocess.run(["powershell", "-Command"] + shell_cmd, capture_output=True)
+    else:
+        return subprocess.run(cmd, shell=True, capture_output=True, text=True)
+```
+
+---
+
 ## Summary Table
 
 | # | Issue | Severity | File | Effort |
 |---|-------|----------|------|--------|
 | 1 | `fintech` domain pattern misses expense apps | 🔴 Critical | `scripts/detect_project.py` | Medium |
 | 2 | Agents are hollow stubs, wrong domain | 🔴 Critical | `.claude/agents/*.md` | High |
+| 7 | All hooks use bash-only commands — broken on Windows | 🔴 Critical | `.claude/settings.json`, `scripts/orchestrate.py` | Medium |
 | 3 | SessionStart loads ~490KB of skills blindly | 🟠 High | `.claude/settings.json` hooks | Low |
 | 4 | No PreToolUse hook for proactive skill injection | 🟡 Medium | `.claude/settings.json` hooks | Low |
 | 5 | `mcp-env-setup.sh` never created by installer | 🟡 Medium | `scripts/orchestrate.py` | Low |
@@ -264,15 +396,15 @@ Also provide a `/dee-rescan` command that re-runs `detect_project.py` in place a
 
 ## Recommended Priority Order
 
-1. **Fix domain detection** (Issue 1) — everything downstream (skill selection, agent assignment, blueprint matching) depends on correct domain. Add `expense_management` domain and fix social false-positives.
+1. **Fix hooks for cross-platform** (Issue 7) — broken on Windows = broken for a large share of Claude Code Desktop users. The Python rewrite also solves Issue 3 (smart skill loading) in the same change.
 
-2. **Write real agent instructions** (Issue 2) — even 20 lines of domain-specific workflow per agent transforms a stub into a useful worker. Start with 3–4 agents per domain.
+2. **Fix domain detection** (Issue 1) — everything downstream depends on correct domain. Add `expense_management`, fix social false-positives.
 
-3. **Smart SessionStart skill loading** (Issue 3) — quick win, reduce context load from ~490KB to ~80KB with 5 lines of bash.
+3. **Write real agent instructions** (Issue 2) — 20 lines of domain workflow per agent transforms stubs into useful workers. Start with 3–4 per domain.
 
-4. **Create mcp-env-setup.sh template** (Issue 5) — quick win, installer change.
+4. **Create mcp-env-setup.sh / mcp-env-setup.ps1 template** (Issue 5) — quick win, installer change. Need both `.sh` (Mac/Linux) and `.ps1` (Windows) variants.
 
-5. **PreToolUse skill injection** (Issue 4) — improves auto-activation without requiring user commands.
+5. **PreToolUse skill injection** (Issue 4) — improves auto-activation via Python hook.
 
 6. **Profile rescan trigger** (Issue 6) — nice-to-have, can wait.
 
@@ -282,10 +414,10 @@ Also provide a `/dee-rescan` command that re-runs `detect_project.py` in place a
 
 - **TECH_SIGNATURES** detection is comprehensive (157 entries) and accurate for framework/library detection
 - **Skill content quality** for core skills (senior-backend, senior-security, code-reviewer) is genuinely useful — good depth, practical patterns
-- **Hook architecture** (PostToolUse on Edit|Write) is the right design pattern, just needs PreToolUse added
+- **Hook architecture** (PostToolUse on Edit|Write) is the right design pattern, just needs cross-platform implementation
 - **Blueprint matching system** concept is sound — domain → skills → agents pipeline just needs correct domain input
-- **install.sh / orchestrate.py** flow works end-to-end on both Mac and Windows
+- **`detect_project.py`** already uses pure Python + pathlib — it works on all platforms. The same approach should be applied to all hooks.
 
 ---
 
-*Field report from active deployment. All issues are reproducible on `Soyelijah/expense-approval-app1` (branch: main).*
+*Field report from active deployment. All issues are reproducible on `Soyelijah/expense-approval-app1` (branch: main, Windows 11 Pro).*
