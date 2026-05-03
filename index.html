@@ -1804,6 +1804,323 @@
             background: linear-gradient(135deg, rgba(0, 212, 170, 0.02) 0%, rgba(0, 82, 255, 0.02) 100%);
         }
 
+        /* ==================== INSTALL METHODS ==================== */
+        .install-methods-selector {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            margin: 48px 0 40px;
+            flex-wrap: wrap;
+        }
+
+        .method-tab {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 24px;
+            border-radius: 14px;
+            border: 1.5px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.02);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            user-select: none;
+        }
+
+        .method-tab:hover {
+            border-color: rgba(0,212,170,0.3);
+            color: var(--text-primary);
+            background: rgba(0,212,170,0.04);
+            transform: translateY(-2px);
+        }
+
+        .method-tab.active {
+            border-color: var(--primary-cyan);
+            background: rgba(0,212,170,0.08);
+            color: var(--primary-cyan);
+            box-shadow: 0 0 24px rgba(0,212,170,0.12);
+        }
+
+        .method-tab .method-badge {
+            font-size: 0.65rem;
+            padding: 2px 7px;
+            border-radius: 20px;
+            background: rgba(0,212,170,0.15);
+            color: var(--primary-cyan);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .method-tab.active .method-badge {
+            background: var(--primary-cyan);
+            color: var(--dark-bg);
+        }
+
+        .method-panel {
+            display: none;
+        }
+
+        .method-panel.active {
+            display: block;
+            animation: fadeIn 0.35s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Method hero card */
+        .method-hero {
+            background: linear-gradient(135deg, rgba(0,82,255,0.06) 0%, rgba(0,212,170,0.04) 100%);
+            border: 1px solid rgba(0,212,170,0.15);
+            border-radius: 20px;
+            padding: 36px 40px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .method-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(0,212,170,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .method-hero-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .method-icon {
+            width: 56px; height: 56px;
+            border-radius: 16px;
+            background: rgba(0,212,170,0.12);
+            border: 1px solid rgba(0,212,170,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .method-icon-blue {
+            background: rgba(0,82,255,0.12);
+            border-color: rgba(0,82,255,0.2);
+        }
+
+        .method-icon-purple {
+            background: rgba(139,92,246,0.12);
+            border-color: rgba(139,92,246,0.2);
+        }
+
+        .method-hero-text h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .method-hero-text p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Command box with copy */
+        .cmd-box {
+            background: rgba(5,10,30,0.9);
+            border: 1px solid rgba(0,212,170,0.2);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .cmd-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: rgba(0,212,170,0.05);
+            border-bottom: 1px solid rgba(0,212,170,0.1);
+        }
+
+        .cmd-box-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary-cyan);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copy-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(0,212,170,0.25);
+            background: transparent;
+            color: var(--primary-cyan);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .copy-btn:hover {
+            background: rgba(0,212,170,0.1);
+            border-color: var(--primary-cyan);
+        }
+
+        .copy-btn.copied {
+            border-color: #22c55e;
+            color: #22c55e;
+            background: rgba(34,197,94,0.08);
+        }
+
+        .cmd-box-body {
+            padding: 18px 20px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--primary-cyan);
+            overflow-x: auto;
+            line-height: 1.7;
+            white-space: pre;
+        }
+
+        .cmd-comment {
+            color: rgba(160,174,192,0.5);
+        }
+
+        .cmd-flag {
+            color: #f59e0b;
+        }
+
+        /* Step list */
+        .install-steps-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .install-step-card {
+            display: flex;
+            gap: 14px;
+            padding: 18px 20px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            transition: all 0.3s;
+        }
+
+        .install-step-card:hover {
+            border-color: rgba(0,212,170,0.2);
+            background: rgba(0,212,170,0.03);
+        }
+
+        .step-num-circle {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgba(0,82,255,0.15);
+            border: 1.5px solid rgba(0,82,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #6090ff;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-card-text h5 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .step-card-text p {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .step-card-text code {
+            font-family: 'Monaco', monospace;
+            font-size: 0.78rem;
+            color: var(--primary-cyan);
+            background: rgba(0,212,170,0.08);
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        /* FAQ accordion */
+        .install-faq {
+            margin-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 32px;
+        }
+
+        .install-faq h4 {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .faq-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .faq-item {
+            padding: 16px 18px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+        }
+
+        .faq-q {
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .faq-q i { color: var(--primary-cyan); font-size: 0.8rem; }
+
+        .faq-a {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .faq-a code {
+            font-family: 'Monaco', monospace;
+            color: var(--primary-cyan);
+            background: rgba(0,212,170,0.08);
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+        }
+
+        /* Legacy code-block (for other sections) */
         .install-steps {
             margin-top: 60px;
         }
@@ -2688,55 +3005,288 @@
     <!-- ==================== INSTALACIÓN ==================== -->
     <section class="section installation" id="installation">
         <div class="container">
-            <h2 class="section-title">Cómo Instalar</h2>
-            <p class="section-subtitle">Flujo completo: de cero a ecosistema profesional en minutos</p>
+            <h2 class="section-title">¿Cómo se instala?</h2>
+            <p class="section-subtitle">Elige el método que mejor se adapte a ti — todos llevan al mismo resultado en menos de 2 minutos</p>
 
-            <div class="install-steps">
-                <div class="install-step reveal">
-                    <div class="install-step-num">Paso 1 — Ejecuta el One-Liner</div>
-                    <h4>Un solo comando: clona, detecta tu proyecto e instala todo automáticamente</h4>
-                    <div class="code-block">rm -rf /tmp/dee && git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee && bash /tmp/dee/install.sh "/path/to/your/project"</div>
+            <!-- Method selector tabs -->
+            <div class="install-methods-selector">
+                <button class="method-tab active" onclick="switchMethod('oneliner', this)">
+                    <i class="fas fa-terminal"></i>
+                    Recomendado
+                    <span class="method-badge">RÁPIDO</span>
+                </button>
+                <button class="method-tab" onclick="switchMethod('windows', this)">
+                    <i class="fab fa-windows"></i>
+                    Windows / Sin Git
+                    <span class="method-badge">CURL</span>
+                </button>
+                <button class="method-tab" onclick="switchMethod('cli', this)">
+                    <i class="fas fa-bolt"></i>
+                    Instalar comando <code style="font-size:0.75rem">dee</code>
+                    <span class="method-badge">PRO</span>
+                </button>
+            </div>
+
+            <!-- ── METHOD 1: One-liner (Recommended) ── -->
+            <div class="method-panel active" id="method-oneliner">
+                <div class="method-hero reveal">
+                    <div class="method-hero-top">
+                        <div class="method-icon">🚀</div>
+                        <div class="method-hero-text">
+                            <h3>Un solo comando — copia, pega, listo</h3>
+                            <p>Abre tu <strong>Terminal</strong> (macOS: <kbd style="background:rgba(255,255,255,0.08);padding:2px 7px;border-radius:5px;font-size:0.85rem">Cmd + Espacio</kbd> → escribe "Terminal" → Enter · Linux: <kbd style="background:rgba(255,255,255,0.08);padding:2px 7px;border-radius:5px;font-size:0.85rem">Ctrl + Alt + T</kbd>), pega el comando y cambia la ruta a tu proyecto.</p>
+                        </div>
+                    </div>
+                    <div class="cmd-box">
+                        <div class="cmd-box-header">
+                            <span class="cmd-box-label"><i class="fas fa-terminal"></i> Terminal — macOS / Linux</span>
+                            <button class="copy-btn" onclick="copyCmd('cmd-oneliner', this)"><i class="fas fa-copy"></i> Copiar</button>
+                        </div>
+                        <div class="cmd-box-body" id="cmd-oneliner"><span class="cmd-comment"># 1. Limpia copia anterior (si existe) y descarga DEE</span>
+rm -rf /tmp/dee && git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee
+
+<span class="cmd-comment"># 2. Ejecuta el instalador — cambia la ruta por la de tu proyecto</span>
+bash /tmp/dee/install.sh "/ruta/a/tu/proyecto"
+
+<span class="cmd-comment"># Ejemplo real:</span>
+bash /tmp/dee/install.sh "~/Documents/mi-aplicacion"</div>
+                    </div>
+                    <p style="font-size:0.85rem;color:var(--text-secondary);margin-top:8px;"><i class="fas fa-info-circle" style="color:var(--primary-cyan);"></i> &nbsp;¿No sabes la ruta de tu proyecto? Escribe <code style="background:rgba(0,212,170,0.08);padding:2px 7px;border-radius:5px;color:var(--primary-cyan);">pwd</code> dentro de la carpeta de tu proyecto en la terminal y te la muestra.</p>
                 </div>
 
-                <div class="install-step reveal">
-                    <div class="install-step-num">Paso 2 — Instalación Automática</div>
-                    <h4>El engine detecta tu stack, instala skills, MCPs, agents y slash commands</h4>
-                    <div class="code-block"># Todo es automático — solo espera ~40 segundos
-# Skills, MCPs, Agents, Hooks, Commands... ¡todo incluido!</div>
+                <div class="install-steps-list reveal">
+                    <div class="install-step-card">
+                        <div class="step-num-circle">1</div>
+                        <div class="step-card-text">
+                            <h5>Abre la Terminal</h5>
+                            <p>macOS: <code>Cmd + Espacio</code> → "Terminal"<br>Linux: <code>Ctrl + Alt + T</code></p>
+                        </div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="step-num-circle">2</div>
+                        <div class="step-card-text">
+                            <h5>Pega el comando</h5>
+                            <p>Copia el comando de arriba, cámbia la ruta por la de tu proyecto y presiona Enter.</p>
+                        </div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="step-num-circle">3</div>
+                        <div class="step-card-text">
+                            <h5>Espera ~40 segundos</h5>
+                            <p>DEE detecta tu stack automáticamente e instala 64 skills, MCPs, hooks y slash commands.</p>
+                        </div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="step-num-circle">4</div>
+                        <div class="step-card-text">
+                            <h5>Configura tus API Keys (opcional)</h5>
+                            <p>Un wizard interactivo aparece al final. Puedes saltarlo si no tienes keys aún.</p>
+                        </div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="step-num-circle">5</div>
+                        <div class="step-card-text">
+                            <h5>Abre Claude Code o Cowork</h5>
+                            <p>Escribe <code>/</code> para ver todos tus skills. Escribe <code>/skills</code> para la lista completa.</p>
+                        </div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="step-num-circle">✓</div>
+                        <div class="step-card-text" style="color:#22c55e;">
+                            <h5 style="color:#22c55e;">¡Listo! Ecosistema instalado</h5>
+                            <p>Claude ahora tiene contexto profundo de tu proyecto y 64 skills especializados activos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── METHOD 2: Windows / No Git ── -->
+            <div class="method-panel" id="method-windows">
+                <div class="method-hero reveal">
+                    <div class="method-hero-top">
+                        <div class="method-icon method-icon-blue">📦</div>
+                        <div class="method-hero-text">
+                            <h3>Descarga el .zip e instala — sin necesitar Git</h3>
+                            <p>Perfecto si estás en <strong>Windows</strong> o si no tienes Git instalado. Descarga el paquete DEE como un ZIP y ejecuta el instalador desde PowerShell o cualquier terminal.</p>
+                        </div>
+                    </div>
+
+                    <div class="cmd-box" style="margin-bottom:16px;">
+                        <div class="cmd-box-header">
+                            <span class="cmd-box-label"><i class="fab fa-windows"></i> PowerShell — Windows</span>
+                            <button class="copy-btn" onclick="copyCmd('cmd-windows-ps', this)"><i class="fas fa-copy"></i> Copiar</button>
+                        </div>
+                        <div class="cmd-box-body" id="cmd-windows-ps"><span class="cmd-comment"># 1. Descarga DEE como ZIP</span>
+curl -L -o dee.zip https://github.com/Soyelijah/devlmer-ecosystem-engine/archive/refs/heads/main.zip
+
+<span class="cmd-comment"># 2. Descomprime</span>
+Expand-Archive -Path dee.zip -DestinationPath .
+
+<span class="cmd-comment"># 3. Instala — cambia la ruta por la de tu proyecto</span>
+bash devlmer-ecosystem-engine-main/install.sh "C:\Users\TuNombre\Documents\mi-proyecto"</div>
+                    </div>
+
+                    <div class="cmd-box">
+                        <div class="cmd-box-header">
+                            <span class="cmd-box-label"><i class="fas fa-terminal"></i> Bash / WSL — Windows</span>
+                            <button class="copy-btn" onclick="copyCmd('cmd-windows-bash', this)"><i class="fas fa-copy"></i> Copiar</button>
+                        </div>
+                        <div class="cmd-box-body" id="cmd-windows-bash"><span class="cmd-comment"># 1. Descarga DEE como ZIP</span>
+curl -L -o dee.zip https://github.com/Soyelijah/devlmer-ecosystem-engine/archive/refs/heads/main.zip
+
+<span class="cmd-comment"># 2. Descomprime</span>
+unzip dee.zip
+
+<span class="cmd-comment"># 3. Instala — cambia la ruta por la de tu proyecto</span>
+cd devlmer-ecosystem-engine-main && bash install.sh "/ruta/a/tu/proyecto"</div>
+                    </div>
+
+                    <div style="margin-top:16px;padding:14px 18px;background:rgba(0,82,255,0.06);border:1px solid rgba(0,82,255,0.15);border-radius:12px;">
+                        <p style="font-size:0.85rem;color:var(--text-secondary);margin:0;"><i class="fas fa-lightbulb" style="color:#f59e0b;"></i> &nbsp;<strong style="color:var(--text-primary);">Tip Windows:</strong> Para abrir PowerShell en tu carpeta de proyecto, mantén <kbd style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;">Shift</kbd> + clic derecho en la carpeta → "Abrir ventana de PowerShell aquí".</p>
+                    </div>
                 </div>
 
-                <div class="install-step reveal">
-                    <div class="install-step-num">Paso 3 — Setup Wizard (API Keys)</div>
-                    <h4>Un asistente interactivo te guía para configurar tus credenciales</h4>
-                    <div class="code-block"># El wizard aparece al final de la instalación automáticamente
-# Modo guiado: te explica cada servicio y dónde encontrar la key
-# Modo esenciales: solo Supabase, Stripe y GitHub (lo mínimo)
-# Puedes correrlo después: bash setup-wizard.sh /tu/proyecto</div>
+                <div class="install-steps-list reveal">
+                    <div class="install-step-card">
+                        <div class="step-num-circle">1</div>
+                        <div class="step-card-text">
+                            <h5>Abre PowerShell</h5>
+                            <p><code>Win + R</code> → escribe <code>powershell</code> → Enter</p>
+                        </div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="step-num-circle">2</div>
+                        <div class="step-card-text">
+                            <h5>Pega los 3 comandos</h5>
+                            <p>Uno a uno, presiona Enter después de cada uno. El tercero es el instalador.</p>
+                        </div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="step-num-circle">3</div>
+                        <div class="step-card-text">
+                            <h5>Espera ~60 segundos</h5>
+                            <p>El instalador detecta tu proyecto y configura todo automáticamente.</p>
+                        </div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="step-num-circle">✓</div>
+                        <div class="step-card-text" style="color:#22c55e;">
+                            <h5 style="color:#22c55e;">¡Ecosistema listo!</h5>
+                            <p>Abre Claude Code o Cowork en tu proyecto y escribe <code>/skills</code>.</p>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="install-step reveal">
-                    <div class="install-step-num">Paso 4 — Abre Claude Code</div>
-                    <h4>Tus skills aparecen como <code>/slash-commands</code> nativos</h4>
-                    <div class="code-block">cd /your/project && claude
-# Escribe / para ver todos tus skills instalados:
-#   /senior-architect  /code-reviewer  /copywriting
-#   /senior-security   /mobile-design  /brainstorming ...
-# Escribe /skills para ver la lista completa
-# Escribe /mcp para ver los MCPs conectados
-# Escribe /plugin para ver los plugins activos</div>
+            <!-- ── METHOD 3: Global CLI ── -->
+            <div class="method-panel" id="method-cli">
+                <div class="method-hero reveal">
+                    <div class="method-hero-top">
+                        <div class="method-icon method-icon-purple">⚡</div>
+                        <div class="method-hero-text">
+                            <h3>Instala el comando <code style="font-size:1rem;color:var(--primary-cyan)">dee</code> — úsalo en cualquier proyecto</h3>
+                            <p>Instala DEE una sola vez como comando global. Después solo escribes <code style="background:rgba(0,212,170,0.08);padding:2px 8px;border-radius:5px;color:var(--primary-cyan)">dee install /tu/proyecto</code> cada vez que quieras instalar en un proyecto nuevo, sin necesitar clonar el repositorio cada vez.</p>
+                        </div>
+                    </div>
+
+                    <div class="cmd-box" style="margin-bottom:16px;">
+                        <div class="cmd-box-header">
+                            <span class="cmd-box-label"><i class="fas fa-download"></i> Paso 1 — Instalar el comando dee (solo una vez)</span>
+                            <button class="copy-btn" onclick="copyCmd('cmd-cli-install', this)"><i class="fas fa-copy"></i> Copiar</button>
+                        </div>
+                        <div class="cmd-box-body" id="cmd-cli-install"><span class="cmd-comment"># Descarga e instala el CLI dee globalmente en tu sistema</span>
+curl -fsSL https://raw.githubusercontent.com/Soyelijah/devlmer-ecosystem-engine/main/install-cli.sh | bash
+
+<span class="cmd-comment"># Después de instalar, reinicia la terminal y verifica:</span>
+dee --version</div>
+                    </div>
+
+                    <div class="cmd-box">
+                        <div class="cmd-box-header">
+                            <span class="cmd-box-label"><i class="fas fa-rocket"></i> Paso 2 — Usar dee en cualquier proyecto</span>
+                            <button class="copy-btn" onclick="copyCmd('cmd-cli-use', this)"><i class="fas fa-copy"></i> Copiar</button>
+                        </div>
+                        <div class="cmd-box-body" id="cmd-cli-use"><span class="cmd-comment"># Instalar DEE en un proyecto nuevo:</span>
+dee install ~/Documents/mi-proyecto
+
+<span class="cmd-comment"># Actualizar DEE en un proyecto existente:</span>
+dee install ~/Documents/mi-proyecto --update
+
+<span class="cmd-comment"># Ver estado del ecosistema instalado:</span>
+dee status ~/Documents/mi-proyecto</div>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:20px;">
+                        <div style="padding:16px 18px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:12px;">
+                            <div style="font-size:0.8rem;font-weight:700;color:#a78bfa;margin-bottom:6px;"><i class="fas fa-check-circle"></i> &nbsp;Ventaja principal</div>
+                            <p style="font-size:0.83rem;color:var(--text-secondary);margin:0;">No necesitas clonar el repositorio cada vez. <code>dee install</code> descarga la última versión automáticamente.</p>
+                        </div>
+                        <div style="padding:16px 18px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:12px;">
+                            <div style="font-size:0.8rem;font-weight:700;color:#a78bfa;margin-bottom:6px;"><i class="fas fa-sync"></i> &nbsp;Actualizar DEE</div>
+                            <p style="font-size:0.83rem;color:var(--text-secondary);margin:0;">Corre el mismo comando de instalación de nuevo para actualizar el CLI a la última versión.</p>
+                        </div>
+                        <div style="padding:16px 18px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:12px;">
+                            <div style="font-size:0.8rem;font-weight:700;color:#a78bfa;margin-bottom:6px;"><i class="fas fa-folder-plus"></i> &nbsp;Múltiples proyectos</div>
+                            <p style="font-size:0.83rem;color:var(--text-secondary);margin:0;">Un solo <code>dee install</code> por proyecto. El CLI detecta el stack de cada uno independientemente.</p>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="install-step reveal">
-                    <div class="install-step-num">Paso 5 — ¡Desarrolla con Superpoderes!</div>
-                    <h4>Claude ahora tiene contexto profundo de tu proyecto y herramientas especializadas</h4>
-                    <div class="code-block"># Claude lee tu CLAUDE.md y PROJECT_PROFILE.json automáticamente
-# Activa skills según el contexto de lo que estés haciendo
-# Los agents especializados trabajan en paralelo
-# Los MCPs conectan con servicios reales (Supabase, Stripe, GitHub...)</div>
+            <!-- FAQ común a todos los métodos -->
+            <div class="install-faq reveal">
+                <h4><i class="fas fa-question-circle" style="color:var(--primary-cyan);margin-right:8px;"></i>Preguntas frecuentes</h4>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <div class="faq-q"><i class="fas fa-chevron-right"></i>¿Qué es "la terminal"?</div>
+                        <div class="faq-a">Es el programa donde escribes comandos de texto. En macOS: busca "Terminal" con <code>Cmd+Espacio</code>. En Windows: busca "PowerShell" en el menú inicio. No hay que ser experto — solo copias y pegas.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q"><i class="fas fa-chevron-right"></i>¿Qué es "la ruta de mi proyecto"?</div>
+                        <div class="faq-a">Es la ubicación de tu carpeta de proyecto en tu computadora. Abre la terminal, navega a tu carpeta con <code>cd</code> y escribe <code>pwd</code> — te mostrará la ruta exacta.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q"><i class="fas fa-chevron-right"></i>¿Necesito API Keys para instalar?</div>
+                        <div class="faq-a">No. El instalador funciona perfectamente sin API Keys. El wizard al final es opcional — puedes presionar Enter para saltar cada paso o correrlo después con <code>bash setup-wizard.sh /tu/proyecto</code>.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q"><i class="fas fa-chevron-right"></i>¿Cómo actualizo DEE en un proyecto existente?</div>
+                        <div class="faq-a">Agrega <code>--update</code> al comando: <code>bash /tmp/dee/install.sh "/tu/proyecto" --update</code>. Actualiza skills y hooks sin perder tu configuración.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q"><i class="fas fa-chevron-right"></i>¿Puedo instalarlo en varios proyectos?</div>
+                        <div class="faq-a">Sí. Ejecuta el instalador una vez por proyecto — cada uno tiene su propio ecosistema en su carpeta <code>.claude/</code>. DEE detecta el stack de cada proyecto independientemente.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-q"><i class="fas fa-chevron-right"></i>¿Dónde puedo ver mis skills instalados?</div>
+                        <div class="faq-a">Abre Claude Code o Cowork en tu proyecto y escribe <code>/skills</code> para ver la lista completa. También están en la carpeta <code>.claude/skills/</code> de tu proyecto.</div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <script>
+    function switchMethod(method, tab) {
+        document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.method-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('method-' + method).classList.add('active');
+    }
+
+    function copyCmd(id, btn) {
+        const el = document.getElementById(id);
+        const text = el.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-copy"></i> Copiar';
+                btn.classList.remove('copied');
+            }, 2000);
+        });
+    }
+    </script>
 
     <!-- ==================== EXPERIENCIA EN CLAUDE CODE ==================== -->
     <section class="section" id="experiencia" style="background: linear-gradient(135deg, rgba(0, 82, 255, 0.03) 0%, rgba(0, 212, 170, 0.02) 100%);">
