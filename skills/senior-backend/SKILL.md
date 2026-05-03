@@ -1,1598 +1,1572 @@
-# Senior Backend Engineering Reference
+---
+name: senior-backend
+description: "Guia de referencia completa para backend senior: API design con OpenAPI 3.1, JWT con refresh tokens, OAuth2 PKCE, Repository pattern, async queues, caching strategies, rate limiting con token bucket, error handling con correlation IDs, testing pyramid, N+1 detection, FastAPI completo, NestJS completo, y checklist de code review con 50+ puntos."
+triggers: ["backend", "API design", "JWT", "refresh token", "repository pattern", "async queue", "caching", "rate limiting", "FastAPI", "NestJS", "N+1", "connection pool", "pagination", "error handling", "testing", "pytest", "backend review"]
+---
 
-Daily reference toolkit for building production-grade backend systems. Covers REST API design, database optimization, authentication, performance engineering, testing strategy, and security hardening.
+# Senior Backend — Guia de Referencia Completa
 
-## 1. API Development Standards
+Referencia practica para ingenieros backend senior. Codigo real, patrones probados en produccion, y checklists accionables.
 
-### RESTful Design Conventions
+---
 
-A properly designed API follows resource-oriented design with consistent verb semantics:
+## 1. API Design Patterns — REST con OpenAPI 3.1
+
+### Principios fundamentales de REST
 
 ```
-GET    /api/v1/users              # List all users (with pagination, filtering, sorting)
-GET    /api/v1/users/{id}         # Fetch single user
-POST   /api/v1/users              # Create new user
-PATCH  /api/v1/users/{id}         # Partial update (update specific fields)
-PUT    /api/v1/users/{id}         # Full replacement (all fields required)
-DELETE /api/v1/users/{id}         # Soft delete (logical deletion)
+Recursos: sustantivos plurales, nunca verbos
+  BIEN:  GET  /api/orders
+  BIEN:  POST /api/orders
+  MAL:   POST /api/create-order
+  MAL:   GET  /api/getOrders
+
+Verbos HTTP con semantica correcta:
+  GET    → Lectura, idempotente, cacheable
+  POST   → Crear, NO idempotente
+  PUT    → Reemplazar completo, idempotente
+  PATCH  → Modificar parcial, idempotente
+  DELETE → Eliminar, idempotente
+
+Codigos de estado correctos:
+  200 OK           → GET exitoso, PUT/PATCH exitoso
+  201 Created      → POST exitoso (incluir Location header)
+  204 No Content   → DELETE exitoso, PUT sin respuesta
+  400 Bad Request  → Validacion fallida, malformed JSON
+  401 Unauthorized → Token ausente o invalido
+  403 Forbidden    → Autenticado pero sin permiso
+  404 Not Found    → Recurso no existe
+  409 Conflict     → Conflicto de estado (ej: orden ya existe)
+  422 Unprocessable → Semanticamente invalido (Pydantic validation)
+  429 Too Many Req → Rate limit superado (con Retry-After header)
+  500 Internal     → Error no esperado (nunca exponer detalles)
 ```
 
-**Response format standardization (always consistent):**
-
-```json
-{
-  "success": true,
-  "code": 200,
-  "data": {
-    "id": "user-123",
-    "email": "user@example.com",
-    "created_at": "2024-01-15T10:30:00Z"
-  },
-  "pagination": {
-    "page": 1,
-    "limit": 50,
-    "total": 248,
-    "has_more": true
-  }
-}
-```
-
-**Error responses (hierarchical codes):**
-
-```json
-{
-  "success": false,
-  "code": 422,
-  "error": {
-    "type": "VALIDATION_ERROR",
-    "message": "Invalid input provided",
-    "fields": {
-      "email": ["Invalid email format"],
-      "age": ["Must be >= 18"]
-    }
-  },
-  "request_id": "req-abc123def456"
-}
-```
-
-### Request/Response Validation Patterns
-
-**FastAPI example (Python):**
+### FastAPI — Implementacion completa production-ready
 
 ```python
-from pydantic import BaseModel, EmailStr, Field, validator
-from typing import Optional
+# backend/src/main.py — Aplicacion FastAPI completa
 
-class CreateUserRequest(BaseModel):
-    email: EmailStr  # Built-in email validation
-    password: str = Field(..., min_length=12, regex="^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).*$")
-    age: int = Field(..., ge=18, le=150)
-    phone: Optional[str] = Field(None, regex="^\\+?1?\\d{9,15}$")
-
-    @validator('password')
-    def password_entropy(cls, v):
-        # Ensure complexity
-        if v.count(set(v)) < 4:  # At least 4 character types
-            raise ValueError("Password too weak")
-        return v
-
-@app.post("/api/v1/users")
-async def create_user(req: CreateUserRequest):
-    # Pydantic validates before handler execution
-    # If invalid → automatic 422 response
-    user = await service.create_user(req)
-    return {"success": True, "data": user}
-```
-
-**Express.js example (Node):**
-
-```javascript
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-
-app.post('/api/v1/users', [
-  body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 12 })
-    .matches(/^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).*$/),
-  body('age').isInt({ min: 18, max: 150 }),
-  body('phone').optional().isMobilePhone()
-], (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      success: false,
-      code: 422,
-      error: { type: 'VALIDATION_ERROR', fields: errors.mapped() }
-    });
-  }
-  // Proceed with business logic
-});
-```
-
-### Error Handling Hierarchy
-
-```
-┌─ Validation Layer (422)
-│   └─ Invalid input format, constraint violation
-│
-├─ Authorization Layer (403)
-│   └─ User authenticated but lacks permission
-│
-├─ Business Logic Layer (400/409)
-│   ├─ 400: Precondition not met (e.g., insufficient funds)
-│   └─ 409: Resource state conflict (e.g., duplicate email)
-│
-├─ System Layer (500)
-│   ├─ 500: Unhandled exception, log immediately with correlation ID
-│   ├─ 502: Gateway error (database unavailable)
-│   ├─ 503: Service temporarily down
-│   └─ 504: Request timeout
-│
-└─ Client Error (4xx)
-    ├─ 400: Bad request
-    ├─ 401: Missing or invalid auth
-    ├─ 403: Authorized but forbidden
-    ├─ 404: Not found
-    ├─ 429: Rate limited
-    └─ 500: Server error
-```
-
-### Middleware Chain Design
-
-Order matters critically. Process in this sequence:
-
-```python
-# FastAPI middleware stack (top to bottom = execution order)
-
-app = FastAPI()
-
-# 1. Logging middleware - FIRST to capture all requests
-@app.middleware("http")
-async def logging_middleware(request: Request, call_next):
-    request.state.request_id = str(uuid4())
-    request.state.start_time = time.time()
-    response = await call_next(request)
-    duration = time.time() - request.state.start_time
-    logger.info("request", extra={
-        "request_id": request.state.request_id,
-        "method": request.method,
-        "path": request.url.path,
-        "status": response.status_code,
-        "duration_ms": duration * 1000,
-        "ip": request.client.host
-    })
-    return response
-
-# 2. Rate limiting - before auth to prevent auth-bypass attacks
-@app.middleware("http")
-async def rate_limit_middleware(request: Request, call_next):
-    key = f"{request.client.host}:{request.url.path}"
-    if not rate_limiter.allow(key):
-        return JSONResponse(
-            status_code=429,
-            content={"error": "Rate limit exceeded"}
-        )
-    return await call_next(request)
-
-# 3. CORS - standard security headers
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://app.example.com"],  # Specific, never "*"
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PATCH", "DELETE"],
-    allow_headers=["Authorization", "Content-Type"],
-    max_age=600  # Cache preflight 10 minutes
-)
-
-# 4. Authentication middleware - validate JWT
-@app.middleware("http")
-async def auth_middleware(request: Request, call_next):
-    if should_authenticate(request.url.path):
-        token = request.headers.get("Authorization", "").replace("Bearer ", "")
-        try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            request.state.user_id = payload["sub"]
-        except jwt.InvalidTokenError:
-            return JSONResponse(status_code=401, content={"error": "Invalid token"})
-    return await call_next(request)
-
-# 5. Route handlers - business logic
-@app.get("/api/v1/users/{user_id}")
-async def get_user(user_id: str, request: Request):
-    # request.state.user_id available from auth middleware
-    # request.state.request_id available from logging middleware
-    pass
-```
-
-### Rate Limiting Implementation
-
-**Token bucket algorithm (most fair):**
-
-```python
-import time
-from collections import defaultdict
-
-class TokenBucket:
-    def __init__(self, rate: int, capacity: int):
-        """
-        rate: tokens per second
-        capacity: max tokens in bucket
-        """
-        self.rate = rate
-        self.capacity = capacity
-        self.buckets = defaultdict(lambda: {"tokens": capacity, "last_refill": time.time()})
-
-    def allow(self, key: str, tokens_required: int = 1) -> bool:
-        bucket = self.buckets[key]
-        now = time.time()
-
-        # Refill tokens based on elapsed time
-        elapsed = now - bucket["last_refill"]
-        bucket["tokens"] = min(
-            self.capacity,
-            bucket["tokens"] + elapsed * self.rate
-        )
-        bucket["last_refill"] = now
-
-        if bucket["tokens"] >= tokens_required:
-            bucket["tokens"] -= tokens_required
-            return True
-        return False
-
-# Usage
-limiter = TokenBucket(rate=10, capacity=100)  # 10 req/sec, burst to 100
-
-# Redis-backed version for distributed systems:
-def check_rate_limit_redis(user_id: str, limit: int = 100, window: int = 60):
-    """Check if user is within 100 requests per 60 seconds"""
-    key = f"rate_limit:{user_id}"
-    current = redis.incr(key)
-    if current == 1:
-        redis.expire(key, window)  # Set expiry on first request
-    return current <= limit
-```
-
-## 2. Database Engineering
-
-### Query Optimization: EXPLAIN ANALYZE
-
-Before deploying any query, always run EXPLAIN ANALYZE:
-
-```sql
--- Get actual execution plan with timing
-EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
-SELECT u.id, u.email, COUNT(o.id) as order_count
-FROM users u
-LEFT JOIN orders o ON u.id = o.user_id
-WHERE u.created_at > NOW() - INTERVAL '30 days'
-GROUP BY u.id
-ORDER BY order_count DESC
-LIMIT 20;
-```
-
-Output reveals:
-- **Seq Scan**: Indicates missing index
-- **Planning Time**: Setup cost
-- **Execution Time**: Actual runtime (critical for SLAs)
-- **Buffers Hit**: % of data from cache vs disk
-
-**Action items from EXPLAIN:**
-- If Seq Scan on WHERE clause: add index
-- If Nested Loop on JOIN: consider materialized view
-- If Memory spike: increase work_mem or add index
-
-### Index Design Strategy
-
-**B-tree indexes** (default for equality/range):
-
-```sql
--- Single column index
-CREATE INDEX idx_users_email ON users(email);  -- O(log n)
-
--- Composite index (order matters)
-CREATE INDEX idx_orders_user_date ON orders(user_id, created_at DESC);
--- Supports: WHERE user_id = x AND created_at > y
--- Does NOT support: WHERE created_at > y (user_id must be first)
-
--- Partial index (reduce size, improve selectivity)
-CREATE INDEX idx_active_users ON users(email) WHERE deleted_at IS NULL;
-
--- Covering index (includes extra columns to avoid table lookup)
-CREATE INDEX idx_orders_summary ON orders(user_id) INCLUDE (total_amount, created_at);
--- SELECT user_id, total_amount FROM orders WHERE user_id = 123  -- Uses only index
-```
-
-**GiST/GIN indexes** (for full-text search, arrays, JSON):
-
-```sql
--- Full-text search
-CREATE INDEX idx_documents_search ON documents USING GIN(to_tsvector('english', content));
-
--- Array operations
-CREATE INDEX idx_tags ON articles USING GIN(tags);  -- Supports @> (contains)
-
--- JSON path queries
-CREATE INDEX idx_metadata ON events USING GIN(metadata);
--- SELECT * FROM events WHERE metadata @> '{"status": "active"}'
-```
-
-**Index maintenance:**
-
-```sql
--- Identify unused indexes
-SELECT schemaname, tablename, indexname, idx_scan
-FROM pg_stat_user_indexes
-WHERE idx_scan = 0
-ORDER BY pg_relation_size(indexrelid) DESC;
-
--- Reindex fragmented index (during maintenance window)
-REINDEX INDEX CONCURRENTLY idx_orders_user_date;  -- Non-blocking
-
--- Analyze statistics for query planner
-ANALYZE users;  -- Updates pg_stat_user_tables
-```
-
-### Zero-Downtime Migrations
-
-**Pattern: Expand → Migrate → Contract**
-
-```python
-# Step 1: Add new column with default (fast, no lock)
-ALTER TABLE users ADD COLUMN phone_number VARCHAR(20) DEFAULT '';
-
-# Step 2: Backfill in batches (app continues working)
-UPDATE users SET phone_number = legacy_phone WHERE phone_number = ''
-  AND id <= 100000;  # Process in chunks to avoid locking
-
-# Step 3: Optional: add constraint
-ALTER TABLE users ADD CONSTRAINT phone_format CHECK (phone_number ~ '^\+?[0-9]{9,15}$');
-
-# Step 4: Remove old column (safe now)
-ALTER TABLE users DROP COLUMN legacy_phone;
-
-# In code: dual-write pattern
-class User:
-    def save(self):
-        # Write to both old and new columns
-        db.execute("""
-            UPDATE users SET phone_number = %s, legacy_phone = %s
-            WHERE id = %s
-        """, (self.phone, self.phone, self.id))
-```
-
-### Connection Pool Tuning
-
-**Formula for optimal pool size:**
-
-```
-pool_size = (core_count * 2) + effective_spindle_count
-
-Example:
-- 4-core CPU + 1 SSD = (4 × 2) + 1 = 9 connections
-- 16-core CPU + 2 spinning disks = (16 × 2) + 2 = 34 connections
-
-Also set:
-- max_overflow = pool_size × 0.5  # Allow temporary burst
-- pool_pre_ping = True             # Test connection before use (detects dropped connections)
-- pool_recycle = 3600              # Recycle connections after 1 hour (prevents stale connections)
-```
-
-**SQLAlchemy configuration:**
-
-```python
-from sqlalchemy import create_engine
-
-engine = create_engine(
-    DATABASE_URL,
-    poolclass=QueuePool,
-    pool_size=9,
-    max_overflow=4,
-    pool_pre_ping=True,
-    pool_recycle=3600,
-    echo=False  # Set True to log all SQL (never in production)
-)
-
-# Monitor pool status
-print(engine.pool.checkedout())  # Connections in use
-print(engine.pool.size())        # Total pool size
-```
-
-### N+1 Query Detection and Prevention
-
-**Problematic pattern:**
-
-```python
-# N+1: 1 query for users + N queries for orders
-users = db.query(User).all()  # Query 1
-for user in users:
-    orders = db.query(Order).filter(Order.user_id == user.id).all()  # Query N
-
-# Fix: Eager loading
-users = db.query(User).options(
-    selectinload(User.orders)  # Single JOIN query
-).all()
-
-# Alternative: Explicit JOIN
-from sqlalchemy.orm import contains_eager
-users = db.query(User).join(Order).options(
-    contains_eager(User.orders)
-).all()
-```
-
-**Detection in logs:**
-
-```python
-# Add instrumentation to catch N+1
-class QueryCounter:
-    def __init__(self):
-        self.queries = []
-
-    def receive_after_cursor_execute(self, conn, cursor, statement, parameters, context, executemany):
-        self.queries.append((statement, parameters))
-
-# In tests
-counter = QueryCounter()
-event.listen(Engine, "after_cursor_execute", counter.receive_after_cursor_execute)
-
-users = get_users()  # Should be 1 query
-assert len(counter.queries) <= 2, f"Expected <=2 queries, got {len(counter.queries)}"
-```
-
-### Transaction Isolation Levels
-
-**Concurrency vs Isolation tradeoff:**
-
-```sql
--- Read Uncommitted (dangerous - rarely used)
--- Dirty reads: Read other transaction's uncommitted data
-
--- Read Committed (PostgreSQL default)
--- Prevents: Dirty reads
--- Allows: Non-repeatable reads, phantom reads
--- Use for: Most applications
-SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
-
--- Repeatable Read
--- Prevents: Dirty reads, non-repeatable reads
--- Allows: Phantom reads
--- Use for: Report generation, consistency required
-SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
-
--- Serializable (strictest)
--- Prevents: All race conditions
--- Slowest, but guarantees correctness
--- Use for: Financial transactions, inventory
-SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
-```
-
-**Example: Stock inventory with race condition:**
-
-```python
-# Unsafe at Read Committed:
-async with db.begin():
-    stock = await db.query(Product).filter(id == 123).with_for_update().first()
-    if stock.quantity >= order_qty:
-        stock.quantity -= order_qty  # Another txn may have decremented simultaneously
-        await db.flush()
-
-# Safe at Serializable:
-try:
-    async with db.begin():
-        stock = await db.query(Product).filter(id == 123).first()
-        if stock.quantity >= order_qty:
-            stock.quantity -= order_qty
-            await db.flush()
-except psycopg2.extensions.TransactionRollbackError:
-    # Conflict detected, retry
-    pass
-```
-
-## 3. Authentication & Authorization
-
-### JWT Implementation (Access + Refresh Token Rotation)
-
-**Token structure:**
-
-```python
-import jwt
-from datetime import datetime, timedelta
-
-# Access token: Short-lived (15 minutes)
-access_token = jwt.encode({
-    "sub": user_id,           # Subject (who this token is for)
-    "iat": datetime.utcnow(),  # Issued at
-    "exp": datetime.utcnow() + timedelta(minutes=15),
-    "type": "access",
-    "scopes": ["read:profile", "write:orders"]  # Permissions
-}, SECRET_KEY, algorithm="HS256")
-
-# Refresh token: Long-lived (30 days), stored in database
-refresh_token = jwt.encode({
-    "sub": user_id,
-    "iat": datetime.utcnow(),
-    "exp": datetime.utcnow() + timedelta(days=30),
-    "type": "refresh",
-    "jti": str(uuid4())  # JWT ID for revocation tracking
-}, SECRET_KEY, algorithm="HS256")
-
-# Store refresh token hash in database
-db.execute(
-    "INSERT INTO refresh_tokens (user_id, token_hash, expires_at) VALUES (%s, %s, %s)",
-    (user_id, hash_token(refresh_token), datetime.utcnow() + timedelta(days=30))
-)
-```
-
-**Token refresh endpoint:**
-
-```python
-@app.post("/api/v1/auth/refresh")
-async def refresh_token(req: RefreshRequest):
-    try:
-        # Decode without expiry validation (we check DB)
-        payload = jwt.decode(req.refresh_token, SECRET_KEY, algorithms=["HS256"])
-
-        # Verify token still in database and not revoked
-        token_record = await db.query(RefreshToken).filter(
-            RefreshToken.jti == payload["jti"]
-        ).first()
-
-        if not token_record or token_record.revoked_at:
-            raise HTTPException(status_code=401, detail="Token revoked")
-
-        # Issue new access token
-        new_access = jwt.encode({
-            "sub": payload["sub"],
-            "iat": datetime.utcnow(),
-            "exp": datetime.utcnow() + timedelta(minutes=15),
-            "type": "access"
-        }, SECRET_KEY, algorithm="HS256")
-
-        return {
-            "access_token": new_access,
-            "token_type": "Bearer",
-            "expires_in": 900  # 15 minutes in seconds
-        }
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Refresh token expired")
-```
-
-### OAuth2 Server-Side Flow
-
-**Authorization code flow (most secure for SPAs):**
-
-```python
-# Step 1: Redirect user to authorization endpoint
-@app.get("/oauth/authorize")
-async def authorize(
-    client_id: str,
-    redirect_uri: str,
-    scope: str,
-    state: str  # CSRF protection
-):
-    # Validate client_id and redirect_uri against database
-    client = await db.query(OAuthClient).filter(
-        OAuthClient.client_id == client_id
-    ).first()
-
-    if not client or redirect_uri not in client.allowed_redirects:
-        raise HTTPException(status_code=400, detail="Invalid client")
-
-    # Store authorization code (10-minute expiry)
-    auth_code = secrets.token_urlsafe(32)
-    await db.execute(
-        "INSERT INTO auth_codes (code, client_id, user_id, scope, expires_at) VALUES (%s, %s, %s, %s, %s)",
-        (auth_code, client_id, request.state.user_id, scope,
-         datetime.utcnow() + timedelta(minutes=10))
-    )
-
-    # Redirect back to client with code
-    return RedirectResponse(f"{redirect_uri}?code={auth_code}&state={state}")
-
-# Step 2: Backend exchanges code for token (server-to-server, no JavaScript)
-@app.post("/oauth/token")
-async def token(req: TokenRequest):
-    # Verify code hasn't expired and matches client_id
-    auth_code = await db.query(AuthCode).filter(
-        AuthCode.code == req.code,
-        AuthCode.client_id == req.client_id,
-        AuthCode.expires_at > datetime.utcnow()
-    ).first()
-
-    if not auth_code:
-        raise HTTPException(status_code=400, detail="Invalid code")
-
-    # Issue access token
-    access_token = jwt.encode({
-        "sub": auth_code.user_id,
-        "client_id": auth_code.client_id,
-        "scope": auth_code.scope,
-        "exp": datetime.utcnow() + timedelta(hours=1)
-    }, SECRET_KEY)
-
-    return {
-        "access_token": access_token,
-        "token_type": "Bearer",
-        "expires_in": 3600
-    }
-```
-
-### Session Management (Stateless vs Stateful)
-
-**Stateless (JWT) - scalability:**
-- No server storage needed
-- Self-contained (client sends proof on every request)
-- Cannot revoke immediately
-- Best for: Public APIs, microservices
-
-**Stateful - control:**
-- Server maintains session store (Redis)
-- Immediate revocation possible
-- Server must query session on each request
-- Best for: Web apps, user dashboards
-
-**Hybrid pattern:**
-
-```python
-class HybridAuth:
-    def create_session(user_id: str, browser_fingerprint: str):
-        # Session ID stored in Redis with TTL
-        session_id = secrets.token_urlsafe(32)
-        redis.setex(
-            f"session:{session_id}",
-            3600,  # 1 hour TTL
-            json.dumps({
-                "user_id": user_id,
-                "fingerprint": browser_fingerprint,
-                "created_at": datetime.utcnow().isoformat()
-            })
-        )
-
-        # Also issue JWT for offline use (shorter-lived)
-        jwt_token = jwt.encode({
-            "sub": user_id,
-            "session_id": session_id,
-            "exp": datetime.utcnow() + timedelta(hours=1)
-        }, SECRET_KEY)
-
-        return {
-            "session_id": session_id,
-            "jwt": jwt_token
-        }
-
-    def validate_request(request: Request):
-        session_id = request.cookies.get("session_id")
-        jwt_token = request.headers.get("Authorization", "").replace("Bearer ", "")
-
-        # Check session still exists (if revoked, will be gone)
-        session_data = redis.get(f"session:{session_id}")
-        if not session_data:
-            raise HTTPException(status_code=401)
-
-        # Verify JWT signature
-        payload = jwt.decode(jwt_token, SECRET_KEY)
-        return payload["sub"]
-```
-
-### API Key Management
-
-```python
-@app.post("/api/v1/users/api-keys")
-async def create_api_key(request: Request):
-    key_prefix = "sk_live_"  # Helps identify key type
-    key_secret = secrets.token_urlsafe(32)
-    key_hash = hashlib.sha256(key_secret.encode()).hexdigest()
-
-    # Store only hash in database (never store plaintext)
-    api_key = APIKey(
-        user_id=request.state.user_id,
-        key_prefix=key_prefix,
-        key_hash=key_hash,
-        name="Production API Key",
-        scopes=["read:data", "write:orders"],
-        rate_limit_per_minute=60,
-        expires_at=datetime.utcnow() + timedelta(days=365)
-    )
-    db.add(api_key)
-    db.commit()
-
-    # Return full key only once (client must save)
-    return {
-        "api_key": f"{key_prefix}{key_secret}",
-        "note": "Save this key in a secure location. You won't be able to see it again."
-    }
-
-# Validation middleware
-@app.middleware("http")
-async def api_key_auth(request: Request, call_next):
-    if request.url.path.startswith("/api/v1/"):
-        api_key = request.headers.get("X-API-Key", "").replace("sk_live_", "")
-        key_hash = hashlib.sha256(api_key.encode()).hexdigest()
-
-        # Check if key exists and not expired
-        api_key_record = await db.query(APIKey).filter(
-            APIKey.key_hash == key_hash,
-            APIKey.expires_at > datetime.utcnow()
-        ).first()
-
-        if api_key_record:
-            request.state.user_id = api_key_record.user_id
-            request.state.api_key_scopes = api_key_record.scopes
-        else:
-            return JSONResponse(status_code=401, content={"error": "Invalid API key"})
-
-    return await call_next(request)
-```
-
-### CORS Configuration Guide
-
-```python
-from fastapi.middleware.cors import CORSMiddleware
-
-# NEVER use allow_origins=["*"] with allow_credentials=True
-# This is a security vulnerability
-
-app.add_middleware(
-    CORSMiddleware,
-    # Specific origins only (check against whitelist)
-    allow_origins=[
-        "https://app.example.com",
-        "https://admin.example.com"
-    ],
-    # Credentials (cookies, auth headers) allowed
-    allow_credentials=True,
-    # Allowed HTTP methods
-    allow_methods=["GET", "POST", "PATCH", "DELETE"],
-    # Allowed request headers
-    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
-    # Allowed response headers (what client can read)
-    expose_headers=["X-Total-Count", "X-Request-ID"],
-    # Cache preflight requests (2-way handshake reduced)
-    max_age=600
-)
-
-# If you need to support all origins (public API):
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,  # Critical: must be False with *
-    allow_methods=["GET"],    # Restrict to safe methods
-    allow_headers=["Content-Type"]
-)
-```
-
-## 4. Performance Engineering
-
-### Profiling Tools
-
-**Python - cProfile (CPU profiling):**
-
-```python
-import cProfile
-import pstats
-from io import StringIO
-
-pr = cProfile.Profile()
-pr.enable()
-
-# Your code here
-result = expensive_operation()
-
-pr.disable()
-s = StringIO()
-ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
-ps.print_stats(10)  # Top 10
-print(s.getvalue())
-
-# Output:
-# function              calls   cumtime   percall
-# expensive_func        1       5.234     5.234    <-- This is your bottleneck
-```
-
-**Python - py-spy (sampling profiler, production-safe):**
-
-```bash
-# Record profiling data while server runs
-py-spy record -o profile.svg -- python -m uvicorn src.main:app
-
-# Generate flamegraph
-# Flamegraph shows which functions consumed CPU (width = time)
-```
-
-**Node.js - clinic.js (comprehensive profiling):**
-
-```bash
-# Install: npm install -g clinic
-
-# Profile CPU, memory, event loop
-clinic doctor -- node server.js
-
-# Interactive HTML report shows:
-# - CPU hotspots
-# - Memory leaks (increasing trend)
-# - Event loop blocking (long operations on main thread)
-```
-
-### Memory Leak Detection
-
-**Python pattern - Growing memory without reclamation:**
-
-```python
-import tracemalloc
-import gc
-
-tracemalloc.start()
-
-for i in range(1000):
-    data = process_request()  # Should be garbage collected
-    # But if reference held somewhere, memory grows
-
-current, peak = tracemalloc.get_traced_memory()
-print(f"Current: {current / 1e6:.1f}MB, Peak: {peak / 1e6:.1f}MB")
-
-# Detailed snapshot
-snapshot = tracemalloc.take_snapshot()
-top_stats = snapshot.statistics('lineno')
-for stat in top_stats[:10]:
-    print(stat)
-
-# Force garbage collection and check
-gc.collect()
-current_after_gc, _ = tracemalloc.get_traced_memory()
-print(f"After GC: {current_after_gc / 1e6:.1f}MB")
-
-# If memory still high → leak exists
-```
-
-**Circular reference detection:**
-
-```python
-import sys
-
-class CachedData:
-    def __init__(self):
-        self.data = {}
-        self.callback = lambda: print(self.data)  # Circular reference
-
-# Object won't be garbage collected immediately
-obj = CachedData()
-del obj  # Memory not freed because callback holds reference
-
-# Solution: use weakref
-import weakref
-
-class CachedData:
-    def __init__(self):
-        self.data = {}
-        self.self_ref = weakref.ref(self)  # Weak reference, doesn't prevent GC
-```
-
-### Async/Await Patterns
-
-**FastAPI with asyncio:**
-
-```python
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
-
-# CPU-bound work must run in thread pool
-executor = ThreadPoolExecutor(max_workers=4)
-
-@app.get("/api/v1/compute/{value}")
-async def compute(value: int):
-    # Long computation (would block event loop)
-    loop = asyncio.get_event_loop()
-    result = await loop.run_in_executor(executor, heavy_computation, value)
-    return {"result": result}
-
-# Concurrent HTTP requests
-async def fetch_multiple_apis(urls: list[str]):
-    tasks = [fetch_url(url) for url in urls]  # Create tasks but don't await
-    results = await asyncio.gather(*tasks)    # Wait for all simultaneously
-    return results
-
-async def fetch_url(url: str):
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-        return response.json()
-
-# Timeout protection
-try:
-    result = await asyncio.wait_for(slow_operation(), timeout=5.0)
-except asyncio.TimeoutError:
-    logger.warning("Operation timed out after 5 seconds")
-```
-
-**Node.js event loop optimization:**
-
-```javascript
-// Bad: Blocking event loop
-app.get('/compute/:value', (req, res) => {
-    const result = heavyComputation(req.params.value);  // Blocks all requests
-    res.json({ result });
-});
-
-// Good: Offload to worker thread
-const { Worker } = require('worker_threads');
-
-app.get('/compute/:value', (req, res) => {
-    const worker = new Worker('./compute-worker.js');
-    worker.on('message', (result) => {
-        res.json({ result });
-    });
-    worker.postMessage(req.params.value);
-});
-
-// compute-worker.js
-const { parentPort } = require('worker_threads');
-parentPort.on('message', (value) => {
-    const result = heavyComputation(value);
-    parentPort.postMessage(result);
-});
-```
-
-### Worker Process Management
-
-**Gunicorn (Python) configuration:**
-
-```bash
-# Optimal worker count: (2 × CPU cores) + 1
-# 4-core server: (2 × 4) + 1 = 9 workers
-
-gunicorn \
-  --workers 9 \
-  --worker-class uvicorn.workers.UvicornWorker \
-  --worker-connections 1000 \
-  --max-requests 10000 \
-  --max-requests-jitter 1000 \
-  --timeout 60 \
-  --keep-alive 5 \
-  src.main:app
-
-# max-requests: Restart worker after N requests (prevents memory leaks from accumulating)
-# max-requests-jitter: Randomize restart (prevents all workers restarting simultaneously)
-# timeout: Kill worker if it doesn't respond in 60 seconds
-```
-
-**PM2 (Node.js) configuration:**
-
-```javascript
-// ecosystem.config.js
-module.exports = {
-  apps: [{
-    name: 'api',
-    script: './src/server.js',
-    instances: 'max',  // Use all CPU cores
-    exec_mode: 'cluster',
-    max_memory_restart: '500M',  // Restart if memory exceeds 500MB
-    error_file: 'logs/err.log',
-    out_file: 'logs/out.log',
-    log_date_format: 'YYYY-MM-DD HH:mm:ss Z'
-  }]
-};
-
-// Deploy
-// pm2 start ecosystem.config.js
-// pm2 save  # Persist across reboots
-// pm2 startup  # Auto-start on system boot
-```
-
-### Response Compression and Streaming
-
-```python
-from fastapi.middleware.gzip import GZIPMiddleware
-
-# Compress responses > 500 bytes
-app.add_middleware(GZIPMiddleware, minimum_size=500)
-
-# Streaming large responses (doesn't buffer in memory)
-@app.get("/api/v1/export/users")
-async def export_users():
-    async def generate():
-        for user_batch in get_users_in_batches(100):
-            for user in user_batch:
-                yield f"{json.dumps(user)}\n"
-
-    return StreamingResponse(
-        generate(),
-        media_type="application/x-ndjson",  # Newline-delimited JSON
-        headers={"Content-Disposition": "attachment; filename=users.jsonl"}
-    )
-
-# Backpressure handling
-@app.get("/api/v1/data-stream")
-async def stream_data():
-    async def generate():
-        for item in large_dataset:
-            await asyncio.sleep(0.01)  # Let buffer drain
-            yield f"{json.dumps(item)}\n"
-    return StreamingResponse(generate(), media_type="application/x-ndjson")
-```
-
-## 5. Testing Strategy
-
-### Unit Test Patterns (Arrange-Act-Assert)
-
-```python
-import pytest
-
-class TestUserService:
-    @pytest.fixture
-    def user_service(self):
-        # Arrange: Setup
-        repository = MockUserRepository()
-        email_service = MockEmailService()
-        return UserService(repository, email_service)
-
-    def test_create_user_with_valid_email(self, user_service):
-        # Arrange
-        email = "valid@example.com"
-
-        # Act
-        user = user_service.create_user(email)
-
-        # Assert
-        assert user.email == email
-        assert user.id is not None
-        assert user.created_at is not None
-
-    def test_create_user_sends_confirmation_email(self, user_service):
-        # Arrange
-        email = "new@example.com"
-
-        # Act
-        user_service.create_user(email)
-
-        # Assert
-        assert user_service.email_service.send_called
-        assert "confirmation" in user_service.email_service.last_subject.lower()
-
-    def test_create_user_with_duplicate_email_raises_error(self, user_service):
-        # Arrange
-        email = "existing@example.com"
-        user_service.repository.add(User(email=email))
-
-        # Act & Assert
-        with pytest.raises(DuplicateUserError):
-            user_service.create_user(email)
-```
-
-### Integration Testing with Test Containers
-
-```python
-from testcontainers.postgres import PostgresContainer
-import pytest
-
-@pytest.fixture(scope="session")
-def postgres():
-    container = PostgresContainer("postgres:16")
-    container.start()
-    yield container
-    container.stop()
-
-@pytest.fixture
-def db_session(postgres):
-    # Create fresh schema for each test
-    engine = create_engine(postgres.get_connection_url())
-    Base.metadata.create_all(engine)
-
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
-    yield session
-
-    session.rollback()
-    session.close()
-
-def test_user_creation_persists_to_database(db_session):
-    # Arrange
-    user = User(email="test@example.com", password_hash="hash123")
-
-    # Act
-    db_session.add(user)
-    db_session.commit()
-
-    # Assert - Query from fresh session confirms it's in DB
-    new_session = sessionmaker(bind=db_session.bind)()
-    retrieved_user = new_session.query(User).filter_by(email="test@example.com").first()
-    assert retrieved_user is not None
-    assert retrieved_user.password_hash == "hash123"
-```
-
-### API Contract Testing
-
-```python
-import requests
-
-class TestOrderAPI:
-    BASE_URL = "http://localhost:8000"
-
-    def test_create_order_returns_expected_fields(self):
-        # Act
-        response = requests.post(
-            f"{self.BASE_URL}/api/v1/orders",
-            json={
-                "user_id": "user-123",
-                "items": [{"product_id": "prod-456", "quantity": 2}]
-            }
-        )
-
-        # Assert
-        assert response.status_code == 201
-        data = response.json()
-
-        # Contract: These fields MUST exist
-        required_fields = ["id", "user_id", "status", "total_amount", "created_at"]
-        for field in required_fields:
-            assert field in data, f"Missing required field: {field}"
-
-        # Contract: Types must be correct
-        assert isinstance(data["id"], str)
-        assert isinstance(data["total_amount"], (int, float))
-        assert isinstance(data["status"], str)
-        assert data["status"] in ["pending", "confirmed", "shipped", "delivered"]
-
-    def test_get_nonexistent_order_returns_404(self):
-        # Act
-        response = requests.get(f"{self.BASE_URL}/api/v1/orders/nonexistent")
-
-        # Assert
-        assert response.status_code == 404
-        assert "not found" in response.json()["error"].lower()
-```
-
-### Load Testing with Locust
-
-```python
-from locust import HttpUser, task, between
-
-class OrderServiceUser(HttpUser):
-    wait_time = between(1, 3)  # Wait 1-3 seconds between requests
-
-    @task(1)
-    def list_orders(self):
-        # Weight: 1 (runs 1x for every 3x browse_product)
-        self.client.get("/api/v1/orders",
-                       headers={"Authorization": f"Bearer {self.token}"})
-
-    @task(3)
-    def browse_product(self):
-        # Weight: 3
-        product_id = random.choice(["prod-1", "prod-2", "prod-3"])
-        self.client.get(f"/api/v1/products/{product_id}")
-
-    def on_start(self):
-        # Setup: authenticate
-        response = self.client.post("/api/v1/auth/login", json={
-            "email": "loadtest@example.com",
-            "password": "password123"
-        })
-        self.token = response.json()["access_token"]
-
-# Run: locust -f locustfile.py --host=http://localhost:8000 --users 100 --spawn-rate 10
-# Spawns 100 users at 10 users/second rate
-# Open http://localhost:8089 for web UI
-```
-
-### Fixture Management
-
-```python
-import pytest
-from factory import Factory, Sequence
-
-class UserFactory(Factory):
-    class Meta:
-        model = User
-
-    id = Sequence(lambda n: f"user-{n}")
-    email = Sequence(lambda n: f"user{n}@example.com")
-    password_hash = "hash123"
-
-@pytest.fixture
-def user(db_session):
-    """Single user fixture"""
-    user = UserFactory()
-    db_session.add(user)
-    db_session.commit()
-    return user
-
-@pytest.fixture
-def users(db_session):
-    """Multiple users fixture"""
-    users = UserFactory.create_batch(10)
-    db_session.add_all(users)
-    db_session.commit()
-    return users
-
-def test_list_users(users, client):
-    response = client.get("/api/v1/users")
-    assert len(response.json()["data"]) == 10
-```
-
-## 6. Logging & Monitoring
-
-### Structured Logging with Correlation IDs
-
-```python
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 import structlog
-import uuid
-
-# Configure structured logging
-structlog.configure(
-    processors=[
-        structlog.stdlib.filter_by_level,
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-        structlog.processors.UnicodeDecoder(),
-        structlog.processors.JSONRenderer()
-    ],
-    context_class=dict,
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    cache_logger_on_first_use=True,
-)
+import uvicorn
 
 logger = structlog.get_logger()
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifecycle manager: startup → yield → shutdown"""
+    # === STARTUP ===
+    logger.info("Starting up Trading Bot API")
+
+    # Inicializar pool de DB
+    from src.database import engine
+    await engine.begin()  # Verifica conexion
+
+    # Inicializar Redis
+    from src.cache import redis_client
+    await redis_client.ping()
+
+    # Inicializar Binance client
+    from src.services.binance_client import binance_client
+    await binance_client.initialize()
+
+    logger.info("All services initialized successfully")
+    yield
+
+    # === SHUTDOWN ===
+    logger.info("Shutting down gracefully")
+    await binance_client.close()
+    await redis_client.close()
+    await engine.dispose()
+    logger.info("Shutdown complete")
+
+app = FastAPI(
+    title="Trading Bot API",
+    description="Institutional-grade cryptocurrency trading API",
+    version="1.0.0",
+    lifespan=lifespan,
+    docs_url="/api/docs",
+    openapi_url="/api/docs/openapi.json",
+    redoc_url="/api/docs/redoc",
+)
+
+# === MIDDLEWARE (orden importa: se aplica de afuera hacia adentro) ===
+
+# CORS — debe ser el primero
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.ALLOWED_ORIGINS,  # Nunca ["*"] en produccion con credentials
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+    expose_headers=["X-Request-ID", "X-Rate-Limit-Remaining"],
+)
+
+# Request ID — correlation para trazabilidad
 @app.middleware("http")
-async def add_correlation_id(request: Request, call_next):
-    # Generate or extract correlation ID
-    correlation_id = request.headers.get("X-Correlation-ID", str(uuid.uuid4()))
-    request.state.correlation_id = correlation_id
-
-    # Add to logger context (included in all logs from this request)
-    with structlog.contextvars.clear_contextvars():
-        structlog.contextvars.bind_contextvars(
-            correlation_id=correlation_id,
-            request_id=str(uuid.uuid4()),
-            path=request.url.path,
-            method=request.method
-        )
-
-        response = await call_next(request)
-
-        logger.info(
-            "request_completed",
-            status_code=response.status_code,
-            duration_ms=(time.time() - request.state.start_time) * 1000
-        )
-
-        return response
-
-# Output:
-# {"event": "request_completed", "correlation_id": "abc-123", "status_code": 200, "duration_ms": 45.2}
-```
-
-### Log Levels Strategy
-
-```python
-logger = structlog.get_logger()
-
-# DEBUG: Detailed info for developers
-logger.debug("processing_user", user_id="123", fields_count=5)
-
-# INFO: Important business events
-logger.info("user_created", user_id="123", email="user@example.com")
-
-# WARNING: Unexpected but recoverable
-logger.warning("database_pool_exhausted", available_connections=0)
-
-# ERROR: Something failed, needs attention
-logger.error("order_processing_failed", order_id="456", error="Payment declined", retry_attempt=2)
-
-# CRITICAL: System down, immediate intervention needed
-logger.critical("database_unreachable", error="Connection timeout after 30s")
-```
-
-### RED Method Metrics
-
-```python
-from prometheus_client import Counter, Histogram, Gauge
-
-# Rate: Requests per second
-request_counter = Counter(
-    'http_requests_total',
-    'Total HTTP requests',
-    ['method', 'endpoint', 'status']
-)
-
-# Errors: Error rate percentage
-error_counter = Counter(
-    'http_errors_total',
-    'Total HTTP errors',
-    ['endpoint', 'error_type']
-)
-
-# Duration: Request latency
-request_duration = Histogram(
-    'http_request_duration_seconds',
-    'HTTP request latency',
-    ['endpoint'],
-    buckets=(0.1, 0.5, 1.0, 2.5, 5.0)  # Latency buckets
-)
-
-@app.middleware("http")
-async def metrics_middleware(request: Request, call_next):
-    start = time.time()
+async def add_request_id(request: Request, call_next):
+    request_id = request.headers.get("X-Request-ID") or str(uuid4())
+    # Inyectar en contexto de structlog para todos los logs del request
+    structlog.contextvars.bind_contextvars(request_id=request_id)
     response = await call_next(request)
-
-    duration = time.time() - start
-
-    request_counter.labels(
-        method=request.method,
-        endpoint=request.url.path,
-        status=response.status_code
-    ).inc()
-
-    if response.status_code >= 400:
-        error_counter.labels(
-            endpoint=request.url.path,
-            error_type=get_error_type(response)
-        ).inc()
-
-    request_duration.labels(endpoint=request.url.path).observe(duration)
-
+    response.headers["X-Request-ID"] = request_id
+    structlog.contextvars.clear_contextvars()
     return response
 
-# Useful dashboards:
-# - P50/P95/P99 latency over time (shows degradation)
-# - Error rate by endpoint (identifies problem areas)
-# - Throughput (requests/sec) (detects anomalies)
-```
-
-### Health Check Endpoints
-
-```python
-@app.get("/api/v1/health")
-async def health_check():
-    checks = {}
-    all_healthy = True
-
-    # Database connectivity
-    try:
-        async with db.begin():
-            await db.execute(text("SELECT 1"))
-        checks["database"] = {"status": "healthy"}
-    except Exception as e:
-        checks["database"] = {"status": "unhealthy", "error": str(e)}
-        all_healthy = False
-
-    # Redis connectivity
-    try:
-        await redis.ping()
-        checks["redis"] = {"status": "healthy"}
-    except Exception as e:
-        checks["redis"] = {"status": "unhealthy", "error": str(e)}
-        all_healthy = False
-
-    # External API dependency
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await asyncio.wait_for(
-                client.get("https://api.binance.com/api/v3/ping", timeout=2),
-                timeout=3
-            )
-        checks["binance_api"] = {"status": "healthy" if response.status_code == 200 else "unhealthy"}
-    except asyncio.TimeoutError:
-        checks["binance_api"] = {"status": "unhealthy", "error": "timeout"}
-        all_healthy = False
-
-    status_code = 200 if all_healthy else 503
-    return Response(
-        status_code=status_code,
-        content=json.dumps({
-            "status": "healthy" if all_healthy else "unhealthy",
-            "checks": checks,
-            "timestamp": datetime.utcnow().isoformat()
-        })
+# Logging de requests
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = time.perf_counter()
+    response = await call_next(request)
+    duration_ms = (time.perf_counter() - start) * 1000
+    logger.info(
+        "http_request",
+        method=request.method,
+        path=request.url.path,
+        status_code=response.status_code,
+        duration_ms=round(duration_ms, 2),
     )
+    return response
+
+# === ERROR HANDLERS ===
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request, exc: RequestValidationError):
+    """Formatea errores de validacion de Pydantic de forma consistente"""
+    errors = []
+    for error in exc.errors():
+        errors.append({
+            "field": ".".join(str(loc) for loc in error["loc"][1:]),
+            "message": error["msg"],
+            "type": error["type"],
+        })
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "error": "validation_error",
+            "message": "Request validation failed",
+            "details": errors,
+        }
+    )
+
+@app.exception_handler(AppError)
+async def app_error_handler(request: Request, exc: AppError):
+    """Handler para errores de dominio conocidos"""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": exc.error_code,
+            "message": exc.message,
+        }
+    )
+
+@app.exception_handler(Exception)
+async def unhandled_error_handler(request: Request, exc: Exception):
+    """Handler de ultimo recurso — nunca exponer detalles en prod"""
+    logger.exception("unhandled_error", error=str(exc))
+    return JSONResponse(
+        status_code=500,
+        content={"error": "internal_error", "message": "An unexpected error occurred"}
+    )
+
+# === ROUTES ===
+app.include_router(auth_router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(orders_router, prefix="/api/orders", tags=["Orders"])
+app.include_router(portfolio_router, prefix="/api/portfolio", tags=["Portfolio"])
 ```
 
-## 7. Security Hardening
-
-### Input Sanitization Checklist
+### Errores de dominio estructurados
 
 ```python
-from html import escape
-import re
-from sqlalchemy import text
+# src/exceptions.py
 
-def sanitize_user_input(value: str, context: str = "general") -> str:
-    """
-    Sanitize user input based on context
-    """
-    if context == "html":
-        # HTML: Escape special characters
-        return escape(value)
+from fastapi import status
 
-    elif context == "url":
-        # URL: Validate format
-        if not re.match(r'^https?://', value):
-            raise ValueError("Invalid URL")
+class AppError(Exception):
+    """Base para todos los errores de dominio"""
+    def __init__(self, error_code: str, message: str, status_code: int = 400):
+        self.error_code = error_code
+        self.message = message
+        self.status_code = status_code
+        super().__init__(message)
+
+class ResourceNotFoundError(AppError):
+    def __init__(self, resource: str, id: str):
+        super().__init__(
+            error_code="resource_not_found",
+            message=f"{resource} with id '{id}' not found",
+            status_code=status.HTTP_404_NOT_FOUND
+        )
+
+class RiskViolationError(AppError):
+    def __init__(self, rule: str, details: str):
+        super().__init__(
+            error_code="risk_violation",
+            message=f"Risk rule violated: {rule}. {details}",
+            status_code=status.HTTP_409_CONFLICT
+        )
+
+class RateLimitError(AppError):
+    def __init__(self, retry_after: int):
+        super().__init__(
+            error_code="rate_limit_exceeded",
+            message=f"Rate limit exceeded. Retry after {retry_after} seconds",
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS
+        )
+```
+
+### Pagination — Cursor-based (recomendado para produccion)
+
+```python
+# src/schemas/pagination.py
+import base64
+from datetime import datetime
+from typing import Generic, TypeVar
+from pydantic import BaseModel
+
+T = TypeVar("T")
+
+class CursorPage(BaseModel, Generic[T]):
+    data: list[T]
+    next_cursor: str | None
+    has_more: bool
+    # NO incluir total_count por defecto — COUNT(*) es caro en tablas grandes
+
+def encode_cursor(dt: datetime) -> str:
+    """Cursor opaco basado en timestamp"""
+    return base64.urlsafe_b64encode(dt.isoformat().encode()).decode()
+
+def decode_cursor(cursor: str) -> datetime:
+    try:
+        decoded = base64.urlsafe_b64decode(cursor.encode()).decode()
+        return datetime.fromisoformat(decoded)
+    except Exception:
+        raise AppError("invalid_cursor", "Invalid pagination cursor", 400)
+
+# Uso en repository
+class OrderRepository:
+    async def list_for_user(
+        self,
+        user_id: UUID,
+        limit: int = 20,
+        cursor: str | None = None,
+        symbol: str | None = None,
+    ) -> CursorPage[Order]:
+        cursor_dt = decode_cursor(cursor) if cursor else None
+
+        query = (
+            select(Order)
+            .where(Order.user_id == user_id)
+            .where(Order.created_at < cursor_dt if cursor_dt else True)
+            .where(Order.symbol == symbol if symbol else True)
+            .order_by(Order.created_at.desc())
+            .limit(limit + 1)  # Pedimos 1 extra para detectar si hay mas
+        )
+        result = await self.db.execute(query)
+        orders = result.scalars().all()
+
+        has_more = len(orders) > limit
+        items = orders[:limit]
+        next_cursor = encode_cursor(items[-1].created_at) if has_more else None
+
+        return CursorPage(data=items, next_cursor=next_cursor, has_more=has_more)
+```
+
+---
+
+## 2. Authentication — JWT con Refresh Tokens
+
+### Implementacion completa de JWT con refresh token rotation
+
+```python
+# src/services/auth_service.py
+
+import secrets
+from datetime import datetime, timedelta
+from typing import Tuple
+from uuid import UUID, uuid4
+import jwt
+from passlib.context import CryptContext
+from sqlalchemy.ext.asyncio import AsyncSession
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+class AuthService:
+    ACCESS_TOKEN_EXPIRE = timedelta(minutes=15)   # Corto: 15 min
+    REFRESH_TOKEN_EXPIRE = timedelta(days=30)
+
+    def __init__(self, db: AsyncSession, settings: Settings):
+        self.db = db
+        self.secret = settings.JWT_SECRET
+        self.algorithm = "HS256"
+
+    def hash_password(self, password: str) -> str:
+        return pwd_context.hash(password)
+
+    def verify_password(self, plain: str, hashed: str) -> bool:
+        return pwd_context.verify(plain, hashed)
+
+    def create_access_token(self, user_id: UUID, email: str, role: str) -> str:
+        jti = str(uuid4())  # JWT ID — para blacklisting si es necesario
+        payload = {
+            "sub": str(user_id),
+            "email": email,
+            "role": role,
+            "jti": jti,
+            "iat": datetime.utcnow(),
+            "exp": datetime.utcnow() + self.ACCESS_TOKEN_EXPIRE,
+            "type": "access",
+        }
+        return jwt.encode(payload, self.secret, algorithm=self.algorithm)
+
+    def create_refresh_token(self) -> Tuple[str, str]:
+        """Retorna (token_string, token_hash_para_db)"""
+        token = secrets.token_urlsafe(64)  # 512 bits de entropia
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        return token, token_hash
+
+    async def login(self, email: str, password: str) -> dict:
+        user = await self._get_user_by_email(email)
+        if not user or not self.verify_password(password, user.password_hash):
+            # Mismo error para email y password — evitar user enumeration
+            raise AppError("invalid_credentials", "Invalid email or password", 401)
+
+        if not user.is_active:
+            raise AppError("account_disabled", "Account is disabled", 403)
+
+        # Crear tokens
+        access_token = self.create_access_token(user.id, user.email, user.role)
+        refresh_token_str, refresh_token_hash = self.create_refresh_token()
+
+        # Guardar refresh token en DB (invalida los anteriores de la "familia")
+        await self._save_refresh_token(
+            user_id=user.id,
+            token_hash=refresh_token_hash,
+            family=str(uuid4()),  # Nueva familia para cada login
+            expires_at=datetime.utcnow() + self.REFRESH_TOKEN_EXPIRE
+        )
+
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token_str,
+            "token_type": "bearer",
+            "expires_in": int(self.ACCESS_TOKEN_EXPIRE.total_seconds()),
+        }
+
+    async def refresh(self, refresh_token_str: str) -> dict:
+        """Refresh token rotation — invalida el usado y emite uno nuevo"""
+        token_hash = hashlib.sha256(refresh_token_str.encode()).hexdigest()
+
+        db_token = await self._get_refresh_token(token_hash)
+
+        if not db_token:
+            raise AppError("invalid_token", "Invalid refresh token", 401)
+
+        if db_token.is_revoked:
+            # ALERTA DE SEGURIDAD: Token reusado — posible robo
+            # Invalidar TODA la familia de tokens
+            await self._revoke_family(db_token.family)
+            raise AppError("token_reuse_detected", "Security violation detected", 401)
+
+        if db_token.expires_at < datetime.utcnow():
+            raise AppError("token_expired", "Refresh token expired", 401)
+
+        # Marcar como usado (revocar)
+        await self._revoke_token(db_token.id)
+
+        # Emitir nuevos tokens
+        user = await self._get_user_by_id(db_token.user_id)
+        access_token = self.create_access_token(user.id, user.email, user.role)
+        new_refresh_str, new_refresh_hash = self.create_refresh_token()
+
+        # Guardar nuevo refresh token en la MISMA familia
+        await self._save_refresh_token(
+            user_id=user.id,
+            token_hash=new_refresh_hash,
+            family=db_token.family,
+            expires_at=datetime.utcnow() + self.REFRESH_TOKEN_EXPIRE
+        )
+
+        return {
+            "access_token": access_token,
+            "refresh_token": new_refresh_str,
+            "token_type": "bearer",
+            "expires_in": int(self.ACCESS_TOKEN_EXPIRE.total_seconds()),
+        }
+
+    async def logout(self, refresh_token_str: str):
+        """Revocar el refresh token actual"""
+        token_hash = hashlib.sha256(refresh_token_str.encode()).hexdigest()
+        await self._revoke_token_by_hash(token_hash)
+
+    def verify_access_token(self, token: str) -> dict:
+        try:
+            payload = jwt.decode(token, self.secret, algorithms=[self.algorithm])
+            if payload.get("type") != "access":
+                raise AppError("invalid_token", "Invalid token type", 401)
+            return payload
+        except jwt.ExpiredSignatureError:
+            raise AppError("token_expired", "Access token expired", 401)
+        except jwt.InvalidTokenError:
+            raise AppError("invalid_token", "Invalid token", 401)
+```
+
+### Auth Middleware para FastAPI
+
+```python
+# src/middleware/auth.py
+
+from fastapi import Request
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from starlette.middleware.base import BaseHTTPMiddleware
+
+EXCLUDED_PATHS = {
+    "/api/auth/login",
+    "/api/auth/register",
+    "/api/auth/refresh",
+    "/api/v1/health",
+    "/api/docs",
+    "/api/docs/openapi.json",
+}
+
+class AuthMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, auth_service: AuthService):
+        super().__init__(app)
+        self.auth_service = auth_service
+
+    async def dispatch(self, request: Request, call_next):
+        # Skip auth para paths excluidos y WebSockets
+        if request.url.path in EXCLUDED_PATHS or request.url.path.startswith("/ws"):
+            return await call_next(request)
+
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return JSONResponse(
+                status_code=401,
+                content={"error": "missing_token", "message": "Authorization token required"}
+            )
+
+        token = auth_header.split(" ")[1]
+        try:
+            payload = self.auth_service.verify_access_token(token)
+            # Inyectar user info en el estado del request
+            request.state.user_id = UUID(payload["sub"])
+            request.state.user_role = payload["role"]
+            request.state.user_email = payload["email"]
+        except AppError as e:
+            return JSONResponse(status_code=e.status_code, content={"error": e.error_code, "message": e.message})
+
+        return await call_next(request)
+
+# Dependency para endpoints que necesitan el usuario
+def get_current_user(request: Request) -> CurrentUser:
+    if not hasattr(request.state, "user_id"):
+        raise AppError("unauthorized", "Authentication required", 401)
+    return CurrentUser(
+        id=request.state.user_id,
+        role=request.state.user_role,
+        email=request.state.user_email
+    )
+
+def require_role(required_role: str):
+    def check_role(user: CurrentUser = Depends(get_current_user)):
+        if user.role != required_role and user.role != "admin":
+            raise AppError("forbidden", "Insufficient permissions", 403)
+        return user
+    return check_role
+```
+
+---
+
+## 3. Database Patterns — Repository + Unit of Work
+
+### Repository Pattern con SQLAlchemy async
+
+```python
+# src/repositories/base.py
+
+from typing import Generic, TypeVar, Type
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, update, delete
+
+ModelT = TypeVar("ModelT")
+
+class BaseRepository(Generic[ModelT]):
+    def __init__(self, db: AsyncSession, model: Type[ModelT]):
+        self.db = db
+        self.model = model
+
+    async def get_by_id(self, id: UUID) -> ModelT | None:
+        result = await self.db.execute(
+            select(self.model).where(self.model.id == id)
+        )
+        return result.scalar_one_or_none()
+
+    async def get_by_id_or_raise(self, id: UUID) -> ModelT:
+        obj = await self.get_by_id(id)
+        if not obj:
+            raise ResourceNotFoundError(self.model.__name__, str(id))
+        return obj
+
+    async def save(self, obj: ModelT) -> ModelT:
+        self.db.add(obj)
+        await self.db.flush()  # flush, no commit — el commit lo hace el UoW
+        await self.db.refresh(obj)
+        return obj
+
+    async def delete(self, id: UUID) -> bool:
+        result = await self.db.execute(
+            delete(self.model).where(self.model.id == id)
+        )
+        return result.rowcount > 0
+
+# src/repositories/order_repository.py
+class OrderRepository(BaseRepository[Order]):
+    def __init__(self, db: AsyncSession):
+        super().__init__(db, Order)
+
+    async def list_for_user(
+        self,
+        user_id: UUID,
+        limit: int = 20,
+        cursor: datetime | None = None,
+        filters: dict | None = None
+    ) -> tuple[list[Order], str | None]:
+        query = (
+            select(Order)
+            .where(Order.user_id == user_id)
+            .order_by(Order.created_at.desc())
+        )
+
+        if cursor:
+            query = query.where(Order.created_at < cursor)
+
+        if filters:
+            if symbol := filters.get("symbol"):
+                query = query.where(Order.symbol == symbol)
+            if status := filters.get("status"):
+                query = query.where(Order.status == status)
+
+        query = query.limit(limit + 1)
+        result = await self.db.execute(query)
+        orders = list(result.scalars())
+
+        has_more = len(orders) > limit
+        items = orders[:limit]
+        next_cursor = encode_cursor(items[-1].created_at) if has_more and items else None
+
+        return items, next_cursor
+
+    async def count_pending_for_user(self, user_id: UUID) -> int:
+        result = await self.db.execute(
+            select(func.count(Order.id))
+            .where(Order.user_id == user_id)
+            .where(Order.status == "PENDING")
+        )
+        return result.scalar_one()
+```
+
+### Optimistic Locking — Evitar race conditions
+
+```python
+# Modelo con version para optimistic locking
+class Position(Base):
+    __tablename__ = "positions"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
+    symbol: Mapped[str] = mapped_column(nullable=False)
+    quantity: Mapped[Decimal] = mapped_column(Numeric(20, 8), nullable=False)
+    version: Mapped[int] = mapped_column(default=1, nullable=False)  # Version counter
+
+    __table_args__ = (
+        Index("ix_positions_user_symbol", "user_id", "symbol", unique=True),
+    )
+
+class PositionRepository(BaseRepository[Position]):
+    async def update_with_optimistic_lock(
+        self,
+        position_id: UUID,
+        updates: dict,
+        expected_version: int
+    ) -> Position:
+        result = await self.db.execute(
+            update(Position)
+            .where(Position.id == position_id)
+            .where(Position.version == expected_version)  # Solo actualiza si version coincide
+            .values(**updates, version=expected_version + 1)
+            .returning(Position)
+        )
+        updated = result.scalar_one_or_none()
+        if not updated:
+            raise AppError(
+                "optimistic_lock_conflict",
+                "Position was modified by another process. Please retry.",
+                409
+            )
+        return updated
+```
+
+---
+
+## 4. Async Patterns — Queues y Background Jobs
+
+### Redis Streams para message queue
+
+```python
+# src/queue/publisher.py
+
+import json
+from uuid import uuid4
+from datetime import datetime
+import redis.asyncio as redis
+
+class EventPublisher:
+    def __init__(self, redis_client: redis.Redis):
+        self.redis = redis_client
+
+    async def publish(self, stream: str, event_type: str, payload: dict) -> str:
+        """Publica un evento en un Redis Stream"""
+        message = {
+            "event_id": str(uuid4()),
+            "event_type": event_type,
+            "occurred_at": datetime.utcnow().isoformat(),
+            "payload": json.dumps(payload),
+        }
+        # XADD retorna el message ID del stream
+        message_id = await self.redis.xadd(stream, message, maxlen=10000)
+        return message_id
+
+# src/queue/consumer.py
+
+class EventConsumer:
+    def __init__(self, redis_client: redis.Redis, consumer_group: str, consumer_name: str):
+        self.redis = redis_client
+        self.group = consumer_group
+        self.name = consumer_name
+
+    async def create_group(self, stream: str):
+        try:
+            await self.redis.xgroup_create(stream, self.group, id="$", mkstream=True)
+        except redis.ResponseError as e:
+            if "BUSYGROUP" not in str(e):
+                raise
+
+    async def consume(self, stream: str, batch_size: int = 10):
+        """Lee y procesa mensajes del stream"""
+        while True:
+            try:
+                # XREADGROUP: leer mensajes no procesados por este consumer
+                messages = await self.redis.xreadgroup(
+                    groupname=self.group,
+                    consumername=self.name,
+                    streams={stream: ">"},  # ">" = solo mensajes nuevos
+                    count=batch_size,
+                    block=5000,  # Block 5 segundos si no hay mensajes
+                )
+
+                if not messages:
+                    continue
+
+                for stream_name, batch in messages:
+                    for message_id, data in batch:
+                        try:
+                            await self.process_message(data)
+                            # ACK despues de procesamiento exitoso
+                            await self.redis.xack(stream, self.group, message_id)
+                        except Exception as e:
+                            logger.error("message_processing_failed",
+                                       message_id=message_id, error=str(e))
+                            # El mensaje queda en el PEL (pending entries list)
+                            # Un proceso de recovery lo reintentara
+
+            except Exception as e:
+                logger.error("consumer_error", error=str(e))
+                await asyncio.sleep(5)
+
+    async def process_message(self, data: dict):
+        event_type = data[b"event_type"].decode()
+        payload = json.loads(data[b"payload"].decode())
+
+        handlers = {
+            "order_filled": self.handle_order_filled,
+            "position_opened": self.handle_position_opened,
+        }
+
+        handler = handlers.get(event_type)
+        if handler:
+            await handler(payload)
+        else:
+            logger.warning("unknown_event_type", event_type=event_type)
+
+    async def handle_order_filled(self, payload: dict):
+        # Actualizar portfolio, notificar usuario, etc.
+        pass
+```
+
+### Celery con Redis para background jobs
+
+```python
+# src/worker/celery_app.py
+
+from celery import Celery
+from celery.utils.log import get_task_logger
+
+celery_app = Celery(
+    "trading_bot",
+    broker="redis://localhost:6379/1",
+    backend="redis://localhost:6379/2",
+    include=["src.worker.tasks"],
+)
+
+celery_app.conf.update(
+    task_serializer="json",
+    accept_content=["json"],
+    result_serializer="json",
+    timezone="UTC",
+    enable_utc=True,
+    # Retry settings
+    task_acks_late=True,           # ACK despues de ejecutar (no al recibir)
+    task_reject_on_worker_lost=True,  # Requeue si el worker muere
+    # Timeouts
+    task_soft_time_limit=55,       # SoftTimeLimitExceeded a los 55s
+    task_time_limit=60,            # Hard kill a los 60s
+    # Rate limits
+    task_annotations={
+        "src.worker.tasks.sync_market_data": {"rate_limit": "10/m"}
+    },
+    # Retry backoff exponencial por defecto
+    task_default_retry_delay=60,
+    task_max_retries=3,
+)
+
+# src/worker/tasks.py
+logger = get_task_logger(__name__)
+
+@celery_app.task(
+    bind=True,
+    max_retries=3,
+    default_retry_delay=30,
+    autoretry_for=(Exception,),
+    retry_backoff=True,           # Exponential backoff
+    retry_backoff_max=300,        # Max 5 minutos entre reintentos
+    retry_jitter=True,            # Evitar thundering herd
+)
+def sync_portfolio_state(self, user_id: str):
+    """Sincroniza el estado del portfolio con el exchange"""
+    try:
+        with get_db_sync() as db:
+            portfolio_service = PortfolioService(db)
+            portfolio_service.sync_from_exchange(UUID(user_id))
+    except BinanceAPIError as exc:
+        logger.error("binance_sync_failed", user_id=user_id, error=str(exc))
+        raise self.retry(exc=exc)
+    except Exception as exc:
+        logger.exception("unexpected_error", user_id=user_id)
+        raise
+
+# Scheduled tasks con celery beat
+celery_app.conf.beat_schedule = {
+    "sync-all-portfolios-every-5min": {
+        "task": "src.worker.tasks.sync_all_portfolios",
+        "schedule": 300.0,  # cada 5 minutos
+    },
+    "cleanup-expired-tokens-daily": {
+        "task": "src.worker.tasks.cleanup_expired_tokens",
+        "schedule": crontab(hour=3, minute=0),  # 3am UTC
+    },
+}
+```
+
+---
+
+## 5. Caching Strategies
+
+### Cache-aside (Lazy Loading) — el patron mas comun
+
+```python
+# src/cache/strategies.py
+
+import hashlib
+import json
+from functools import wraps
+from typing import Callable
+import redis.asyncio as redis
+
+class CacheService:
+    def __init__(self, redis_client: redis.Redis):
+        self.redis = redis_client
+        self.default_ttl = 300  # 5 minutos
+
+    async def get(self, key: str) -> dict | None:
+        data = await self.redis.get(key)
+        return json.loads(data) if data else None
+
+    async def set(self, key: str, value: dict, ttl: int | None = None) -> None:
+        await self.redis.setex(
+            key,
+            ttl or self.default_ttl,
+            json.dumps(value, default=str)
+        )
+
+    async def invalidate(self, pattern: str) -> int:
+        """Invalida todas las keys que coincidan con el pattern"""
+        keys = await self.redis.keys(pattern)
+        if keys:
+            return await self.redis.delete(*keys)
+        return 0
+
+    async def get_or_set(
+        self,
+        key: str,
+        fetch_fn: Callable,
+        ttl: int | None = None
+    ):
+        """Cache-aside: busca en cache, si no existe llama fetch_fn"""
+        cached = await self.get(key)
+        if cached is not None:
+            return cached
+
+        # Cache miss — obtener dato real
+        value = await fetch_fn()
+        if value is not None:
+            await self.set(key, value, ttl)
         return value
 
-    elif context == "email":
-        # Email: Validate and normalize
-        email = value.strip().lower()
-        if "@" not in email or len(email) < 5:
-            raise ValueError("Invalid email")
-        return email
+# Uso en service
+class MarketService:
+    def __init__(self, cache: CacheService, binance: BinanceClient):
+        self.cache = cache
+        self.binance = binance
 
-    elif context == "filename":
-        # Filename: Remove path traversal attempts
-        filename = value.split("/")[-1].split("\\")[-1]
-        if filename.startswith("."):
-            raise ValueError("Invalid filename")
-        return filename
+    async def get_ticker(self, symbol: str) -> dict:
+        key = f"ticker:{symbol}"
+        return await self.cache.get_or_set(
+            key=key,
+            fetch_fn=lambda: self.binance.get_ticker(symbol),
+            ttl=5  # 5 segundos — dato muy volatile
+        )
 
-    elif context == "sql":
-        # SQL: Use parameterized queries ONLY (never string concatenation)
-        # NEVER do: f"SELECT * FROM users WHERE id = {user_id}"
-        # ALWAYS do: await db.execute(text("SELECT * FROM users WHERE id = :id"), {"id": user_id})
-        pass
+    async def get_user_portfolio(self, user_id: UUID) -> dict:
+        key = f"portfolio:{user_id}"
+        return await self.cache.get_or_set(
+            key=key,
+            fetch_fn=lambda: self._fetch_portfolio_from_db(user_id),
+            ttl=60  # 1 minuto — se invalida al hacer trades
+        )
 
-    elif context == "json":
-        # JSON: Limit depth to prevent DoS
-        parsed = json.loads(value)
-        assert_json_depth(parsed, max_depth=10)
-        return json.dumps(parsed)
-
-    return value.strip()[:1000]  # Generic: trim whitespace, limit length
+    async def invalidate_user_portfolio(self, user_id: UUID):
+        """Llamar despues de cada trade"""
+        await self.cache.invalidate(f"portfolio:{user_id}")
 ```
 
-### SQL Injection Prevention
+### Cache keys con namespacing y versioning
 
 ```python
-# VULNERABLE - NEVER DO THIS
-@app.get("/api/v1/users/{user_id}")
-async def get_user_unsafe(user_id: str):
-    query = f"SELECT * FROM users WHERE id = '{user_id}'"  # INJECTABLE
-    result = await db.execute(text(query))
-    return result.first()
+class CacheKeys:
+    """Centralizar la definicion de cache keys evita colisiones y facilita invalidacion"""
+    VERSION = "v1"
 
-# SAFE - Use parameterized queries
-@app.get("/api/v1/users/{user_id}")
-async def get_user_safe(user_id: str):
-    query = text("SELECT * FROM users WHERE id = :user_id")
-    result = await db.execute(query, {"user_id": user_id})
-    return result.first()
+    @staticmethod
+    def ticker(symbol: str) -> str:
+        return f"{CacheKeys.VERSION}:ticker:{symbol}"
 
-# SAFE - ORM prevents injection automatically
-@app.get("/api/v1/users/{user_id}")
-async def get_user_orm(user_id: str):
-    user = await db.query(User).filter(User.id == user_id).first()
-    return user
+    @staticmethod
+    def user_portfolio(user_id: UUID) -> str:
+        return f"{CacheKeys.VERSION}:portfolio:{user_id}"
+
+    @staticmethod
+    def user_orders(user_id: UUID, page: int = 1) -> str:
+        return f"{CacheKeys.VERSION}:orders:{user_id}:page:{page}"
+
+    @staticmethod
+    def rate_limit(key: str) -> str:
+        return f"{CacheKeys.VERSION}:ratelimit:{key}"
 ```
 
-### SSRF Prevention
+---
+
+## 6. Rate Limiting — Token Bucket con Redis
 
 ```python
-from urllib.parse import urlparse
-import socket
+# src/middleware/rate_limiter.py
 
-def is_safe_url(url: str) -> bool:
-    """Prevent Server-Side Request Forgery attacks"""
-    try:
-        parsed = urlparse(url)
+import time
+from starlette.middleware.base import BaseHTTPMiddleware
 
-        # Only allow http/https
-        if parsed.scheme not in ["http", "https"]:
-            return False
+class RateLimiterMiddleware(BaseHTTPMiddleware):
+    """
+    Implementa rate limiting por IP y por usuario autenticado.
+    Usa Token Bucket via script Lua en Redis (atomico).
+    """
 
-        # Resolve hostname to IP and check against blocklist
-        ip = socket.gethostbyname(parsed.hostname)
+    RATE_LIMITS = {
+        # (tokens_por_segundo, capacidad_maxima, burst_permitido)
+        "default": (10, 60, 30),          # 10 req/s, burst de 30
+        "api/auth": (2, 10, 5),           # Auth endpoints: 2 req/s
+        "api/orders": (5, 30, 10),        # Trading: 5 req/s
+        "api/market": (50, 300, 100),     # Market data: mas liberal
+    }
 
-        # Block private IP ranges
-        blocked_ranges = [
-            "127.0.0.0/8",      # Loopback
-            "10.0.0.0/8",       # Private
-            "172.16.0.0/12",    # Private
-            "192.168.0.0/16",   # Private
-            "169.254.0.0/16",   # Link-local
-            "0.0.0.0/8",        # Current network
-            "255.255.255.255/32" # Broadcast
-        ]
+    TOKEN_BUCKET_LUA = """
+    local key = KEYS[1]
+    local rate = tonumber(ARGV[1])
+    local capacity = tonumber(ARGV[2])
+    local now = tonumber(ARGV[3])
+    local cost = tonumber(ARGV[4])  -- Cuantos tokens cuesta esta request
 
-        ip_obj = ipaddress.ip_address(ip)
-        for blocked in blocked_ranges:
-            if ip_obj in ipaddress.ip_network(blocked):
-                return False
+    local bucket = redis.call('HMGET', key, 'tokens', 'last_refill')
+    local tokens = tonumber(bucket[1])
+    local last_refill = tonumber(bucket[2])
 
-        return True
-    except Exception:
-        return False
+    if not tokens then
+        tokens = capacity
+        last_refill = now
+    end
 
-# Usage
-@app.post("/api/v1/webhooks/notify")
-async def notify_webhook(url: str):
-    if not is_safe_url(url):
-        raise HTTPException(status_code=400, detail="Invalid URL")
+    -- Refill tokens basado en tiempo transcurrido
+    local elapsed = now - last_refill
+    tokens = math.min(capacity, tokens + elapsed * rate)
 
-    async with httpx.AsyncClient() as client:
-        response = await client.post(url, json={"event": "triggered"})
+    local allowed = tokens >= cost
+    if allowed then
+        tokens = tokens - cost
+    end
+
+    -- Guardar estado con TTL automatico
+    redis.call('HMSET', key, 'tokens', tokens, 'last_refill', now)
+    redis.call('EXPIRE', key, math.ceil(capacity / rate) + 10)
+
+    -- Retornar: allowed, tokens_remaining, reset_time
+    local reset_time = math.ceil((capacity - tokens) / rate)
+    return {allowed and 1 or 0, math.floor(tokens), reset_time}
+    """
+
+    def __init__(self, app, redis_client):
+        super().__init__(app)
+        self.redis = redis_client
+
+    async def dispatch(self, request: Request, call_next):
+        # Determinar el limite aplicable
+        path = request.url.path
+        rate, capacity, _ = self.RATE_LIMITS.get("default", (10, 60, 30))
+
+        for prefix, limits in self.RATE_LIMITS.items():
+            if prefix != "default" and path.startswith(f"/{prefix}"):
+                rate, capacity, _ = limits
+                break
+
+        # Key: usuario autenticado > IP
+        user_id = getattr(request.state, "user_id", None)
+        ip = request.client.host
+        bucket_key = f"ratelimit:{user_id or ip}:{path.split('/')[2]}"
+
+        result = await self.redis.eval(
+            self.TOKEN_BUCKET_LUA,
+            1, bucket_key,
+            rate, capacity,
+            time.time(),
+            1  # Costo de esta request: 1 token
+        )
+
+        allowed, tokens_remaining, reset_time = result
+
+        if not allowed:
+            return JSONResponse(
+                status_code=429,
+                content={"error": "rate_limit_exceeded", "message": f"Retry after {reset_time}s"},
+                headers={
+                    "X-RateLimit-Limit": str(capacity),
+                    "X-RateLimit-Remaining": "0",
+                    "X-RateLimit-Reset": str(int(time.time()) + reset_time),
+                    "Retry-After": str(reset_time),
+                }
+            )
+
+        response = await call_next(request)
+        response.headers["X-RateLimit-Limit"] = str(capacity)
+        response.headers["X-RateLimit-Remaining"] = str(tokens_remaining)
+        return response
 ```
 
-### Dependency Vulnerability Scanning
+---
 
-```bash
-# Python: Check for known vulnerabilities
-pip install safety
-safety check
+## 7. Testing Pyramid — pytest completo
 
-# Node.js: Built-in npm audit
-npm audit
-npm audit fix  # Auto-fix where possible
-
-# GitHub: Dependabot automatically checks and creates PRs
-
-# Programmatic check (Python)
-from safety.cli import check_from_file
-from pathlib import Path
-
-def scan_dependencies():
-    requirements_file = Path("requirements.txt")
-    vulnerable = check_from_file(requirements_file)
-    if vulnerable:
-        logger.critical("vulnerable_dependencies_found", count=len(vulnerable))
-        raise RuntimeError(f"Found {len(vulnerable)} vulnerable packages")
-```
-
-### Secret Rotation Strategy
+### Unit Tests — logica de negocio aislada
 
 ```python
+# tests/unit/test_risk_service.py
+import pytest
+from unittest.mock import AsyncMock, MagicMock
+from decimal import Decimal
+from uuid import uuid4
+
+from src.services.risk_service import RiskService
+from src.exceptions import RiskViolationError
+
+@pytest.fixture
+def mock_portfolio_repo():
+    return AsyncMock()
+
+@pytest.fixture
+def risk_service(mock_portfolio_repo):
+    return RiskService(portfolio_repo=mock_portfolio_repo)
+
+class TestRiskService:
+    async def test_blocks_position_exceeding_10_percent(self, risk_service, mock_portfolio_repo):
+        """Position > 10% del portfolio debe ser rechazada"""
+        user_id = uuid4()
+        mock_portfolio_repo.get_total_value.return_value = Decimal("10000.00")
+        mock_portfolio_repo.get_position_value.return_value = Decimal("0.00")
+
+        with pytest.raises(RiskViolationError) as exc_info:
+            await risk_service.validate_position_size(
+                user_id=user_id,
+                symbol="BTCUSDT",
+                order_value=Decimal("1500.00"),  # 15% del portfolio
+            )
+
+        assert exc_info.value.error_code == "risk_violation"
+        assert "max_position_size" in str(exc_info.value.message).lower()
+
+    async def test_allows_position_at_exactly_10_percent(self, risk_service, mock_portfolio_repo):
+        """Position == 10% debe ser permitida (limite inclusivo)"""
+        user_id = uuid4()
+        mock_portfolio_repo.get_total_value.return_value = Decimal("10000.00")
+        mock_portfolio_repo.get_position_value.return_value = Decimal("0.00")
+
+        # No debe lanzar excepcion
+        await risk_service.validate_position_size(
+            user_id=user_id,
+            symbol="BTCUSDT",
+            order_value=Decimal("1000.00"),  # Exactamente 10%
+        )
+
+    async def test_considers_existing_position_in_check(self, risk_service, mock_portfolio_repo):
+        """Si ya hay una posicion abierta, debe sumarse al calculo"""
+        user_id = uuid4()
+        mock_portfolio_repo.get_total_value.return_value = Decimal("10000.00")
+        mock_portfolio_repo.get_position_value.return_value = Decimal("800.00")  # Posicion actual: 8%
+
+        with pytest.raises(RiskViolationError):
+            # 8% existente + 5% nueva = 13% > 10% limite
+            await risk_service.validate_position_size(
+                user_id=user_id,
+                symbol="BTCUSDT",
+                order_value=Decimal("500.00"),  # 5%
+            )
+```
+
+### Integration Tests — con DB real en transaccion
+
+```python
+# tests/integration/test_order_repository.py
+import pytest
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, AsyncSessionMaker
+from src.repositories.order_repository import OrderRepository
+
+# conftest.py
+@pytest.fixture(scope="session")
+def engine():
+    return create_async_engine(
+        "postgresql+asyncpg://test:test@localhost:5432/trading_test",
+        echo=False
+    )
+
+@pytest.fixture
+async def db(engine):
+    """Cada test usa su propia transaccion que se revierte al final"""
+    async with engine.begin() as conn:
+        # Crear schema
+        await conn.run_sync(Base.metadata.create_all)
+
+    async with AsyncSession(engine) as session:
+        async with session.begin():
+            yield session
+            await session.rollback()  # Siempre rollback — test isolation
+
+@pytest.fixture
+def order_repo(db):
+    return OrderRepository(db)
+
+class TestOrderRepository:
+    async def test_list_returns_orders_for_correct_user(self, order_repo, db):
+        user_id = uuid4()
+        other_user_id = uuid4()
+
+        # Crear ordenes para el usuario objetivo
+        for i in range(3):
+            db.add(Order(user_id=user_id, symbol="BTCUSDT", side="BUY", quantity=0.1, status="FILLED"))
+
+        # Crear orden para otro usuario
+        db.add(Order(user_id=other_user_id, symbol="ETHUSDT", side="BUY", quantity=1.0, status="FILLED"))
+        await db.flush()
+
+        orders, cursor = await order_repo.list_for_user(user_id=user_id, limit=10)
+
+        assert len(orders) == 3
+        assert all(o.user_id == user_id for o in orders)
+
+    async def test_pagination_cursor_works_correctly(self, order_repo, db):
+        user_id = uuid4()
+        # Crear 5 ordenes con timestamps distintos
+        for i in range(5):
+            order = Order(
+                user_id=user_id,
+                symbol="BTCUSDT",
+                side="BUY",
+                quantity=0.1,
+                status="FILLED",
+                created_at=datetime(2024, 1, i + 1)
+            )
+            db.add(order)
+        await db.flush()
+
+        # Primera pagina: 3 items
+        page1, cursor1 = await order_repo.list_for_user(user_id=user_id, limit=3)
+        assert len(page1) == 3
+        assert cursor1 is not None
+
+        # Segunda pagina usando el cursor
+        page2, cursor2 = await order_repo.list_for_user(user_id=user_id, limit=3, cursor=cursor1)
+        assert len(page2) == 2
+        assert cursor2 is None  # No hay mas paginas
+```
+
+### Performance Tests — detectar N+1 queries
+
+```python
+# tests/performance/test_n_plus_one.py
+import pytest
+from sqlalchemy import event
+
+class QueryCounter:
+    """Context manager que cuenta las queries ejecutadas"""
+    def __init__(self, db):
+        self.db = db
+        self.count = 0
+
+    def __enter__(self):
+        event.listen(self.db.sync_session.bind, "before_cursor_execute", self._count)
+        return self
+
+    def __exit__(self, *args):
+        event.remove(self.db.sync_session.bind, "before_cursor_execute", self._count)
+
+    def _count(self, *args, **kwargs):
+        self.count += 1
+
+async def test_get_orders_with_trades_no_n_plus_one(db, order_repo):
+    """Verificar que cargar 20 ordenes con trades usa exactamente 2 queries (no 21)"""
+    user_id = uuid4()
+
+    # Crear 20 ordenes con trades
+    for i in range(20):
+        order = Order(user_id=user_id, ...)
+        db.add(order)
+        trade = Trade(order=order, ...)
+        db.add(trade)
+    await db.flush()
+
+    with QueryCounter(db) as counter:
+        orders = await order_repo.get_orders_with_trades(user_id, limit=20)
+
+    # Debe usar: 1 query para orders + 1 query para todos los trades (JOIN o IN)
+    # NO 1 query por trade (N+1)
+    assert counter.count <= 2, f"Expected <= 2 queries, got {counter.count} (N+1 detected!)"
+```
+
+---
+
+## 8. NestJS — Implementacion Completa
+
+```typescript
+// src/orders/orders.module.ts
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { OrdersController } from './orders.controller';
+import { OrdersService } from './orders.service';
+import { OrdersRepository } from './orders.repository';
+import { Order } from './entities/order.entity';
+import { RiskModule } from '../risk/risk.module';
+import { CacheModule } from '../cache/cache.module';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([Order]),
+    RiskModule,
+    CacheModule,
+  ],
+  controllers: [OrdersController],
+  providers: [OrdersService, OrdersRepository],
+  exports: [OrdersService],
+})
+export class OrdersModule {}
+
+// src/orders/entities/order.entity.ts
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Index, ManyToOne } from 'typeorm';
+
+@Entity('orders')
+export class Order {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Index()
+  @Column('uuid')
+  userId: string;
+
+  @Column({ length: 20 })
+  symbol: string;
+
+  @Column({ type: 'enum', enum: ['BUY', 'SELL'] })
+  side: 'BUY' | 'SELL';
+
+  @Column({ type: 'decimal', precision: 20, scale: 8 })
+  quantity: string;
+
+  @Column({
+    type: 'enum',
+    enum: ['PENDING', 'FILLED', 'CANCELLED', 'REJECTED'],
+    default: 'PENDING',
+  })
+  status: string;
+
+  @Column({ nullable: true })
+  exchangeOrderId: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+}
+
+// src/orders/orders.controller.ts
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+  ParseUUIDPipe,
+} from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { OrdersService } from './orders.service';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { ListOrdersDto } from './dto/list-orders.dto';
+
+@ApiTags('Orders')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('orders')
+export class OrdersController {
+  constructor(private readonly ordersService: OrdersService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'List orders with cursor pagination' })
+  @ApiResponse({ status: 200, description: 'Returns paginated orders' })
+  async list(@CurrentUser() user: AuthUser, @Query() query: ListOrdersDto) {
+    return this.ordersService.listForUser(user.id, query);
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Place a new order' })
+  @ApiResponse({ status: 201, description: 'Order placed successfully' })
+  @ApiResponse({ status: 409, description: 'Risk violation or conflict' })
+  async create(@CurrentUser() user: AuthUser, @Body() dto: CreateOrderDto) {
+    return this.ordersService.placeOrder(user.id, dto);
+  }
+
+  @Get(':id')
+  async getOne(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.ordersService.getOrderForUser(user.id, id);
+  }
+}
+
+// src/orders/dto/create-order.dto.ts
+import { IsString, IsEnum, IsNumber, IsPositive, IsOptional, Max, Matches } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+
+export class CreateOrderDto {
+  @ApiProperty({ example: 'BTCUSDT' })
+  @IsString()
+  @Matches(/^[A-Z]{2,10}USDT$/, { message: 'Symbol must be a valid USDT pair' })
+  symbol: string;
+
+  @ApiProperty({ enum: ['BUY', 'SELL'] })
+  @IsEnum(['BUY', 'SELL'])
+  side: 'BUY' | 'SELL';
+
+  @ApiProperty({ example: 0.001, minimum: 0 })
+  @IsNumber({ maxDecimalPlaces: 8 })
+  @IsPositive()
+  @Max(100)
+  quantity: number;
+
+  @ApiProperty({ enum: ['MARKET', 'LIMIT'], default: 'MARKET' })
+  @IsEnum(['MARKET', 'LIMIT'])
+  @IsOptional()
+  orderType: 'MARKET' | 'LIMIT' = 'MARKET';
+
+  @ApiProperty({ required: false })
+  @IsNumber({ maxDecimalPlaces: 8 })
+  @IsPositive()
+  @IsOptional()
+  price?: number;
+}
+
+// src/orders/orders.service.ts
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { RiskService } from '../risk/risk.service';
+import { BinanceService } from '../binance/binance.service';
+import { CacheService } from '../cache/cache.service';
+
+@Injectable()
+export class OrdersService {
+  constructor(
+    private readonly ordersRepo: OrdersRepository,
+    private readonly riskService: RiskService,
+    private readonly binance: BinanceService,
+    private readonly cache: CacheService,
+    private readonly dataSource: DataSource,
+  ) {}
+
+  async placeOrder(userId: string, dto: CreateOrderDto): Promise<Order> {
+    // Validacion de riesgo antes de la transaccion
+    await this.riskService.validateOrder(userId, dto);
+
+    // Usar QueryRunner para transaccion manual
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // Enviar al exchange
+      const exchangeOrder = await this.binance.placeOrder({
+        symbol: dto.symbol,
+        side: dto.side,
+        type: dto.orderType,
+        quantity: dto.quantity,
+        price: dto.price,
+      });
+
+      // Persistir en DB
+      const order = queryRunner.manager.create(Order, {
+        userId,
+        symbol: dto.symbol,
+        side: dto.side,
+        quantity: String(dto.quantity),
+        status: 'PENDING',
+        exchangeOrderId: exchangeOrder.orderId,
+      });
+      await queryRunner.manager.save(order);
+      await queryRunner.commitTransaction();
+
+      // Invalidar cache de portfolio
+      await this.cache.invalidate(`portfolio:${userId}`);
+
+      return order;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      // Si ya fue enviado al exchange pero fallo la DB, necesitamos cancelar
+      // Esto es un saga — ver senior-architect para el patron completo
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+}
+```
+
+---
+
+## 9. Connection Pooling y Query Optimization
+
+```python
+# src/database.py — configuracion optima del pool
+
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+
+engine = create_async_engine(
+    settings.DATABASE_URL,
+    # Pool sizing: (num_cores * 2) + num_spindles
+    # Para 4 cores con SSD: (4 * 2) + 1 = 9 → redondear a 10-20
+    pool_size=20,
+    max_overflow=40,        # Extra conexiones bajo alta carga
+    pool_timeout=30,        # Tiempo max esperando conexion del pool
+    pool_recycle=3600,      # Reciclar conexiones cada hora (evitar timeout de DB)
+    pool_pre_ping=True,     # Verificar conexion antes de usar (detecta connections muertas)
+    echo=settings.DEBUG,    # Log de SQL en desarrollo
+    connect_args={
+        "statement_timeout": "30000",     # 30s timeout por statement
+        "lock_timeout": "10000",           # 10s timeout para locks
+        "connect_timeout": 10,
+    }
+)
+
+AsyncSessionMaker = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False  # Importante para async: no expire al hacer commit
+)
+
+# Dependency injection
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionMaker() as session:
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise
+```
+
+### Query Optimization — Detectar queries lentas
+
+```sql
+-- PostgreSQL: queries lentas (>100ms) en los ultimos 5 minutos
+SELECT
+    query,
+    calls,
+    mean_exec_time::int as avg_ms,
+    max_exec_time::int as max_ms,
+    total_exec_time::int / 1000 as total_sec,
+    rows
+FROM pg_stat_statements
+WHERE mean_exec_time > 100
+ORDER BY mean_exec_time DESC
+LIMIT 20;
+
+-- Indices que no se usan (candidatos para eliminar)
+SELECT
+    schemaname, tablename, indexname,
+    idx_scan as scans,
+    pg_size_pretty(pg_relation_size(indexrelid)) as size
+FROM pg_stat_user_indexes
+WHERE idx_scan < 10
+ORDER BY pg_relation_size(indexrelid) DESC;
+
+-- Tablas con muchos sequential scans (candidatos para nuevos indices)
+SELECT
+    relname as table,
+    seq_scan as seq_scans,
+    idx_scan as idx_scans,
+    n_live_tup as rows
+FROM pg_stat_user_tables
+WHERE seq_scan > 1000
+ORDER BY seq_scan DESC;
+```
+
+```python
+# src/repositories/base.py — EXPLAIN ANALYZE en desarrollo
+
 import os
-from datetime import datetime, timedelta
+from sqlalchemy import text
 
-class SecretManager:
-    def __init__(self, vault_client):
-        self.vault = vault_client
-        self.cache = {}
-        self.cache_ttl = timedelta(hours=1)
+async def explain_query(db: AsyncSession, query) -> str:
+    """Solo en desarrollo — muestra el plan de ejecucion"""
+    if os.getenv("ENV") != "development":
+        return ""
 
-    async def get_secret(self, secret_name: str) -> str:
-        """Get secret with TTL-based caching"""
-        cache_key = f"{secret_name}_cached_at"
-
-        # Check if cached and not expired
-        if secret_name in self.cache:
-            cached_at = self.cache.get(cache_key)
-            if cached_at and datetime.utcnow() - cached_at < self.cache_ttl:
-                return self.cache[secret_name]
-
-        # Fetch from vault
-        secret = await self.vault.read(secret_name)
-        self.cache[secret_name] = secret
-        self.cache[cache_key] = datetime.utcnow()
-
-        return secret
-
-    async def rotate_secret(self, secret_name: str, new_secret: str):
-        """Rotate secret with zero-downtime"""
-        # Step 1: Create new secret version
-        secret_version = f"{secret_name}:v2"
-        await self.vault.write(secret_version, new_secret)
-
-        # Step 2: Update application to accept both old and new
-        # (Update .env or config to read from secret_version)
-
-        # Step 3: Wait for all servers to pick up new config
-        await asyncio.sleep(300)  # 5 minutes grace period
-
-        # Step 4: Delete old secret version
-        await self.vault.delete(secret_name)
-
-        # Step 5: Rename new version to primary
-        await self.vault.write(secret_name, new_secret)
-        await self.vault.delete(secret_version)
-
-# Usage
-@app.on_event("startup")
-async def load_secrets():
-    app.state.database_password = await secret_manager.get_secret("db_password")
-    app.state.jwt_secret = await secret_manager.get_secret("jwt_secret_key")
+    compiled = query.compile(dialect=db.bind.dialect)
+    explain_sql = f"EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) {compiled}"
+    result = await db.execute(text(explain_sql), compiled.params)
+    return "\n".join(row[0] for row in result)
 ```
 
-This reference covers production-grade backend practices across all critical domains. Consult specific sections when designing APIs, optimizing databases, hardening security, or implementing testing strategies.
+---
+
+## 10. Backend Code Review Checklist (50+ puntos)
+
+### API Design
+- [ ] Los endpoints usan sustantivos plurales, no verbos
+- [ ] Los codigos HTTP son semanticamente correctos (201 para creacion, 204 para delete)
+- [ ] Los errores de validacion retornan 422 con campo y mensaje especifico
+- [ ] Todos los endpoints de lista tienen paginacion (no devuelven arrays sin limite)
+- [ ] Los endpoints GET son idempotentes y cacheables
+- [ ] Hay versionado en la URL para APIs publicas (/v1/)
+- [ ] El OpenAPI/Swagger esta actualizado con ejemplos reales
+- [ ] Los campos de respuesta no tienen informacion sensible (passwords, tokens internos)
+
+### Autenticacion y Autorizacion
+- [ ] Todos los endpoints protegidos validan el JWT
+- [ ] Los tokens de acceso tienen expiry <= 15 minutos
+- [ ] Los refresh tokens tienen rotation implementada
+- [ ] El middleware excluye correctamente los endpoints publicos
+- [ ] Los errores de auth son identicos para email vs password incorrecto (evitar enumeration)
+- [ ] Los endpoints de admin verifican el rol explicitamente
+- [ ] Los usuarios solo pueden ver/modificar sus propios recursos (IDOR checks)
+
+### Database
+- [ ] Las queries usan el ORM o parameterized queries — cero string concatenation
+- [ ] Los indices existen para todos los campos usados en WHERE y JOIN frecuentes
+- [ ] Se hizo EXPLAIN ANALYZE en queries nuevas con datos > 10k rows
+- [ ] Las transacciones estan en el nivel correcto (no en el middleware HTTP)
+- [ ] Hay rollback en el except para todas las transacciones manuales
+- [ ] Los modelos nuevos tienen migraciones versionadas (no autoincrement sin migration)
+- [ ] No hay N+1 queries (verificado con QueryCounter o logs)
+- [ ] Las relaciones con muchos registros usan lazy loading o IN queries, no eager load masivo
+
+### Performance
+- [ ] Los endpoints criticos tienen rate limiting
+- [ ] El cache esta implementado para queries costosas (TTL apropiado)
+- [ ] Los background jobs pesados estan en workers separados (Celery/etc.)
+- [ ] El connection pool esta configurado apropiadamente para el servidor
+- [ ] Los timeouts estan definidos en clientes externos (Binance, HTTP, DB)
+- [ ] Las responses grandes usan streaming si el payload > 1MB
+
+### Seguridad
+- [ ] Los secrets vienen de variables de entorno, no hardcoded
+- [ ] Los logs no contienen passwords, tokens, tarjetas, PIIs
+- [ ] Los archivos subidos son validados (extension, content-type, tamano)
+- [ ] Los errores de produccion no exponen stack traces
+- [ ] Las dependencias nuevas fueron auditadas (pip-audit / npm audit)
+- [ ] Los headers de seguridad estan configurados (CORS, HSTS via nginx)
+- [ ] Los UUIDs son usados como IDs publicos (no IDs secuenciales que revelan volumen)
+
+### Confiabilidad
+- [ ] Los clientes externos tienen retry con exponential backoff
+- [ ] Los circuit breakers estan en servicios externos criticos
+- [ ] Las operaciones criticas son idempotentes (pueden repetirse sin doble efecto)
+- [ ] Hay dead letter queue para jobs fallidos
+- [ ] Los health checks cubren DB, Redis, y servicios externos criticos
+- [ ] Los errores son logueados con correlation_id y contexto suficiente para debuggear
+
+### Testing
+- [ ] Cobertura de la logica de negocio nueva > 80%
+- [ ] Los happy paths Y los sad paths estan testeados
+- [ ] Los tests de integracion usan rollback (no quedan datos en la DB de test)
+- [ ] Los mocks son especificos — no mockear todo (integration > unit donde importa)
+- [ ] Los tests son deterministas (sin sleep, sin dependencia de tiempo real)
+- [ ] El N+1 esta verificado con QueryCounter o similar
+
+### Observabilidad
+- [ ] Los logs son estructurados (JSON) con level, message, y contexto
+- [ ] El correlation_id esta en todos los logs del request
+- [ ] Las metricas criticas se incrementan en el lugar correcto (counters, histogramas)
+- [ ] Los errores inesperados logean el stack trace completo
+- [ ] Las queries lentas (>500ms) tienen un log WARNING
+
+### Codigo
+- [ ] Las funciones tienen una sola responsabilidad
+- [ ] Los nombres de variables y funciones son descriptivos (no `data`, `result`, `tmp`)
+- [ ] No hay codigo comentado — se elimina o se documenta el por que
+- [ ] Los type hints estan en todas las funciones publicas (Python) o tipado en TS
+- [ ] La logica de negocio esta en Services, no en Controllers/Routes
+- [ ] No hay imports circulares
+- [ ] Las constantes magicas tienen nombres explicativos

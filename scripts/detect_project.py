@@ -478,11 +478,18 @@ class ProjectFingerprinter:
             ".tox", "coverage", ".pytest_cache", ".mypy_cache",
             "target", ".gradle", ".idea", ".vscode", ".turbo",
             ".output", ".svelte-kit", ".vercel", ".netlify",
-            "android/build", "ios/Pods", ".dart_tool"
+            "android/build", "ios/Pods", ".dart_tool",
+            # DEE self-contamination exclusions (Issue #21)
+            ".claude", ".dee", "devlmer-ecosystem-engine",
         }
         for dirpath, dirnames, filenames in os.walk(self.root):
+            # Filter by name-level skip list
             dirnames[:] = [d for d in dirnames if d not in skip]
             rel_dir = os.path.relpath(dirpath, self.root)
+            # Also skip the `skills` directory when it lives inside `.claude`
+            # to prevent DEE skill files from contaminating domain detection
+            if rel_dir.startswith(".claude"):
+                dirnames[:] = [d for d in dirnames if d != "skills"]
             self.dirs.append(rel_dir)
             for fn in filenames:
                 rel = os.path.join(rel_dir, fn)

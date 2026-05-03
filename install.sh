@@ -488,6 +488,8 @@ ${BOLD}OPTIONS:${RESET}
     --yes, -y           Alias for --non-interactive
     --github-token      Provide GitHub Personal Access Token
     --gemini-key        Provide Gemini API key for Nano-Banana MCP
+    --update            Re-copy skills, regenerate slash commands, update settings.json
+                        (does NOT re-ask for API keys)
 
 ${BOLD}EXAMPLES:${RESET}
     ./install.sh /path/to/project
@@ -916,7 +918,7 @@ add_nano_banana_to_settings() {
   "mcpServers": {
     "nano-banana": {
       "command": "node",
-      "args": ["${SCRIPT_DIR}/nano-banana-mcp/index.js"],
+      "args": ["${SCRIPT_DIR}/mcps/nano-banana-mcp/dist/index.js"],
       "env": {
         "GEMINI_API_KEY": "${GEMINI_KEY}"
       }
@@ -947,7 +949,7 @@ try:
 
     settings['mcpServers']['nano-banana'] = {
         'command': 'node',
-        'args': ['${SCRIPT_DIR}/nano-banana-mcp/index.js'],
+        'args': ['${SCRIPT_DIR}/mcps/nano-banana-mcp/dist/index.js'],
         'env': {
             'GEMINI_API_KEY': '${GEMINI_KEY}'
         }
@@ -2056,9 +2058,15 @@ generate_slash_commands() {
         local skill_md="${skill_dir}/SKILL.md"
 
         if [[ -f "${skill_md}" ]]; then
-            # Extract description from SKILL.md frontmatter
+            # Extract description from SKILL.md frontmatter.
+            # Handles both bare values and quoted values (description: "text").
+            # YAML frontmatter (--- delimiters) is valid and expected — not an error.
             local desc
-            desc=$(sed -n '/^description:/{ s/^description: *//; p; q; }' "${skill_md}" | cut -c1-150)
+            desc=$(sed -n '/^description:/{ s/^description:[[:space:]]*//; s/^["'"'"']//; s/["'"'"']$//; p; q; }' "${skill_md}" | cut -c1-150)
+            # Fallback: if no frontmatter description, grab first non-empty non-dash line
+            if [[ -z "${desc}" ]]; then
+                desc=$(grep -v '^---' "${skill_md}" | grep -v '^#' | grep -v '^[[:space:]]*$' | head -1 | cut -c1-150)
+            fi
 
             cat > "${commands_dir}/${skill_name}.md" << CMDEOF
 # /${skill_name}
@@ -2451,6 +2459,12 @@ parse_arguments() {
                 GEMINI_KEY="$2"
                 shift 2
                 ;;
+            --update)
+                # Re-copy skills, regenerate slash commands, update settings.json
+                # Does NOT re-ask for API keys
+                MODE="update"
+                shift
+                ;;
             *)
                 # Positional arguments form the target directory path
                 # Handles unquoted paths with spaces: install.sh ~/My Projects/app
@@ -2834,8 +2848,10 @@ show_product_info() {
 offer_setup_wizard() {
     local wizard_path="${SCRIPT_DIR}/setup-wizard.sh"
 
-    # Only offer if MCP env setup file exists (meaning MCPs need keys)
+    # mcp-env-setup.sh is OPTIONAL — only created when MCPs require API keys.
+    # Its absence is normal and should NOT be reported as a warning or error (Issue #14).
     if [[ ! -f "${TARGET_DIR}/.claude/mcp-env-setup.sh" ]]; then
+        log_verbose "mcp-env-setup.sh not present (optional — only needed when MCPs require API keys)"
         return
     fi
 
@@ -2971,6 +2987,19 @@ main() {
         run_step "Orchestrator" run_orchestrator
 
         echo ""
+    fi
+
+    # --update mode: re-copy skills + regenerate commands + merge settings, skip API key prompts
+    if [[ "${MODE}" == "update" ]]; then
+        log_section "DEE UPDATE MODE"
+        log_info "Re-copying bundled skills from DEE repository..."
+        run_step "Bundled skills (update)" copy_bundled_skills
+        run_step "Slash commands (update)" generate_slash_commands
+        run_step "Settings merge (update)" create_settings_json
+        log_success "🔄 DEE updated to latest version"
+        show_summary
+        show_product_info
+        exit 0
     fi
 
     # MCP installation (full and skills-only modes)

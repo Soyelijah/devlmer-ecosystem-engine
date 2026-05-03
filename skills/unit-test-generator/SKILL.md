@@ -1,832 +1,1236 @@
 ---
 name: unit-test-generator
-description: Generate comprehensive unit tests for Python (pytest) and TypeScript (vitest/jest). Coverage patterns, AAA testing model (Arrange-Act-Assert), parametrized tests, fixtures, mocking, edge cases, integration testing guidance, and TDD workflow.
+description: Generador automático de tests unitarios e integración para Python/pytest, TypeScript/Vitest, React Testing Library y NestJS/Jest. Se activa al crear o modificar endpoints, rutas, controladores, servicios o funciones importantes. Genera tests completos con happy path, error cases, autenticación y cobertura de edge cases. Incluye fixtures, mocks, factories, parametrize, y ejemplos listos para copiar.
+metadata:
+  version: 1.0.0
+  author: Devlmer / Pierre Solier
+  creator: Devlmer
+  branding: Institutional-grade test generation for production codebases
 triggers:
-  - "generate tests"
-  - "write unit tests"
+  - "escribe tests"
+  - "genera unit tests"
+  - "testing para"
+  - "crear tests de"
+  - "nuevo endpoint"
+  - "nueva ruta"
+  - "añade tests"
   - "test coverage"
-  - "test strategy"
-  - "pytest"
-  - "jest"
-  - "vitest"
-  - "mock"
-  - "TDD"
-  - "edge cases"
+  - "pruebas unitarias"
+  - "pruebas de integración"
+auto_activate:
+  paths:
+    - "routes/**"
+    - "api/**"
+    - "controllers/**"
+    - "endpoints/**"
+    - "services/**"
+    - "src/routes/**"
+    - "src/api/**"
+    - "src/controllers/**"
+    - "src/services/**"
+  on_create: true
+  on_modify: true
 ---
 
-# Unit Test Generator Skill
+# Unit Test Generator
 
-Professional test generation following enterprise standards. Covers unit testing patterns, fixtures, mocking strategies, coverage targets, and TDD workflows.
+Skill especializado en generación de tests completos, realistas y mantenibles. Cubre Python/pytest, TypeScript/Vitest + Testing Library, y NestJS/Jest.
 
-## Test Pyramid Architecture
+---
 
-Optimal testing distribution by volume:
+## Filosofia de Testing
+
+### Qué testear (y qué NO)
+
+**Testear:**
+- Comportamiento observable desde afuera (inputs → outputs)
+- Contratos de API (qué acepta, qué devuelve, qué status codes)
+- Reglas de negocio críticas
+- Casos límite y edge cases (null, vacío, valores extremos)
+- Flujos de error y manejo de excepciones
+- Autenticación y autorización
+
+**NO testear:**
+- Implementación interna (nombres de variables, orden de llamadas internas)
+- Librerías de terceros (ya tienen sus propios tests)
+- Getters/setters triviales sin lógica
+- Código generado automáticamente
+- Detalles de UI que cambian frecuentemente sin lógica de negocio
+
+### Principio Fundamental
 
 ```
-        /\
-       /  \  E2E & Manual (10%)
-      /____\
-
-     /      \
-    /  API   \  Integration (20%)
-   /________\
-
-  /          \
- /   Unit     \ Unit Tests (70%)
-/______________\
+Un test que pasa cuando el código está roto, o falla cuando el código está correcto,
+es PEOR que no tener test.
 ```
 
-**Unit Tests**: Fast, isolated, test single function
-**Integration Tests**: Medium speed, test modules together
-**E2E Tests**: Slow, test complete user flows
-
-## AAA Testing Model (Arrange-Act-Assert)
-
-All tests follow this structure for clarity and maintainability.
-
-### Python (pytest)
-
-```python
-import pytest
-from src.calculator import Calculator
-
-class TestCalculator:
-    """Calculate operations with edge case handling."""
-
-    def test_addition_positive_numbers(self):
-        # ARRANGE: Setup test data and objects
-        calculator = Calculator()
-        a, b = 2, 3
-
-        # ACT: Perform the action being tested
-        result = calculator.add(a, b)
-
-        # ASSERT: Verify the result
-        assert result == 5
-
-    def test_addition_with_negative_numbers(self):
-        # ARRANGE
-        calculator = Calculator()
-        a, b = -2, 3
-
-        # ACT
-        result = calculator.add(a, b)
-
-        # ASSERT
-        assert result == 1
-
-    def test_division_by_zero_raises_error(self):
-        # ARRANGE
-        calculator = Calculator()
-
-        # ACT & ASSERT (combined for error testing)
-        with pytest.raises(ValueError, match="Cannot divide by zero"):
-            calculator.divide(10, 0)
-```
-
-### TypeScript (Jest/Vitest)
-
-```typescript
-import { Calculator } from "./calculator";
-
-describe("Calculator", () => {
-  let calculator: Calculator;
-
-  beforeEach(() => {
-    // ARRANGE: Setup before each test
-    calculator = new Calculator();
-  });
-
-  test("should add two positive numbers correctly", () => {
-    // ARRANGE
-    const a = 2;
-    const b = 3;
-
-    // ACT
-    const result = calculator.add(a, b);
-
-    // ASSERT
-    expect(result).toBe(5);
-  });
-
-  test("should add positive and negative numbers", () => {
-    // ARRANGE
-    const a = -2;
-    const b = 3;
-
-    // ACT
-    const result = calculator.add(a, b);
-
-    // ASSERT
-    expect(result).toBe(1);
-  });
-
-  test("should throw error when dividing by zero", () => {
-    // ARRANGE & ACT & ASSERT
-    expect(() => calculator.divide(10, 0)).toThrow("Cannot divide by zero");
-  });
-});
-```
-
-## Parametrized Tests
-
-Run same test with multiple input sets efficiently.
-
-### Python (pytest.mark.parametrize)
-
-```python
-@pytest.mark.parametrize("input_a,input_b,expected", [
-    (2, 3, 5),           # Positive numbers
-    (-2, 3, 1),          # Mixed signs
-    (0, 5, 5),           # Zero
-    (100, 200, 300),     # Large numbers
-])
-def test_addition_multiple_cases(input_a, input_b, expected):
-    calculator = Calculator()
-    assert calculator.add(input_a, input_b) == expected
-
-
-@pytest.mark.parametrize("value,expected_type", [
-    ("hello", str),
-    (123, int),
-    (45.67, float),
-    (True, bool),
-    (None, type(None)),
-])
-def test_type_detection(value, expected_type):
-    assert type(value) == expected_type
-```
-
-### TypeScript (test.each)
-
-```typescript
-describe.each([
-  [2, 3, 5],
-  [-2, 3, 1],
-  [0, 5, 5],
-  [100, 200, 300],
-])("Calculator.add(%i, %i) should return %i", (a, b, expected) => {
-  let calculator: Calculator;
-
-  beforeEach(() => {
-    calculator = new Calculator();
-  });
-
-  it("addition test", () => {
-    expect(calculator.add(a, b)).toBe(expected);
-  });
-});
-```
-
-## Fixtures and Setup/Teardown
-
-### Python Fixtures
-
-```python
-import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-
-@pytest.fixture
-def test_database():
-    """Create and teardown test database for each test."""
-    # SETUP: Create test database
-    engine = create_engine("sqlite:///:memory:")
-    Base.metadata.create_all(engine)
-
-    session = Session(engine)
-    yield session  # Test runs here with this session
-
-    # TEARDOWN: Cleanup after test
-    session.close()
-    engine.dispose()
-
-
-@pytest.fixture
-def sample_user():
-    """Provide test user data."""
-    return User(
-        id=1,
-        name="John Doe",
-        email="john@example.com",
-        is_active=True
-    )
-
-
-class TestUserRepository:
-    def test_save_user(self, test_database, sample_user):
-        # test_database and sample_user fixtures injected
-        repository = UserRepository(test_database)
-        repository.save(sample_user)
-
-        result = test_database.query(User).filter_by(id=1).first()
-        assert result.email == "john@example.com"
-```
-
-### TypeScript Fixtures (Jest)
-
-```typescript
-describe("UserRepository", () => {
-  let repository: UserRepository;
-  let mockDatabase: jest.Mocked<Database>;
-
-  beforeEach(() => {
-    // SETUP: Initialize mocks and dependencies
-    mockDatabase = {
-      query: jest.fn(),
-      save: jest.fn(),
-      delete: jest.fn(),
-    } as any;
-
-    repository = new UserRepository(mockDatabase);
-  });
-
-  afterEach(() => {
-    // TEARDOWN: Clear mocks
-    jest.clearAllMocks();
-  });
-
-  test("should save user to database", () => {
-    const user = { id: 1, name: "John" };
-    repository.save(user);
-
-    expect(mockDatabase.save).toHaveBeenCalledWith(user);
-  });
-});
-```
-
-## Mocking and Spies
-
-### Python Mocking
-
-```python
-from unittest.mock import Mock, patch, MagicMock
-import pytest
-
-class TestPaymentService:
-    @patch("src.payment_service.payment_gateway")
-    def test_charge_card_success(self, mock_gateway):
-        # Setup mock return value
-        mock_gateway.process_charge.return_value = {
-            "success": True,
-            "transaction_id": "tx-123"
-        }
-
-        service = PaymentService()
-        result = service.charge_card("4111111111111111", 99.99)
-
-        # Verify the mock was called correctly
-        mock_gateway.process_charge.assert_called_once_with(
-            "4111111111111111",
-            99.99
-        )
-
-        assert result["transaction_id"] == "tx-123"
-
-
-class TestEmailService:
-    def test_send_email_with_mock(self):
-        # Create a mock object
-        mock_smtp = Mock()
-        mock_smtp.send_message = Mock(return_value=None)
-
-        service = EmailService(smtp=mock_smtp)
-        service.send("user@example.com", "Hello", "Message body")
-
-        # Verify mock interactions
-        assert mock_smtp.send_message.called
-        assert mock_smtp.send_message.call_count == 1
-
-    @patch.object(EmailService, "send", return_value=True)
-    def test_with_method_patch(self, mock_send):
-        service = EmailService()
-        result = service.send("user@example.com", "Hello", "Body")
-
-        assert result is True
-        mock_send.assert_called_once()
-```
-
-### TypeScript Mocking (Jest)
-
-```typescript
-import { PaymentService } from "./payment-service";
-import { PaymentGateway } from "./payment-gateway";
-
-jest.mock("./payment-gateway");
-
-describe("PaymentService", () => {
-  let service: PaymentService;
-  let mockGateway: jest.Mocked<PaymentGateway>;
-
-  beforeEach(() => {
-    // Create mock implementation
-    mockGateway = {
-      processCharge: jest.fn().mockResolvedValue({
-        success: true,
-        transactionId: "tx-123"
-      }),
-      refund: jest.fn(),
-    } as any;
-
-    service = new PaymentService(mockGateway);
-  });
-
-  test("should process charge and return transaction ID", async () => {
-    // ACT
-    const result = await service.chargeCard("4111111111111111", 99.99);
-
-    // ASSERT
-    expect(result.transactionId).toBe("tx-123");
-    expect(mockGateway.processCharge).toHaveBeenCalledWith(
-      "4111111111111111",
-      99.99
-    );
-  });
-
-  test("should handle payment gateway errors", async () => {
-    // ARRANGE: Mock error scenario
-    mockGateway.processCharge.mockRejectedValue(
-      new Error("Gateway timeout")
-    );
-
-    // ACT & ASSERT
-    await expect(
-      service.chargeCard("4111111111111111", 99.99)
-    ).rejects.toThrow("Gateway timeout");
-  });
-
-  test("spy on existing method", () => {
-    const spy = jest.spyOn(service, "validateCard");
-    spy.mockReturnValue(true);
-
-    service.validateCard("4111111111111111");
-
-    expect(spy).toHaveBeenCalled();
-    spy.mockRestore(); // Clean up
-  });
-});
-```
-
-## Edge Cases and Boundary Testing
-
-Always test extreme and unusual inputs.
-
-```python
-class TestEmailValidator:
-    """Test email validation with edge cases."""
-
-    @pytest.mark.parametrize("email,valid", [
-        # Valid emails
-        ("simple@example.com", True),
-        ("user+tag@example.co.uk", True),
-        ("123@example.com", True),
-
-        # Invalid - no @ symbol
-        ("invalid.email.com", False),
-
-        # Invalid - missing domain
-        ("user@", False),
-
-        # Invalid - empty string
-        ("", False),
-
-        # Invalid - only whitespace
-        ("   ", False),
-
-        # Invalid - SQL injection attempt
-        ("' OR '1'='1'@example.com", False),
-
-        # Invalid - XSS attempt
-        ("<script>alert('xss')</script>@example.com", False),
-
-        # Edge case - maximum length
-        ("a" * 240 + "@example.com", False),  # Exceeds typical limit
-
-        # Edge case - Unicode characters
-        ("user@例え.jp", True),
-
-        # Edge case - subdomain with hyphens
-        ("user@mail-server.example.com", True),
-
-        # Edge case - numbers in domain
-        ("user@123.456.com", True),
-    ])
-    def test_email_validation(self, email, valid):
-        validator = EmailValidator()
-        assert validator.is_valid(email) == valid
-
-
-class TestNumberParser:
-    """Test number parsing edge cases."""
-
-    @pytest.mark.parametrize("input_str,expected,should_error", [
-        # Valid cases
-        ("123", 123, False),
-        ("0", 0, False),
-        ("-456", -456, False),
-        ("3.14", 3.14, False),
-
-        # Edge cases
-        ("", None, True),
-        ("   ", None, True),
-        ("abc", None, True),
-        ("12.34.56", None, True),
-        ("1e10", 10000000000, False),  # Scientific notation
-        ("+999", 999, False),
-        ("0x10", 16, False),  # Hex
-    ])
-    def test_parse_number(self, input_str, expected, should_error):
-        parser = NumberParser()
-
-        if should_error:
-            with pytest.raises(ValueError):
-                parser.parse(input_str)
-        else:
-            assert parser.parse(input_str) == expected
-```
-
-## Integration Testing
-
-Tests that verify multiple components working together.
-
-### Python Integration Test
-
-```python
-import pytest
-from httpx import AsyncClient
-from fastapi import FastAPI
-
-@pytest.fixture
-async def client():
-    """Create test client with real app instance."""
-    from src.main import app
-    async with AsyncClient(app=app, base_url="http://test") as ac:
-        yield ac
-
-
-class TestUserAPI:
-    @pytest.mark.asyncio
-    async def test_create_and_retrieve_user(self, client, test_database):
-        """Integration: Create user via API, then retrieve it."""
-
-        # ARRANGE
-        user_data = {
-            "name": "Jane Doe",
-            "email": "jane@example.com",
-            "password": "secure_password_123"
-        }
-
-        # ACT: Create user
-        response = await client.post("/api/users", json=user_data)
-        assert response.status_code == 201
-        created_user = response.json()
-
-        # ACT: Retrieve user
-        response = await client.get(f"/api/users/{created_user['id']}")
-
-        # ASSERT
-        assert response.status_code == 200
-        retrieved_user = response.json()
-        assert retrieved_user["email"] == "jane@example.com"
-        assert "password" not in retrieved_user  # Sensitive data stripped
-```
-
-### TypeScript Integration Test
-
-```typescript
-import request from "supertest";
-import { app } from "./app";
-
-describe("User API Integration", () => {
-  let userId: number;
-
-  test("POST /api/users creates new user", async () => {
-    const response = await request(app)
-      .post("/api/users")
-      .send({
-        name: "Jane Doe",
-        email: "jane@example.com",
-        password: "secure_password_123"
-      });
-
-    expect(response.status).toBe(201);
-    expect(response.body).toHaveProperty("id");
-    userId = response.body.id;
-  });
-
-  test("GET /api/users/:id retrieves created user", async () => {
-    const response = await request(app).get(`/api/users/${userId}`);
-
-    expect(response.status).toBe(200);
-    expect(response.body.email).toBe("jane@example.com");
-    expect(response.body).not.toHaveProperty("password");
-  });
-
-  test("PUT /api/users/:id updates user", async () => {
-    const response = await request(app)
-      .put(`/api/users/${userId}`)
-      .send({ name: "Jane Smith" });
-
-    expect(response.status).toBe(200);
-    expect(response.body.name).toBe("Jane Smith");
-  });
-
-  test("DELETE /api/users/:id removes user", async () => {
-    const deleteResponse = await request(app).delete(`/api/users/${userId}`);
-    expect(deleteResponse.status).toBe(204);
-
-    const getResponse = await request(app).get(`/api/users/${userId}`);
-    expect(getResponse.status).toBe(404);
-  });
-});
-```
-
-## Test Coverage Targets
-
-### Coverage Metrics
+Escribe tests que:
+1. **Fallen por las razones correctas** — si el comportamiento cambia, el test falla
+2. **Sean legibles** — otro dev debe entender qué está testeando
+3. **Sean independientes** — no dependan del orden de ejecución ni de otros tests
+4. **Sean rápidos** — un suite lento no se ejecuta
+
+---
+
+## Testing Pyramid
 
 ```
-Coverage = (Statements executed / Total statements) × 100
+         /\
+        /  \
+       / E2E \ ← Pocos, lentos, caros. Testean flujos completos
+      /--------\
+     /Integration\ ← Moderados. Testean módulos con dependencias reales
+    /------------\
+   /  Unit Tests  \ ← Muchos, rápidos, baratos. Testean unidades aisladas
+  /________________\
 ```
 
-**Target Breakdown**:
-- **Overall**: 80%+ coverage
-- **Critical paths** (auth, payments): 95%+
-- **Utilities**: 70%+
-- **UI components**: 60%+ (harder to test)
+**Distribución recomendada:**
+- 70% Unit tests
+- 20% Integration tests
+- 10% E2E tests
 
-### Coverage Tools
+**Coverage objetivo:** 80% como mínimo. 100% es contraproducente — enfocarse en cobertura de comportamiento, no de líneas.
+
+---
+
+## Python / pytest
+
+### Setup inicial
 
 ```bash
-# Python: pytest-cov
-pytest --cov=src/ --cov-report=html
+# Instalación
+pip install pytest pytest-asyncio pytest-mock pytest-cov httpx
 
-# JavaScript: Jest coverage
-jest --coverage --coverage-directory=coverage
-
-# Coverage analysis
-coverage report --fail-under=80
-
-# Generate badges
-coverage-badge -o coverage.svg
+# Estructura de proyecto
+tests/
+├── conftest.py          # Fixtures globales y configuración
+├── factories/           # Fábricas de datos de test
+│   ├── __init__.py
+│   └── user_factory.py
+├── unit/
+│   ├── __init__.py
+│   ├── test_auth_service.py
+│   └── test_risk_service.py
+├── integration/
+│   ├── __init__.py
+│   └── test_auth_endpoints.py
+└── e2e/
+    └── test_trading_flow.py
 ```
 
-### Analyzing Coverage Gaps
+### pytest.ini / pyproject.toml
 
-```python
-# coverage.py report shows lines not covered
-# Example output:
-# src/payment_service.py    87%    line 45, 67-69 (not covered)
+```toml
+# pyproject.toml
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short --cov=src --cov-report=term-missing --cov-fail-under=80"
 
-# Always investigate uncovered lines:
-# 1. Is it dead code? Remove it
-# 2. Is it error path? Add test for error scenario
-# 3. Is it untestable? Refactor for testability
+[tool.coverage.run]
+omit = [
+    "tests/*",
+    "src/migrations/*",
+    "src/main.py",     # entry point, tested via integration
+]
 ```
 
-## TDD Workflow (Red-Green-Refactor)
-
-### 1. Red: Write Failing Test
+### conftest.py — Fixtures Globales
 
 ```python
-# Write test BEFORE implementation
-def test_user_can_update_profile(self):
-    user = User(name="John", email="john@example.com")
+# tests/conftest.py
+import pytest
+import asyncio
+from typing import AsyncGenerator, Generator
+from unittest.mock import AsyncMock, MagicMock
+from httpx import AsyncClient, ASGITransport
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 
-    user.update_profile(name="Jane", email="jane@example.com")
+from src.main import app
+from src.database.connection import get_db
+from src.config.settings import get_settings
 
-    assert user.name == "Jane"
-    assert user.email == "jane@example.com"
-```
 
-Running this test FAILS because `update_profile` doesn't exist.
+# ─── Database Fixtures ────────────────────────────────────────────────────────
 
-### 2. Green: Minimal Implementation
+@pytest.fixture(scope="session")
+def event_loop():
+    """Create event loop for async tests."""
+    loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
 
-```python
-class User:
-    def __init__(self, name: str, email: str):
-        self.name = name
-        self.email = email
 
-    # Minimal implementation to pass test
-    def update_profile(self, name: str, email: str):
-        self.name = name
-        self.email = email
-```
-
-Now the test PASSES.
-
-### 3. Refactor: Improve Code Quality
-
-```python
-class User:
-    def __init__(self, name: str, email: str):
-        self.name = name
-        self.email = email
-
-    def update_profile(self, **updates):
-        """Update profile with validation."""
-        if "name" in updates:
-            if len(updates["name"]) < 1:
-                raise ValueError("Name cannot be empty")
-            self.name = updates["name"]
-
-        if "email" in updates:
-            if "@" not in updates["email"]:
-                raise ValueError("Invalid email")
-            self.email = updates["email"]
-```
-
-Test still PASSES after refactoring.
-
-### TDD Example: Complete Cycle
-
-```python
-# Step 1: RED - Test for email validation (will fail)
-def test_user_validation_rejects_invalid_email(self):
-    with pytest.raises(ValueError, match="Invalid email"):
-        User(name="John", email="not-an-email")
-
-# Step 2: GREEN - Minimal implementation
-class User:
-    def __init__(self, name: str, email: str):
-        if "@" not in email:
-            raise ValueError("Invalid email")
-        self.name = name
-        self.email = email
-
-# Step 3: REFACTOR - Extract validation
-class EmailValidator:
-    @staticmethod
-    def validate(email: str) -> bool:
-        return "@" in email and "." in email.split("@")[1]
-
-class User:
-    def __init__(self, name: str, email: str):
-        if not EmailValidator.validate(email):
-            raise ValueError("Invalid email")
-        self.name = name
-        self.email = email
-
-# Test still passes, code is better
-```
-
-## Testing Anti-Patterns
-
-### DON'T: Test Implementation Details
-
-```python
-# BAD: Testing internal implementation
-def test_user_stores_password_hash(self):
-    user = User("john", "secure_password")
-    assert len(user.password_hash) == 60  # Bcrypt hash length
-    assert not user.password_hash == "secure_password"
-
-# GOOD: Test behavior, not implementation
-def test_user_password_is_not_stored_plaintext(self):
-    user = User("john", "secure_password")
-    assert not user.verify_password("wrong_password")
-    assert user.verify_password("secure_password")
-```
-
-### DON'T: Have Tests with Multiple Assertions on Different Concerns
-
-```python
-# BAD: Multiple assertions on different things
-def test_user_creation(self):
-    user = User("john", "john@example.com")
-    assert user.name == "john"           # Concern: name storage
-    assert user.email == "john@example.com"  # Concern: email storage
-    assert user.created_at is not None   # Concern: timestamp
-    assert user.is_active == True        # Concern: active flag
-
-# GOOD: Separate tests for each concern
-def test_user_stores_name(self):
-    user = User("john", "john@example.com")
-    assert user.name == "john"
-
-def test_user_stores_email(self):
-    user = User("john", "john@example.com")
-    assert user.email == "john@example.com"
-
-def test_user_created_with_timestamp(self):
-    user = User("john", "john@example.com")
-    assert user.created_at is not None
-
-def test_user_created_as_active(self):
-    user = User("john", "john@example.com")
-    assert user.is_active is True
-```
-
-### DON'T: Use Test Data Builders Incorrectly
-
-```python
-# BAD: Magic numbers everywhere
-def test_order_calculation(self):
-    order = Order(100, 10, 0.1, "CA", 2)
-    assert order.total == 123.4  # What do these numbers mean?
-
-# GOOD: Use descriptive builder
-class OrderBuilder:
-    def __init__(self):
-        self.subtotal = 100
-        self.tax_rate = 0.1
-        self.shipping_cost = 10
-        self.state = "CA"
-        self.quantity = 2
-
-    def with_subtotal(self, subtotal):
-        self.subtotal = subtotal
-        return self
-
-    def build(self):
-        return Order(
-            self.subtotal,
-            self.shipping_cost,
-            self.tax_rate,
-            self.state,
-            self.quantity
-        )
-
-def test_order_calculation(self):
-    order = (
-        OrderBuilder()
-        .with_subtotal(100)
-        .build()
+@pytest.fixture(scope="session")
+async def test_engine():
+    """In-memory SQLite engine for tests (or test PostgreSQL)."""
+    settings = get_settings()
+    engine = create_async_engine(
+        settings.DATABASE_URL_TEST,
+        echo=False,
     )
-    assert order.total == 123.4  # Clear intent
-```
+    # Create all tables
+    async with engine.begin() as conn:
+        from src.models import Base
+        await conn.run_sync(Base.metadata.create_all)
+    
+    yield engine
+    
+    # Cleanup
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+    await engine.dispose()
 
-### DON'T: Skip Testing Error Cases
 
-```python
-# BAD: Only happy path
-def test_login(self):
-    user = User.login("john@example.com", "password123")
-    assert user.is_authenticated
-
-# GOOD: Test error cases
-def test_login_with_correct_credentials(self):
-    user = User.login("john@example.com", "password123")
-    assert user.is_authenticated
-
-def test_login_with_wrong_password_fails(self):
-    with pytest.raises(AuthenticationError):
-        User.login("john@example.com", "wrong_password")
-
-def test_login_with_nonexistent_user_fails(self):
-    with pytest.raises(UserNotFoundError):
-        User.login("nonexistent@example.com", "password123")
-
-def test_login_with_empty_credentials_fails(self):
-    with pytest.raises(ValueError):
-        User.login("", "")
-```
-
-## Test Organization Best Practices
-
-### Arrange Tests Logically
-
-```python
-# Group tests by feature
-class TestUserAuthentication:
-    def test_login_with_valid_credentials(self): pass
-    def test_login_with_invalid_credentials(self): pass
-    def test_logout_clears_session(self): pass
-
-class TestUserProfile:
-    def test_update_profile_name(self): pass
-    def test_update_profile_email(self): pass
-    def test_profile_validation(self): pass
-
-# Use descriptive names
-def test_user_can_login_with_email_and_password(self): pass
-def test_login_fails_with_wrong_password(self): pass
-def test_login_fails_if_account_disabled(self): pass
-```
-
-### Keep Tests DRY
-
-```python
-# Use fixtures for common setup
 @pytest.fixture
-def authenticated_user(test_database):
-    user = User(name="John", email="john@example.com")
-    test_database.add(user)
-    return user
+async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
+    """Isolated database session per test with rollback."""
+    async_session = async_sessionmaker(test_engine, expire_on_commit=False)
+    
+    async with test_engine.begin() as connection:
+        await connection.begin_nested()
+        async with async_sessionmaker(
+            connection, expire_on_commit=False
+        )() as session:
+            yield session
+            await session.rollback()
 
-class TestUserOperations:
-    def test_user_can_access_profile(self, authenticated_user):
-        assert authenticated_user.email == "john@example.com"
 
-    def test_user_can_update_profile(self, authenticated_user):
-        authenticated_user.update_profile(name="Jane")
-        assert authenticated_user.name == "Jane"
+# ─── HTTP Client Fixtures ─────────────────────────────────────────────────────
+
+@pytest.fixture
+async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
+    """Test HTTP client with database override."""
+    
+    async def override_get_db():
+        yield db_session
+    
+    app.dependency_overrides[get_db] = override_get_db
+    
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        yield ac
+    
+    app.dependency_overrides.clear()
+
+
+# ─── Auth Fixtures ────────────────────────────────────────────────────────────
+
+@pytest.fixture
+def mock_user():
+    """Default test user."""
+    return {
+        "id": "test-user-123",
+        "email": "test@example.com",
+        "username": "testuser",
+        "is_active": True,
+        "role": "user",
+    }
+
+
+@pytest.fixture
+def admin_user():
+    """Admin test user."""
+    return {
+        "id": "admin-user-456",
+        "email": "admin@example.com",
+        "username": "adminuser",
+        "is_active": True,
+        "role": "admin",
+    }
+
+
+@pytest.fixture
+async def auth_headers(client: AsyncClient, mock_user: dict) -> dict:
+    """Get auth headers by logging in."""
+    response = await client.post("/api/auth/login", json={
+        "email": mock_user["email"],
+        "password": "testpassword123",
+    })
+    token = response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def mock_auth_token():
+    """Static JWT for unit tests (no real auth)."""
+    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test"
+```
+
+### Factories — Generadores de Datos
+
+```python
+# tests/factories/user_factory.py
+from dataclasses import dataclass, field
+from typing import Optional
+import uuid
+
+
+@dataclass
+class UserFactory:
+    """Factory para crear usuarios de test."""
+    
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    email: str = field(default_factory=lambda: f"user_{uuid.uuid4().hex[:8]}@test.com")
+    username: str = field(default_factory=lambda: f"user_{uuid.uuid4().hex[:8]}")
+    password_hash: str = "$2b$12$test_hash_value"
+    is_active: bool = True
+    role: str = "user"
+    
+    @classmethod
+    def create(cls, **overrides) -> "UserFactory":
+        """Create user with optional overrides."""
+        return cls(**overrides)
+    
+    @classmethod
+    def create_admin(cls, **overrides) -> "UserFactory":
+        return cls(role="admin", **overrides)
+    
+    @classmethod
+    def create_inactive(cls, **overrides) -> "UserFactory":
+        return cls(is_active=False, **overrides)
+    
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "email": self.email,
+            "username": self.username,
+            "is_active": self.is_active,
+            "role": self.role,
+        }
+
+
+# tests/factories/order_factory.py
+from decimal import Decimal
+import uuid
+
+
+class OrderFactory:
+    """Factory para órdenes de trading."""
+    
+    @staticmethod
+    def create_market_buy(
+        symbol: str = "BTCUSDT",
+        quantity: Decimal = Decimal("0.01"),
+        user_id: str = None,
+    ) -> dict:
+        return {
+            "id": str(uuid.uuid4()),
+            "symbol": symbol,
+            "side": "BUY",
+            "type": "MARKET",
+            "quantity": str(quantity),
+            "status": "PENDING",
+            "user_id": user_id or str(uuid.uuid4()),
+        }
+    
+    @staticmethod
+    def create_limit_sell(
+        symbol: str = "BTCUSDT",
+        quantity: Decimal = Decimal("0.01"),
+        price: Decimal = Decimal("50000"),
+    ) -> dict:
+        return {
+            "id": str(uuid.uuid4()),
+            "symbol": symbol,
+            "side": "SELL",
+            "type": "LIMIT",
+            "quantity": str(quantity),
+            "price": str(price),
+            "status": "PENDING",
+        }
+```
+
+### Tests de Endpoint FastAPI — Ejemplo Completo
+
+```python
+# tests/integration/test_auth_endpoints.py
+"""
+Tests para /api/auth/* endpoints.
+Cubre: registro, login, refresh, logout, validación.
+"""
+import pytest
+from httpx import AsyncClient
+from unittest.mock import AsyncMock, patch
+
+from tests.factories.user_factory import UserFactory
+
+
+class TestRegisterEndpoint:
+    """POST /api/auth/register"""
+    
+    async def test_register_happy_path(self, client: AsyncClient):
+        """Usuario nuevo puede registrarse con datos válidos."""
+        payload = {
+            "email": "newuser@test.com",
+            "username": "newuser",
+            "password": "SecurePass123!",
+        }
+        
+        response = await client.post("/api/auth/register", json=payload)
+        
+        assert response.status_code == 201
+        data = response.json()
+        assert data["email"] == payload["email"]
+        assert data["username"] == payload["username"]
+        assert "password" not in data  # nunca exponer password
+        assert "id" in data
+    
+    async def test_register_duplicate_email_returns_409(self, client: AsyncClient):
+        """Registrar con email duplicado retorna 409 Conflict."""
+        payload = {
+            "email": "existing@test.com",
+            "username": "newuser1",
+            "password": "SecurePass123!",
+        }
+        
+        # Primer registro
+        await client.post("/api/auth/register", json=payload)
+        
+        # Segundo registro con mismo email
+        payload["username"] = "differentuser"
+        response = await client.post("/api/auth/register", json=payload)
+        
+        assert response.status_code == 409
+        assert "already exists" in response.json()["detail"].lower()
+    
+    @pytest.mark.parametrize("invalid_payload,expected_status,error_field", [
+        ({"email": "notanemail", "username": "u", "password": "Pass123!"}, 422, "email"),
+        ({"email": "valid@test.com", "username": "", "password": "Pass123!"}, 422, "username"),
+        ({"email": "valid@test.com", "username": "user", "password": "weak"}, 422, "password"),
+        ({}, 422, None),  # Missing all fields
+    ])
+    async def test_register_invalid_payload(
+        self, client: AsyncClient, invalid_payload: dict,
+        expected_status: int, error_field: str
+    ):
+        """Payloads inválidos retornan 422 Unprocessable Entity."""
+        response = await client.post("/api/auth/register", json=invalid_payload)
+        assert response.status_code == expected_status
+
+
+class TestLoginEndpoint:
+    """POST /api/auth/login"""
+    
+    async def test_login_returns_jwt_tokens(self, client: AsyncClient, mock_user: dict):
+        """Login exitoso retorna access_token y refresh_token."""
+        response = await client.post("/api/auth/login", json={
+            "email": mock_user["email"],
+            "password": "testpassword123",
+        })
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert "access_token" in data
+        assert "refresh_token" in data
+        assert data["token_type"] == "bearer"
+    
+    async def test_login_wrong_password_returns_401(self, client: AsyncClient, mock_user: dict):
+        """Contraseña incorrecta retorna 401."""
+        response = await client.post("/api/auth/login", json={
+            "email": mock_user["email"],
+            "password": "wrongpassword",
+        })
+        
+        assert response.status_code == 401
+        assert response.json()["detail"] == "Invalid credentials"
+    
+    async def test_login_nonexistent_user_returns_401(self, client: AsyncClient):
+        """Usuario inexistente retorna 401 (no 404, para no revelar info)."""
+        response = await client.post("/api/auth/login", json={
+            "email": "ghost@test.com",
+            "password": "somepassword",
+        })
+        
+        assert response.status_code == 401
+    
+    async def test_login_inactive_user_returns_403(self, client: AsyncClient):
+        """Usuario inactivo no puede hacer login."""
+        response = await client.post("/api/auth/login", json={
+            "email": "inactive@test.com",
+            "password": "testpassword123",
+        })
+        
+        assert response.status_code == 403
+
+
+class TestProtectedEndpoints:
+    """Tests para endpoints que requieren autenticación."""
+    
+    async def test_access_protected_without_token_returns_401(self, client: AsyncClient):
+        """Sin token, los endpoints protegidos retornan 401."""
+        response = await client.get("/api/portfolio/summary")
+        assert response.status_code == 401
+    
+    async def test_access_protected_with_invalid_token_returns_401(self, client: AsyncClient):
+        """Token inválido retorna 401."""
+        response = await client.get(
+            "/api/portfolio/summary",
+            headers={"Authorization": "Bearer invalid.token.here"},
+        )
+        assert response.status_code == 401
+    
+    async def test_access_protected_with_valid_token(
+        self, client: AsyncClient, auth_headers: dict
+    ):
+        """Token válido permite acceso a endpoints protegidos."""
+        response = await client.get("/api/portfolio/summary", headers=auth_headers)
+        assert response.status_code == 200
+```
+
+### Tests de Servicios con Mocks
+
+```python
+# tests/unit/test_auth_service.py
+"""
+Tests unitarios para AuthService.
+Mockeamos el repositorio para aislar la lógica de negocio.
+"""
+import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import datetime, timedelta
+
+from src.services.auth_service import AuthService
+from src.schemas.auth import LoginRequest, RegisterRequest
+from src.exceptions import InvalidCredentialsError, UserAlreadyExistsError
+
+
+@pytest.fixture
+def mock_user_repository():
+    """Mock del UserRepository."""
+    repo = AsyncMock()
+    repo.find_by_email = AsyncMock(return_value=None)
+    repo.find_by_id = AsyncMock(return_value=None)
+    repo.create = AsyncMock()
+    repo.update = AsyncMock()
+    return repo
+
+
+@pytest.fixture
+def auth_service(mock_user_repository):
+    """AuthService con dependencias mockeadas."""
+    return AuthService(
+        user_repository=mock_user_repository,
+        secret_key="test-secret-key",
+        algorithm="HS256",
+        access_token_expire_minutes=30,
+    )
+
+
+class TestAuthServiceLogin:
+    """Tests para AuthService.login()"""
+    
+    async def test_login_returns_tokens_for_valid_credentials(
+        self, auth_service: AuthService, mock_user_repository: AsyncMock
+    ):
+        """Login con credenciales válidas retorna access y refresh token."""
+        # Arrange
+        from tests.factories.user_factory import UserFactory
+        user = UserFactory.create()
+        
+        mock_user_repository.find_by_email.return_value = user
+        
+        with patch("src.services.auth_service.verify_password", return_value=True):
+            # Act
+            result = await auth_service.login(
+                LoginRequest(email=user.email, password="validpassword")
+            )
+        
+        # Assert
+        assert result.access_token is not None
+        assert result.refresh_token is not None
+        assert result.token_type == "bearer"
+    
+    async def test_login_raises_for_wrong_password(
+        self, auth_service: AuthService, mock_user_repository: AsyncMock
+    ):
+        """Login con contraseña incorrecta lanza InvalidCredentialsError."""
+        from tests.factories.user_factory import UserFactory
+        user = UserFactory.create()
+        mock_user_repository.find_by_email.return_value = user
+        
+        with patch("src.services.auth_service.verify_password", return_value=False):
+            with pytest.raises(InvalidCredentialsError):
+                await auth_service.login(
+                    LoginRequest(email=user.email, password="wrongpassword")
+                )
+    
+    async def test_login_raises_for_nonexistent_user(
+        self, auth_service: AuthService, mock_user_repository: AsyncMock
+    ):
+        """Login con usuario inexistente lanza InvalidCredentialsError (no UserNotFound)."""
+        mock_user_repository.find_by_email.return_value = None
+        
+        with pytest.raises(InvalidCredentialsError):
+            await auth_service.login(
+                LoginRequest(email="ghost@test.com", password="anypassword")
+            )
+    
+    async def test_login_calls_find_by_email_once(
+        self, auth_service: AuthService, mock_user_repository: AsyncMock
+    ):
+        """Login consulta el repositorio exactamente una vez."""
+        mock_user_repository.find_by_email.return_value = None
+        
+        try:
+            await auth_service.login(
+                LoginRequest(email="ghost@test.com", password="any")
+            )
+        except InvalidCredentialsError:
+            pass
+        
+        mock_user_repository.find_by_email.assert_called_once_with("ghost@test.com")
+
+
+class TestAuthServiceRegister:
+    """Tests para AuthService.register()"""
+    
+    @pytest.mark.parametrize("email", [
+        "user@example.com",
+        "user+tag@example.co.uk",
+        "user.name@subdomain.example.com",
+    ])
+    async def test_register_accepts_valid_emails(
+        self, auth_service: AuthService, mock_user_repository: AsyncMock, email: str
+    ):
+        """Register acepta emails válidos en múltiples formatos."""
+        mock_user_repository.find_by_email.return_value = None
+        
+        result = await auth_service.register(
+            RegisterRequest(email=email, username="validuser", password="SecurePass123!")
+        )
+        
+        assert result.email == email
+    
+    async def test_register_raises_for_existing_email(
+        self, auth_service: AuthService, mock_user_repository: AsyncMock
+    ):
+        """Register con email existente lanza UserAlreadyExistsError."""
+        from tests.factories.user_factory import UserFactory
+        existing_user = UserFactory.create(email="existing@test.com")
+        mock_user_repository.find_by_email.return_value = existing_user
+        
+        with pytest.raises(UserAlreadyExistsError):
+            await auth_service.register(
+                RegisterRequest(
+                    email="existing@test.com",
+                    username="newusername",
+                    password="SecurePass123!",
+                )
+            )
+    
+    async def test_register_hashes_password(
+        self, auth_service: AuthService, mock_user_repository: AsyncMock
+    ):
+        """Register nunca guarda la contraseña en texto plano."""
+        mock_user_repository.find_by_email.return_value = None
+        
+        plain_password = "MyPlainPassword123!"
+        await auth_service.register(
+            RegisterRequest(
+                email="new@test.com",
+                username="newuser",
+                password=plain_password,
+            )
+        )
+        
+        # Verificar que lo guardado en el repo no es la contraseña plana
+        call_args = mock_user_repository.create.call_args
+        saved_user = call_args[0][0]
+        assert saved_user.password_hash != plain_password
+        assert len(saved_user.password_hash) > 20  # Es un hash
+```
+
+### pytest-asyncio y configuración async
+
+```python
+# Modo 1: Decorador por test
+@pytest.mark.asyncio
+async def test_something():
+    result = await some_async_function()
+    assert result == expected
+
+# Modo 2: asyncio_mode = "auto" en pytest.ini (recomendado)
+# Todos los tests async se ejecutan automáticamente sin decorador
+
+# Modo 3: Fixture async
+@pytest.fixture
+async def my_fixture():
+    client = await create_client()
+    yield client
+    await client.close()
 ```
 
 ---
 
-**Last Updated**: 2026-04-07
-**Testing Standards Version**: 3.0
-**Supported Frameworks**: pytest, Jest, Vitest
+## TypeScript / Vitest + Testing Library
+
+### Setup inicial
+
+```bash
+# Instalación para proyecto Vite/React
+npm install -D vitest @vitest/ui jsdom
+npm install -D @testing-library/react @testing-library/user-event @testing-library/jest-dom
+npm install -D msw  # Mock Service Worker para API mocking
+
+# vitest.config.ts
+```
+
+```typescript
+// vitest.config.ts
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.ts'],
+    coverage: {
+      reporter: ['text', 'html', 'lcov'],
+      exclude: ['node_modules/', 'src/test/', '**/*.d.ts'],
+      thresholds: {
+        global: {
+          branches: 80,
+          functions: 80,
+          lines: 80,
+          statements: 80,
+        },
+      },
+    },
+  },
+  resolve: {
+    alias: { '@': path.resolve(__dirname, './src') },
+  },
+});
+```
+
+### Setup global de tests
+
+```typescript
+// src/test/setup.ts
+import '@testing-library/jest-dom';
+import { cleanup } from '@testing-library/react';
+import { afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { server } from './mocks/server';
+
+// Limpiar DOM entre tests
+afterEach(() => {
+  cleanup();
+});
+
+// MSW server lifecycle
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+
+// Mock global de localStorage
+const localStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+  length: 0,
+  key: vi.fn(),
+};
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
+// Mock de window.matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+```
+
+### MSW — Mock Service Worker para APIs
+
+```typescript
+// src/test/mocks/handlers.ts
+import { http, HttpResponse } from 'msw';
+
+export const handlers = [
+  // GET /api/portfolio/summary
+  http.get('/api/portfolio/summary', () => {
+    return HttpResponse.json({
+      totalValue: 10333.50,
+      totalPnl: 233.50,
+      totalPnlPercent: 2.31,
+      positions: [],
+    });
+  }),
+  
+  // POST /api/auth/login
+  http.post('/api/auth/login', async ({ request }) => {
+    const body = await request.json() as { email: string; password: string };
+    
+    if (body.email === 'test@example.com' && body.password === 'validpassword') {
+      return HttpResponse.json({
+        access_token: 'mock-jwt-token-12345',
+        refresh_token: 'mock-refresh-token-67890',
+        token_type: 'bearer',
+      });
+    }
+    
+    return HttpResponse.json(
+      { detail: 'Invalid credentials' },
+      { status: 401 }
+    );
+  }),
+  
+  // Error handler para simular fallos de red
+  http.get('/api/orders', () => {
+    return HttpResponse.error();
+  }),
+];
+
+// src/test/mocks/server.ts
+import { setupServer } from 'msw/node';
+import { handlers } from './handlers';
+
+export const server = setupServer(...handlers);
+```
+
+### Testing React Components — Ejemplo Completo
+
+```typescript
+// src/components/__tests__/LoginForm.test.tsx
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { LoginForm } from '../LoginForm';
+import { AuthContext } from '@/contexts/AuthContext';
+import { server } from '@/test/mocks/server';
+import { http, HttpResponse } from 'msw';
+
+// Helper para renderizar con contexto
+function renderLoginForm(authContextValue = {}) {
+  const defaultContext = {
+    login: vi.fn(),
+    logout: vi.fn(),
+    user: null,
+    token: null,
+    isAuthenticated: false,
+    loading: false,
+    ...authContextValue,
+  };
+  
+  return {
+    ...render(
+      <AuthContext.Provider value={defaultContext}>
+        <LoginForm />
+      </AuthContext.Provider>
+    ),
+    mockLogin: defaultContext.login,
+  };
+}
+
+describe('LoginForm', () => {
+  const user = userEvent.setup();
+  
+  describe('Rendering', () => {
+    it('renders email and password inputs', () => {
+      renderLoginForm();
+      
+      expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
+    });
+    
+    it('shows loading state while submitting', async () => {
+      const { mockLogin } = renderLoginForm();
+      mockLogin.mockImplementation(
+        () => new Promise((resolve) => setTimeout(resolve, 1000))
+      );
+      
+      await user.type(screen.getByLabelText(/email/i), 'test@example.com');
+      await user.type(screen.getByLabelText(/password/i), 'password123');
+      await user.click(screen.getByRole('button', { name: /sign in/i }));
+      
+      expect(screen.getByRole('button', { name: /loading/i })).toBeDisabled();
+    });
+  });
+  
+  describe('Form validation', () => {
+    it('shows error for invalid email format', async () => {
+      renderLoginForm();
+      
+      await user.type(screen.getByLabelText(/email/i), 'notanemail');
+      await user.click(screen.getByRole('button', { name: /sign in/i }));
+      
+      expect(await screen.findByText(/invalid email/i)).toBeInTheDocument();
+    });
+    
+    it('shows error for empty password', async () => {
+      renderLoginForm();
+      
+      await user.type(screen.getByLabelText(/email/i), 'valid@test.com');
+      await user.click(screen.getByRole('button', { name: /sign in/i }));
+      
+      expect(await screen.findByText(/password is required/i)).toBeInTheDocument();
+    });
+  });
+  
+  describe('Successful login', () => {
+    it('calls login with email and password', async () => {
+      const { mockLogin } = renderLoginForm();
+      
+      await user.type(screen.getByLabelText(/email/i), 'test@example.com');
+      await user.type(screen.getByLabelText(/password/i), 'validpassword');
+      await user.click(screen.getByRole('button', { name: /sign in/i }));
+      
+      await waitFor(() => {
+        expect(mockLogin).toHaveBeenCalledWith({
+          email: 'test@example.com',
+          password: 'validpassword',
+        });
+      });
+    });
+  });
+  
+  describe('Failed login', () => {
+    it('shows error message on invalid credentials', async () => {
+      // Override handler para este test específico
+      server.use(
+        http.post('/api/auth/login', () => {
+          return HttpResponse.json(
+            { detail: 'Invalid credentials' },
+            { status: 401 }
+          );
+        })
+      );
+      
+      const { mockLogin } = renderLoginForm();
+      mockLogin.mockRejectedValueOnce(new Error('Invalid credentials'));
+      
+      await user.type(screen.getByLabelText(/email/i), 'test@example.com');
+      await user.type(screen.getByLabelText(/password/i), 'wrongpassword');
+      await user.click(screen.getByRole('button', { name: /sign in/i }));
+      
+      expect(
+        await screen.findByText(/invalid credentials/i)
+      ).toBeInTheDocument();
+    });
+  });
+});
+```
+
+### Testing Custom Hooks
+
+```typescript
+// src/hooks/__tests__/usePortfolio.test.ts
+import { describe, it, expect, vi } from 'vitest';
+import { renderHook, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PropsWithChildren } from 'react';
+import { usePortfolio } from '../usePortfolio';
+
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+  
+  return ({ children }: PropsWithChildren) => (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  );
+}
+
+describe('usePortfolio', () => {
+  it('returns portfolio data on success', async () => {
+    const { result } = renderHook(() => usePortfolio(), {
+      wrapper: createWrapper(),
+    });
+    
+    // Estado inicial: loading
+    expect(result.current.isLoading).toBe(true);
+    
+    // Esperar a que cargue
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    
+    expect(result.current.data?.totalValue).toBe(10333.50);
+  });
+  
+  it('returns error state on API failure', async () => {
+    // El handler de MSW ya está configurado para devolver error en /api/orders
+    const { result } = renderHook(() => usePortfolio(), {
+      wrapper: createWrapper(),
+    });
+    
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    
+    expect(result.current.error).toBeTruthy();
+  });
+});
+```
+
+### Snapshot Testing — Cuándo Sí y Cuándo No
+
+```typescript
+// ✅ SÍ usar snapshots para: componentes estáticos/puramente visuales
+it('renders correctly', () => {
+  const { container } = render(<Badge variant="success">Active</Badge>);
+  expect(container.firstChild).toMatchSnapshot();
+});
+
+// ❌ NO usar snapshots para: componentes con estado, datos dinámicos, fechas
+// Snapshot de toda una página = mantenimiento horrible
+// En cambio, usar assertions específicas:
+it('shows user name', () => {
+  render(<UserCard name="Pierre" />);
+  expect(screen.getByText('Pierre')).toBeInTheDocument();
+});
+```
+
+---
+
+## NestJS / Jest
+
+### Setup de TestingModule
+
+```typescript
+// src/auth/auth.service.spec.ts
+import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
+import { AuthService } from './auth.service';
+import { UsersService } from '../users/users.service';
+import { ConfigService } from '@nestjs/config';
+
+describe('AuthService', () => {
+  let service: AuthService;
+  let usersService: jest.Mocked<UsersService>;
+  let jwtService: jest.Mocked<JwtService>;
+  
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        AuthService,
+        {
+          provide: UsersService,
+          useValue: {
+            findByEmail: jest.fn(),
+            create: jest.fn(),
+          },
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            sign: jest.fn().mockReturnValue('mock-jwt-token'),
+            verify: jest.fn(),
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockReturnValue('test-secret'),
+          },
+        },
+      ],
+    }).compile();
+    
+    service = module.get<AuthService>(AuthService);
+    usersService = module.get(UsersService);
+    jwtService = module.get(JwtService);
+  });
+  
+  describe('login', () => {
+    it('should return access token for valid credentials', async () => {
+      const mockUser = {
+        id: '1',
+        email: 'test@test.com',
+        passwordHash: '$2b$10$hashedpassword',
+      };
+      
+      usersService.findByEmail.mockResolvedValue(mockUser as any);
+      jest.spyOn(service as any, 'verifyPassword').mockResolvedValue(true);
+      
+      const result = await service.login({
+        email: 'test@test.com',
+        password: 'validpass',
+      });
+      
+      expect(result.access_token).toBe('mock-jwt-token');
+      expect(jwtService.sign).toHaveBeenCalledWith(
+        expect.objectContaining({ sub: '1', email: 'test@test.com' })
+      );
+    });
+  });
+});
+```
+
+### E2E Tests con Supertest
+
+```typescript
+// test/auth.e2e-spec.ts
+import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import * as request from 'supertest';
+import { AppModule } from '../src/app.module';
+
+describe('Auth (e2e)', () => {
+  let app: INestApplication;
+  
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+    
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    await app.init();
+  });
+  
+  afterAll(async () => {
+    await app.close();
+  });
+  
+  describe('POST /auth/login', () => {
+    it('returns 200 with tokens for valid credentials', () => {
+      return request(app.getHttpServer())
+        .post('/api/auth/login')
+        .send({ email: 'test@test.com', password: 'validpass' })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('access_token');
+          expect(res.body.token_type).toBe('bearer');
+        });
+    });
+    
+    it('returns 401 for invalid credentials', () => {
+      return request(app.getHttpServer())
+        .post('/api/auth/login')
+        .send({ email: 'test@test.com', password: 'wrongpass' })
+        .expect(401);
+    });
+  });
+});
+```
+
+---
+
+## Generacion Automatica de Tests para un Endpoint
+
+Dado un endpoint nuevo, generar estos tests en este orden:
+
+### Checklist de tests a generar
+
+```
+Para CADA endpoint nuevo:
+
+[ ] 1. Happy path (200/201) con datos válidos
+[ ] 2. Auth: sin token → 401
+[ ] 3. Auth: token inválido → 401
+[ ] 4. Auth: token expirado → 401
+[ ] 5. Auth: permisos insuficientes (rol incorrecto) → 403
+[ ] 6. Validación: payload vacío → 422
+[ ] 7. Validación: campos requeridos faltantes → 422
+[ ] 8. Validación: tipos incorrectos → 422
+[ ] 9. Validación: valores fuera de rango → 422 o 400
+[ ] 10. Resource not found → 404
+[ ] 11. Conflicto/duplicado → 409
+[ ] 12. Rate limiting (si aplica) → 429
+[ ] 13. Edge case: valores límite (min/max, strings vacíos, arrays vacíos)
+[ ] 14. Edge case: datos especiales (unicode, XSS, SQL injection — debe fallar gracefully)
+[ ] 15. Respuesta contiene campos esperados (no más, no menos)
+[ ] 16. Response time acceptable (< 200ms para ops simples)
+```
+
+---
+
+## Test Naming Conventions
+
+```python
+# Python — BDD style con describe/it implícito
+class TestAuthServiceLogin:          # Clase = módulo o método
+    def test_login_returns_tokens_for_valid_credentials(self): ...
+    def test_login_raises_for_wrong_password(self): ...
+    def test_login_raises_for_nonexistent_user(self): ...
+    def test_login_calls_repository_once(self): ...
+    #   ^ verbo_descripcion_condicion_resultado
+
+# TypeScript — BDD explícito
+describe('AuthService', () => {
+  describe('login()', () => {
+    it('returns tokens when credentials are valid', () => {});
+    it('throws InvalidCredentialsError when password is wrong', () => {});
+    it('throws InvalidCredentialsError when user does not exist', () => {});
+  });
+});
+```
+
+**Regla de oro:** El nombre del test debe describir el comportamiento completo sin leer el código.
+- Mal: `test_login()`
+- Bien: `test_login_with_valid_credentials_returns_jwt_access_and_refresh_tokens()`
+
+---
+
+## Comandos Utiles
+
+```bash
+# Python
+PYTHONPATH=. pytest tests/ -v                          # Todos los tests
+PYTHONPATH=. pytest tests/unit/ -v                     # Solo unit tests
+PYTHONPATH=. pytest tests/ -k "test_login"            # Filtrar por nombre
+PYTHONPATH=. pytest tests/ --cov=src --cov-report=html # Con coverage HTML
+PYTHONPATH=. pytest tests/ -x                          # Parar en primer fallo
+PYTHONPATH=. pytest tests/ --lf                        # Solo los que fallaron antes
+
+# TypeScript/Vitest
+npm run test                    # Todos los tests
+npm run test -- --coverage     # Con coverage
+npm run test -- --watch        # Watch mode
+npm run test -- LoginForm      # Filtrar por archivo
+npx vitest ui                  # UI mode interactivo
+```
+
+---
+
+## Anti-patrones a Evitar
+
+```python
+# ❌ MAL: Test que verifica implementación interna
+def test_login_calls_bcrypt():
+    assert bcrypt.checkpw.called  # ¿Qué pasa si cambio a argon2?
+
+# ✅ BIEN: Test que verifica comportamiento
+def test_login_rejects_wrong_password():
+    with pytest.raises(InvalidCredentialsError):
+        await service.login(LoginRequest(email="u@t.com", password="wrong"))
+
+# ❌ MAL: Tests que dependen entre sí
+def test_create_user():
+    global user_id
+    result = create_user(...)
+    user_id = result.id  # Estado global = tests frágiles
+
+# ✅ BIEN: Tests independientes con fixtures
+async def test_get_user(db_session, mock_user):
+    user = await UserRepository(db_session).create(mock_user)
+    result = await UserRepository(db_session).find_by_id(user.id)
+    assert result.email == mock_user["email"]
+
+# ❌ MAL: Assert con mensajes genéricos
+assert result  # ¿Qué falló exactamente?
+
+# ✅ BIEN: Assert descriptivo
+assert result.status_code == 201, f"Expected 201, got {result.status_code}: {result.json()}"
+```
