@@ -4,9 +4,9 @@
 
 ### Intelligent Ecosystems for Every Project
 
-[![Version](https://img.shields.io/badge/version-3.1.1-0052FF?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/tag/v3.1.1)
+[![Version](https://img.shields.io/badge/version-4.0.0-0052FF?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/tag/v4.0.0)
 [![License](https://img.shields.io/badge/license-MIT-00D4AA?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE)
-[![Skills](https://img.shields.io/badge/skills-62-FF6B35?style=for-the-badge&logo=stackblitz&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/tree/main/skills)
+[![Skills](https://img.shields.io/badge/skills-64-FF6B35?style=for-the-badge&logo=stackblitz&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/tree/main/skills)
 [![Domains](https://img.shields.io/badge/domains-22-8B5CF6?style=for-the-badge&logo=target&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/blueprints/ecosystems.json)
 [![MCPs](https://img.shields.io/badge/MCPs-31-00B4D8?style=for-the-badge&logo=puzzle&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/blueprints/ecosystems.json)
 [![Issues](https://img.shields.io/github/issues/Soyelijah/devlmer-ecosystem-engine?style=for-the-badge&logo=github&logoColor=white&color=FFB800)](https://github.com/Soyelijah/devlmer-ecosystem-engine/issues)
@@ -21,10 +21,10 @@
 
 | | |
 |---|---|
-| **Versión** | 3.1.1 — The Enterprise Standard |
+| **Versión** | 4.0.0 — Enterprise Complete |
 | **Autor** | Pierre Solier (Devlmer) |
 | **Licencia** | [MIT](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE) |
-| **Última actualización** | Abril 2026 |
+| **Última actualización** | Mayo 2026 |
 
 ---
 
@@ -32,7 +32,7 @@
 
 ### ¿Qué es DEE?
 
-**Devlmer Ecosystem Engine (DEE) v3.1** es un motor inteligente y de nivel empresarial que detecta automáticamente qué tipo de proyecto estás utilizando e **instala todo lo que necesitas para trabajar profesionalmente** en un único comando.
+**Devlmer Ecosystem Engine (DEE) v4.0** es un motor inteligente y de nivel empresarial que detecta automáticamente qué tipo de proyecto estás utilizando e **instala todo lo que necesitas para trabajar profesionalmente** en un único comando.
 
 Sin importar si trabajas con:
 - Aplicaciones React, Vue, Angular o Svelte
@@ -42,7 +42,7 @@ Sin importar si trabajas con:
 - Aplicaciones móviles, data science, o infraestructura en la nube
 
 **DEE** detecta tu tipo de proyecto y carga automáticamente:
-- **62 habilidades profesionales** especializadas y auditadas
+- **64 habilidades profesionales** especializadas y auditadas (10 reescritas a nivel enterprise)
 - **Motor de inteligencia de proyecto** que detecta automáticamente tu stack tecnológico
 - **Plugins y MCPs** recomendados para tu stack
 - **Hooks de sesión** para auto-verificación y garantía de calidad
@@ -59,13 +59,13 @@ El resultado: Una experiencia de desarrollo completamente personalizada, lista p
 ### Si alguien te envía este mensaje, cópialo y pégalo en tu agente Claude:
 
 ```
-Instala el Devlmer Ecosystem Engine v3.1 en mi proyecto. Ejecuta estos comandos:
+Instala el Devlmer Ecosystem Engine v4.0 en mi proyecto. Ejecuta estos comandos:
 
 git clone https://github.com/Soyelijah/devlmer-ecosystem-engine.git /tmp/dee-install
 bash /tmp/dee-install/install.sh .
 
-Esto instalará 62 skills profesionales, 8 slash commands, MCPs recomendados,
-agentes especializados y hooks de auto-verificación. El instalador detectará
+Esto instalará 64 skills profesionales (10 enterprise-grade), slash commands, MCPs recomendados,
+agentes especializados y hooks cross-platform de auto-verificación. El instalador detectará
 automáticamente mi tipo de proyecto y personalizará todo.
 
 Después de instalar, verifica con: ls .claude/skills/ && ls .claude/commands/
@@ -233,7 +233,7 @@ El instalador lanzará automáticamente un **Setup Wizard** que te pedirá:
 
 ```
 ╔══════════════════════════════════════════╗
-║     DEE v3.1 — Setup Wizard             ║
+║     DEE v4.0 — Setup Wizard             ║
 ╠══════════════════════════════════════════╣
 ║  GitHub Token (opcional):  ghp_xxx...   ║
 ║  Gemini API Key (opcional): AIza...     ║
@@ -254,9 +254,9 @@ bash install.sh ~/tu-proyecto --no-github --no-external
 Cuando el instalador termine, verás:
 
 ```
-[✓] Devlmer Ecosystem Engine v3.1 instalado exitosamente
+[✓] Devlmer Ecosystem Engine v4.0 instalado exitosamente
 [✓] Motor de detección de proyecto: ACTIVO
-[✓] 62 habilidades cargadas y verificadas
+[✓] 64 habilidades cargadas y verificadas (10 enterprise-grade)
 [✓] 8 slash commands generados en .claude/commands/
 [✓] GitHub CLI verificado
 [✓] Nano-Banana-MCP (Gemini) listo para imagen
@@ -276,7 +276,7 @@ claude code ~/tu-proyecto
 # Abre Cowork → Selecciona tu carpeta de proyecto
 ```
 
-Una vez abierto, escribe `/skills` para verificar que todo está instalado. Deberías ver 62 skills disponibles.
+Una vez abierto, escribe `/skills` para verificar que todo está instalado. Deberías ver 64 skills disponibles.
 
 Si algo falla, consulta la sección "Troubleshooting" abajo.
 
@@ -588,7 +588,7 @@ Después de ejecutar DEE, tu proyecto tendrá esta estructura adicional:
 ```
 tu-proyecto/
 ├── .claude/
-│   ├── skills/                          # 62 habilidades personalizadas
+│   ├── skills/                          # 64 habilidades personalizadas (10 enterprise-grade)
 │   │   ├── code-review/
 │   │   │   └── SKILL.md
 │   │   ├── security-audit/
@@ -638,7 +638,7 @@ tu-proyecto/
 
 ### GitHub CLI Integration
 
-DEE v3.1 verifica e integra con tu autenticación local de GitHub CLI:
+DEE v4.0 verifica e integra con tu autenticación local de GitHub CLI:
 
 #### Cómo Funciona
 
@@ -1050,7 +1050,7 @@ bash install.sh /ruta/tu/proyecto
 | Archivo/Carpeta | Propósito |
 |-----------------|-----------|
 | `.claude/` | Carpeta raíz de DEE (no editar manualmente) |
-| `.claude/skills/` | 62 habilidades profesionales auditadas |
+| `.claude/skills/` | 64 habilidades profesionales (10 enterprise-grade) |
 | `.claude/blueprints/` | Plantillas de configuración por tipo de proyecto |
 | `.claude/agents/` | Agentes especializados (CEO, Backend, Frontend, etc.) |
 | `.claude/hooks/` | Scripts que se ejecutan automáticamente |
@@ -1139,13 +1139,13 @@ Texto completo en: [`LICENSE`](https://github.com/Soyelijah/devlmer-ecosystem-en
 
 ### Créditos
 
-**Devlmer Ecosystem Engine v3.1.1**
+**Devlmer Ecosystem Engine v4.0.0**
 
 Diseñado, desarrollado y mantenido íntegramente por:
 
 - **Pierre Solier** — Fundador & CEO de [Devlmer](https://github.com/Soyelijah)
   - Arquitectura del sistema y motor de detección de ecosistemas
-  - 62 skills profesionales y 31 integraciones MCP
+  - 64 skills profesionales (10 enterprise) y 31 integraciones MCP
   - CLI (`dee`), instalador, wizard interactivo y landing page
   - Infraestructura CI/CD, testing y documentación
 
@@ -1282,7 +1282,7 @@ Si todos los elementos tienen check, estás listo para empezar.
 
 <div align="center">
 
-#### ⚡ Devlmer Ecosystem Engine v3.1.1
+#### ⚡ Devlmer Ecosystem Engine v4.0.0
 
 **[Repositorio](https://github.com/Soyelijah/devlmer-ecosystem-engine)** · **[Issues](https://github.com/Soyelijah/devlmer-ecosystem-engine/issues)** · **[Releases](https://github.com/Soyelijah/devlmer-ecosystem-engine/releases)** · **[Licencia](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE)**
 

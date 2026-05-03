@@ -6,6 +6,43 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ---
 
+## [4.0.0] - 2026-05-03
+
+### 🚀 Enterprise Overhaul — Closes #12 #13 #14 #15 #16 #17 #18 #19 #20 #21 #22 #23
+
+### Agregado
+- **2 skills nuevas**: `changelog-agent` (conventional commits, semver, GitHub Actions) y `zone-guard` (🔴🟡🟢 security zones, CLI `zone_guard.py`)
+- **`--update` flag** en `install.sh`: actualiza un proyecto ya instalado sin reinstalar desde cero
+- **Hooks cross-platform con Python stdlib**: `config/settings.json` reescrito con Python3 puro (sin bash-only commands → compatible Windows/Linux/macOS)
+- **Multi-skill loading**: PostToolUse ahora carga TODOS los skills que coincidan, no sólo el primero
+- **Auto-confirmación de skills**: hooks muestran ✅ con nombre de skill al activarse
+
+### Cambiado
+- **10 skills enterprise-grade reescritos** con contenido real y profundo (1,000–1,800 líneas cada uno):
+  - `senior-architect`: ADR, C4 Model, CQRS, Event Sourcing, Saga patterns
+  - `senior-backend`: FastAPI, NestJS, JWT, Repository pattern, async patterns
+  - `senior-security`: OWASP Top 10 2024, incident response, threat modeling
+  - `senior-prompt-engineer`: CoT/ToT/ReAct, 22 templates, meta-prompting
+  - `code-reviewer`: 50+ reglas, severity classification, confidence filtering
+  - `ui-design-system`: Design tokens, atomic design, WCAG 2.1 AA, Storybook
+  - `unit-test-generator`: pytest, Vitest, NestJS/Jest, TDD workflows
+  - `project-intelligence`: Reescrito sin referencias a scripts fantasma
+  - `changelog-agent`: Nuevo, conventional commits + semver + release automation
+  - `zone-guard`: Nuevo, security zones con CLI interactivo
+- **Total skills**: 62 → **64 skills**
+- **Versión**: 3.1.1 → **4.0.0**
+- **Fecha**: Abril 2026 → **Mayo 2026**
+
+### Corregido
+- **`detect_project.py` auto-contaminación** (#12): excluye `.claude/`, `.dee/`, `devlmer-ecosystem-engine` del escaneo
+- **Hooks YAML frontmatter falso positivo** (#13): dee-doctor ya no reporta error por comentarios en `settings.json`
+- **`mcp-env-setup.sh` nivel de warning** (#14): degradado de WARN a INFO
+- **Hooks solo cargaban primer skill** (#15): reescrito para cargar todos los matches
+- **Compatibilidad Windows** (#16): Python stdlib reemplaza bash-only commands en hooks
+- **Skills con contenido básico** (#17-#23): 8 skills reescritos con profundidad enterprise real
+
+---
+
 ## [3.1.1] - 2026-04-07
 
 ### Agregado
