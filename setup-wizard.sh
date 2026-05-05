@@ -213,7 +213,15 @@ update_settings_json() {
     fi
 
     python3 << PYEOF
-import json, os
+import json, os, sys
+
+# Fix #24 — Force UTF-8 stdout/stderr for Windows cp1252 compatibility
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except (AttributeError, Exception):
+        pass
 
 settings_path = "${SETTINGS_FILE}"
 var_name = "${var_name}"
