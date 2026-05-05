@@ -4,4 +4,23 @@ __pycache__/
 Thumbs.db
 *.log
 node_modules/
+
+# ──────────────────────────────────────────────────────────────────
+# Environment & API key configurations — NEVER commit these
+# Closes #26 — Security: API key leak prevention
+# ──────────────────────────────────────────────────────────────────
 .env
+.env.*
+!.env.example
+
+# Local API key configurations (contain GEMINI_API_KEY, GitHub tokens, etc.)
+.claude/config/nano-banana-config.json
+.claude/config/github-config.json
+.claude/config/*.local.json
+.claude/.env
+.claude/.env.*
+
+# DEE local state files (per-project, not for upstream)
+.claude/PROJECT_PROFILE.json
+.claude/logs/
+.claude/.dee-backup-*/
