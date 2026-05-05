@@ -938,6 +938,14 @@ import json
 import sys
 import os
 
+# Fix #24 — Force UTF-8 stdout/stderr for Windows cp1252 compatibility
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except (AttributeError, Exception):
+        pass
+
 try:
     settings_file = '${settings_file}'
 
@@ -1045,7 +1053,16 @@ copy_bundled_skills() {
     if command -v python3 >/dev/null 2>&1; then
         local stripped_count
         stripped_count=$(TARGET_DIR="${TARGET_DIR}" python3 << 'STRIP_FM'
-import os, glob
+import os, glob, sys
+
+# Fix #24 — Force UTF-8 stdout/stderr for Windows cp1252 compatibility
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except (AttributeError, Exception):
+        pass
+
 skills_dir = os.path.join(os.environ.get('TARGET_DIR', '.'), '.claude/skills')
 count = 0
 for md in glob.glob(os.path.join(skills_dir, '*/SKILL.md')):
@@ -1290,6 +1307,14 @@ import subprocess
 import os
 import sys
 import shutil
+
+# Fix #24 — Force UTF-8 stdout/stderr for Windows cp1252 compatibility
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except (AttributeError, Exception):
+        pass
 
 profile_path = os.environ.get('profile_path', '')
 target_dir = os.environ.get('TARGET_DIR', '')
@@ -1670,6 +1695,14 @@ configure_agents() {
 import json
 import os
 import sys
+
+# Fix #24 — Force UTF-8 stdout/stderr for Windows cp1252 compatibility
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except (AttributeError, Exception):
+        pass
 
 profile_path = os.environ.get('profile_path', '')
 target_dir = os.environ.get('TARGET_DIR', '')
@@ -2254,7 +2287,17 @@ create_settings_json() {
         log_info "settings.json already exists — adding hooks and metadata..."
         if command -v python3 >/dev/null 2>&1; then
             TARGET_DIR="${TARGET_DIR}" python3 << 'MERGE_SETTINGS'
-import json, os
+import json, os, sys
+
+# Fix #24 — Force UTF-8 stdout/stderr for Windows cp1252 compatibility
+# Prevents UnicodeEncodeError when printing emojis (✅, ✓) on Windows default codepage
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except (AttributeError, Exception):
+        pass
+
 target_dir = os.environ.get('TARGET_DIR', '')
 settings_file = os.path.join(target_dir, '.claude/settings.json')
 try:
