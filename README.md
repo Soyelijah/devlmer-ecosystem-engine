@@ -4,7 +4,7 @@
 
 ### Intelligent Ecosystems for Every Project
 
-[![Version](https://img.shields.io/badge/version-4.0.0-0052FF?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/tag/v4.0.0)
+[![Version](https://img.shields.io/badge/version-4.0.1-0052FF?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/tag/v4.0.1)
 [![License](https://img.shields.io/badge/license-MIT-00D4AA?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE)
 [![Skills](https://img.shields.io/badge/skills-64-FF6B35?style=for-the-badge&logo=stackblitz&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/tree/main/skills)
 [![Domains](https://img.shields.io/badge/domains-22-8B5CF6?style=for-the-badge&logo=target&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/blueprints/ecosystems.json)
@@ -21,10 +21,26 @@
 
 | | |
 |---|---|
-| **Versión** | 4.0.0 — Enterprise Complete |
+| **Versión** | 4.0.1 — Windows + Security Hardening |
 | **Autor** | Pierre Solier (Devlmer) |
 | **Licencia** | [MIT](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE) |
 | **Última actualización** | Mayo 2026 |
+
+---
+
+<div align="center">
+
+## 🚀 Quick Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Soyelijah/devlmer-ecosystem-engine/main/install-cli.sh | bash
+```
+
+**📖 Full installation guide → [INSTALL.md](INSTALL.md)**
+
+*Choose from 4 install methods · Windows / macOS / Linux · 30 seconds · v4.0.1*
+
+</div>
 
 ---
 
