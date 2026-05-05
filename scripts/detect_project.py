@@ -479,16 +479,29 @@ class ProjectFingerprinter:
             "target", ".gradle", ".idea", ".vscode", ".turbo",
             ".output", ".svelte-kit", ".vercel", ".netlify",
             "android/build", "ios/Pods", ".dart_tool",
-            # DEE self-contamination exclusions (Issue #21)
-            ".claude", ".dee", "devlmer-ecosystem-engine",
+            # DEE self-contamination exclusions (Issues #21, #30)
+            ".claude", ".dee", ".agents", "devlmer-ecosystem-engine",
         }
+
+        # Issue #30 — also load user-defined exclusions from .deeignore
+        deeignore_path = os.path.join(self.root, ".deeignore")
+        if os.path.isfile(deeignore_path):
+            try:
+                with open(deeignore_path, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#"):
+                            skip.add(line)
+            except (IOError, OSError):
+                pass
+
         for dirpath, dirnames, filenames in os.walk(self.root):
             # Filter by name-level skip list
             dirnames[:] = [d for d in dirnames if d not in skip]
             rel_dir = os.path.relpath(dirpath, self.root)
-            # Also skip the `skills` directory when it lives inside `.claude`
-            # to prevent DEE skill files from contaminating domain detection
-            if rel_dir.startswith(".claude"):
+            # Also skip the `skills` directory when it lives inside .claude / .agents / .dee
+            # to prevent DEE skill files from contaminating domain detection (#21, #30)
+            if rel_dir.startswith((".claude", ".agents", ".dee")):
                 dirnames[:] = [d for d in dirnames if d != "skills"]
             self.dirs.append(rel_dir)
             for fn in filenames:
