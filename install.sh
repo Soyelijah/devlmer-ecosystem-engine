@@ -218,6 +218,10 @@ TARGET_DIR=""
 MODE="full"  # full, skills-only, scan-only
 VERBOSE=0
 
+# Fix #25 — Real dry-run mode (preview only, NO file modifications)
+DRY_RUN=0
+DRY_RUN_OPS=()  # accumulator for "would do X" log entries
+
 # GitHub authentication
 GITHUB_TOKEN=""
 GITHUB_PAT=""
@@ -316,6 +320,38 @@ log_verbose() {
     if [[ ${VERBOSE} -eq 1 ]]; then
         echo -e "    ${WHITE}${1}${RESET}"
     fi
+}
+
+# Fix #25 — Dry-run logging: predicts an operation without performing it.
+# Usage:
+#   dry_run_log "create" "${TARGET_DIR}/.claude/commands/foo.md"
+#   dry_run_log "modify" "${TARGET_DIR}/.claude/settings.json" "merge hooks"
+#   dry_run_log "delete" "${TARGET_DIR}/.claude/legacy-install.sh"
+# Returns:
+#   0 if DRY_RUN is active (caller should skip the real operation)
+#   1 if DRY_RUN is inactive (caller should proceed)
+dry_run_log() {
+    if [[ ${DRY_RUN} -eq 0 ]]; then
+        return 1
+    fi
+    local op="${1}"
+    local target="${2}"
+    local note="${3:-}"
+    local color=""
+    case "${op}" in
+        create) color="${GREEN:-}" ;;
+        modify) color="${YELLOW:-}" ;;
+        delete) color="${RED:-}" ;;
+        *)      color="${CYAN:-}" ;;
+    esac
+    if [[ -n "${note}" ]]; then
+        echo -e "  ${color}[DRY-RUN]${RESET} ${op} ${target} (${note})"
+        DRY_RUN_OPS+=("${op}|${target}|${note}")
+    else
+        echo -e "  ${color}[DRY-RUN]${RESET} ${op} ${target}"
+        DRY_RUN_OPS+=("${op}|${target}|")
+    fi
+    return 0
 }
 
 # Check if running in an interactive terminal with a real TTY
@@ -478,8 +514,12 @@ ${BOLD}ARGUMENTS:${RESET}
 
 ${BOLD}OPTIONS:${RESET}
     --help              Show this help message and exit
+    --dry-run           Preview all changes WITHOUT modifying any files (#25)
+                        Returns a summary of what would be created/modified/deleted.
+                        Safe to run on any project — guaranteed read-only.
     --skills-only       Install skills only, skip project scanning
-    --scan-only         Run project fingerprinting only, skip skill install
+    --scan-only         Install base config + project fingerprinting,
+                        skip skills/MCP/external installs (NOT a dry-run, see --dry-run)
     --verbose           Enable verbose output
     --no-external       Skip external skill installations (from npm)
     --no-mcp            Skip MCP (Model Context Protocol) installations
@@ -493,6 +533,7 @@ ${BOLD}OPTIONS:${RESET}
 
 ${BOLD}EXAMPLES:${RESET}
     ./install.sh /path/to/project
+    ./install.sh . --dry-run                      # preview changes only
     ./install.sh . --skills-only
     ./install.sh ~ --scan-only --verbose
     ./install.sh . --github-token ghp_xxxxxxxxxxxx
@@ -2465,6 +2506,11 @@ parse_arguments() {
                 show_help
                 exit 0
                 ;;
+            --dry-run)
+                # Fix #25 — Real dry-run mode: NO file modifications
+                DRY_RUN=1
+                shift
+                ;;
             --skills-only)
                 MODE="skills-only"
                 shift
@@ -2932,6 +2978,116 @@ offer_setup_wizard() {
 # MAIN INSTALLATION FLOW
 # ============================================================================
 
+# Fix #25 — Run a dry-run preview of what install.sh would do.
+# Inspects the source repo and the target directory WITHOUT modifying anything.
+# Reports a per-file summary (create/modify/delete) and counts.
+run_dry_run_preview() {
+    echo ""
+    echo -e "${BOLD}${YELLOW}╔══════════════════════════════════════════════════════════════╗${RESET}"
+    echo -e "${BOLD}${YELLOW}║                  DRY-RUN MODE — NO CHANGES                  ║${RESET}"
+    echo -e "${BOLD}${YELLOW}║       This is a read-only preview. No files modified.       ║${RESET}"
+    echo -e "${BOLD}${YELLOW}╚══════════════════════════════════════════════════════════════╝${RESET}"
+    echo ""
+
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+    log_section "PREDICTED CHANGES"
+
+    # Predict directory creation
+    for d in .claude .claude/skills .claude/commands .claude/hooks .claude/config \
+             .claude/agents .claude/mcps .claude/cache .claude/logs; do
+        if [[ ! -d "${TARGET_DIR}/${d}" ]]; then
+            dry_run_log "create" "${TARGET_DIR}/${d}/" "directory"
+        fi
+    done
+
+    # Predict skills install
+    if [[ -d "${script_dir}/skills" ]]; then
+        local skills_count
+        skills_count=$(find "${script_dir}/skills" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+        dry_run_log "create" "${TARGET_DIR}/.claude/skills/" "${skills_count} skill(s) from ${script_dir}/skills"
+    fi
+
+    # Predict commands generation
+    if [[ -d "${script_dir}/commands" ]]; then
+        local cmd_count
+        cmd_count=$(find "${script_dir}/commands" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+        dry_run_log "create" "${TARGET_DIR}/.claude/commands/" "${cmd_count} slash command(s)"
+    fi
+
+    # Predict hooks copy
+    if [[ -d "${script_dir}/.claude/hooks" ]]; then
+        for hook in "${script_dir}/.claude/hooks"/*.md; do
+            [[ -f "${hook}" ]] || continue
+            local hook_name
+            hook_name="$(basename "${hook}")"
+            dry_run_log "create" "${TARGET_DIR}/.claude/hooks/${hook_name}"
+        done
+    fi
+
+    # Predict config files
+    for cfg in dee-config.yaml ecosystems.json github-config.json nano-banana-config.json; do
+        if [[ -f "${script_dir}/.claude/config/${cfg}" ]] || [[ -f "${script_dir}/config/${cfg}" ]]; then
+            local action="create"
+            if [[ -f "${TARGET_DIR}/.claude/config/${cfg}" ]]; then
+                action="modify"
+            fi
+            dry_run_log "${action}" "${TARGET_DIR}/.claude/config/${cfg}"
+        fi
+    done
+
+    # Predict CLAUDE.md
+    if [[ -f "${TARGET_DIR}/CLAUDE.md" ]]; then
+        dry_run_log "modify" "${TARGET_DIR}/CLAUDE.md" "append DEE footer"
+    else
+        dry_run_log "create" "${TARGET_DIR}/CLAUDE.md"
+    fi
+
+    # Predict settings.json
+    if [[ -f "${TARGET_DIR}/.claude/settings.json" ]]; then
+        dry_run_log "modify" "${TARGET_DIR}/.claude/settings.json" "merge hooks + mcpServers"
+    else
+        dry_run_log "create" "${TARGET_DIR}/.claude/settings.json"
+    fi
+
+    # Predict PROJECT_PROFILE.json
+    dry_run_log "create" "${TARGET_DIR}/.claude/PROJECT_PROFILE.json" "via detect_project.py"
+
+    # Predict .deeignore
+    if [[ ! -f "${TARGET_DIR}/.deeignore" ]]; then
+        dry_run_log "create" "${TARGET_DIR}/.deeignore"
+    fi
+
+    # MCP installs
+    if [[ -z "${NO_MCP:-}" ]] && [[ "${MODE}" != "scan-only" ]] && [[ "${MODE}" != "skills-only" ]]; then
+        dry_run_log "create" "${TARGET_DIR}/.claude/mcps/" "MCPs from PROJECT_PROFILE recommendations"
+    fi
+
+    # Summary
+    echo ""
+    log_section "DRY-RUN SUMMARY"
+
+    local created_count=0 modified_count=0 deleted_count=0
+    for entry in "${DRY_RUN_OPS[@]}"; do
+        case "${entry%%|*}" in
+            create) created_count=$((created_count + 1)) ;;
+            modify) modified_count=$((modified_count + 1)) ;;
+            delete) deleted_count=$((deleted_count + 1)) ;;
+        esac
+    done
+
+    echo -e "  ${GREEN}+ Would CREATE  : ${created_count} item(s)${RESET}"
+    echo -e "  ${YELLOW}~ Would MODIFY  : ${modified_count} item(s)${RESET}"
+    echo -e "  ${RED}- Would DELETE  : ${deleted_count} item(s)${RESET}"
+    echo ""
+    log_info "Total predicted operations: $((created_count + modified_count + deleted_count))"
+    echo ""
+    log_info "No changes have been made. To execute these operations, re-run without --dry-run:"
+    echo -e "  ${CYAN}bash install.sh \"${TARGET_DIR}\"${RESET}"
+    echo ""
+}
+
 main() {
     show_banner
 
@@ -2946,6 +3102,12 @@ main() {
     log_info "Installation Mode: ${MODE}"
     log_info "Target Directory: ${TARGET_DIR}"
     echo ""
+
+    # Fix #25 — Real dry-run early exit (no file modifications)
+    if [[ ${DRY_RUN} -eq 1 ]]; then
+        run_dry_run_preview
+        exit 0
+    fi
 
     # Detect platform
     local platform=$(detect_platform)
