@@ -4,7 +4,7 @@
 
 ### Intelligent Ecosystems for Every Project
 
-[![Version](https://img.shields.io/badge/version-4.0.1-0052FF?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/tag/v4.0.1)
+[![Version](https://img.shields.io/badge/version-4.0.3-0052FF?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/releases/tag/v4.0.3)
 [![License](https://img.shields.io/badge/license-MIT-00D4AA?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/LICENSE)
 [![Skills](https://img.shields.io/badge/skills-64-FF6B35?style=for-the-badge&logo=stackblitz&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/tree/main/skills)
 [![Domains](https://img.shields.io/badge/domains-22-8B5CF6?style=for-the-badge&logo=target&logoColor=white)](https://github.com/Soyelijah/devlmer-ecosystem-engine/blob/main/blueprints/ecosystems.json)

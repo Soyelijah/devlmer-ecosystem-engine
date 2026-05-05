@@ -422,7 +422,7 @@ class ProjectFingerprinter:
         secondary = [d for d in domain_sorted[1:5] if d[1] > 0.15]
 
         return {
-            "engine_version": "3.0.0",
+            "engine_version": "4.0.3",
             "project_path": str(self.root),
             "project_name": self.root.name,
 
