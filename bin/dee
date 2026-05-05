@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# dee — Devlmer Ecosystem Engine CLI v3.1
+# dee — Devlmer Ecosystem Engine CLI v4.0.4
 #
 # Global command for managing DEE installations.
 # Installed to ~/.local/bin/dee by the installer.
@@ -17,7 +17,7 @@
 
 set -euo pipefail
 
-VERSION="3.1.1"
+VERSION="4.0.4"
 REPO_URL="https://github.com/Soyelijah/devlmer-ecosystem-engine.git"
 TMP_DIR="/tmp/dee-$$"
 
