@@ -1,6 +1,6 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════════
-#  DEVLMER ECOSYSTEM ENGINE v3.1 — Interactive Setup Wizard
+#  DEVLMER ECOSYSTEM ENGINE v4.0.3 — Interactive Setup Wizard
 #  Configures API keys for MCP services in a friendly, guided way.
 #
 #  Usage:
@@ -67,7 +67,7 @@ print_header() {
     echo -e "${CYAN}${BOLD}"
     echo -e "  ╔═══════════════════════════════════════════════════════════╗"
     echo -e "  ║                                                           ║"
-    echo -e "  ║        DEVLMER ECOSYSTEM ENGINE v3.1                     ║"
+    echo -e "  ║        DEVLMER ECOSYSTEM ENGINE v4.0.3                     ║"
     echo -e "  ║        ${RESET}${CYAN}Setup Wizard — Configuración Guiada${BOLD}              ║"
     echo -e "  ║                                                           ║"
     echo -e "  ╚═══════════════════════════════════════════════════════════╝"
@@ -425,7 +425,7 @@ for mcp in d.get('mcpServers', {}).values():
 
     echo ""
     echo -e "  ${DIM}═══════════════════════════════════════════════════════${RESET}"
-    echo -e "  ${DIM}  Devlmer Ecosystem Engine v3.1 — by Pierre Solier${RESET}"
+    echo -e "  ${DIM}  Devlmer Ecosystem Engine v4.0.3 — by Pierre Solier${RESET}"
     echo -e "  ${DIM}═══════════════════════════════════════════════════════${RESET}"
     echo ""
 }

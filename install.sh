@@ -2,13 +2,13 @@
 
 ################################################################################
 #
-# DEVLMER ECOSYSTEM ENGINE v3.1 - Master Installer Script
+# DEVLMER ECOSYSTEM ENGINE v4.0.3 - Master Installer Script
 #
 # A comprehensive, enterprise-grade installer for the Devlmer Ecosystem Engine.
 # Handles GitHub authentication, Nano-Banana-MCP setup, skill installation,
 # project intelligence setup, MCP integration, and global configuration initialization.
 #
-# Product: Devlmer Ecosystem Engine v3.1 (DEE by Devlmer)
+# Product: Devlmer Ecosystem Engine v4.0.3 (DEE by Devlmer)
 # Author: Pierre Solier (Devlmer)
 # Website: devlmer.com
 #
@@ -22,7 +22,7 @@
 #   ./install.sh --non-interactive (or --yes / -y)
 #
 # Compatibility: Bash 3.2+ (macOS default), Bash 4+, zsh 5+
-# Version: 3.1
+# Version: 4.0.3
 # Last Updated: 2026-04-05
 #
 ################################################################################
@@ -272,7 +272,7 @@ mkdir -p "${HOME}/.devlmer" 2>/dev/null || true
 {
     echo ""
     echo "================================================================"
-    echo "=== DEE v3.1 Install — $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
+    echo "=== DEE v4.0.3 Install — $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
     echo "=== Bash: ${BASH_VERSION} | OS: $(uname -s) $(uname -r) ==="
     echo "=== Args: $* ==="
     echo "================================================================"
@@ -488,7 +488,7 @@ show_banner() {
 ║               ██████╔╝███████╗ ╚████╔╝ ██║ ╚═╝ ██║███████╗███████╗██║  ██║║
 ║               ╚═════╝ ╚══════╝  ╚═══╝  ╚═╝     ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝║
 ║                                                                            ║
-║                    DEVLMER ECOSYSTEM ENGINE v3.1                          ║
+║                    DEVLMER ECOSYSTEM ENGINE v4.0.3                          ║
 ║                     Master Installer & Configuration Suite                ║
 ║                                                                            ║
 ║             Production-Grade Installation for Enterprise Environments      ║
@@ -504,7 +504,7 @@ EOF
 show_help() {
     cat << EOF
 
-${BOLD}DEVLMER ECOSYSTEM ENGINE v3.1 - Master Installer${RESET}
+${BOLD}DEVLMER ECOSYSTEM ENGINE v4.0.3 - Master Installer${RESET}
 
 ${BOLD}USAGE:${RESET}
     ./install.sh [target-directory] [options]
@@ -1362,7 +1362,7 @@ target_dir = os.environ.get('TARGET_DIR', '')
 settings_file = os.path.join(target_dir, '.claude/settings.json')
 
 # ═══════════════════════════════════════════════════════════════════
-# DEVLMER MCP REGISTRY v3.1
+# DEVLMER MCP REGISTRY v4.0.3
 # Maps short names to verified npm packages with proper configurations
 # ═══════════════════════════════════════════════════════════════════
 MCP_REGISTRY = {
@@ -2241,7 +2241,7 @@ create_global_claude_md() {
         if ! grep -q "Devlmer Ecosystem Engine" "${claude_md_path}" 2>/dev/null; then
             cat >> "${claude_md_path}" << 'APPEND_EOF'
 
-## Devlmer Ecosystem Engine v3.1
+## Devlmer Ecosystem Engine v4.0.3
 
 This project has been configured with the Devlmer Ecosystem Engine.
 Skills, MCPs, agents and slash commands are available in `.claude/`.
@@ -2252,7 +2252,7 @@ APPEND_EOF
     else
         # Create new CLAUDE.md at project root
         cat > "${claude_md_path}" << 'CLAUDEMD_EOF'
-# CLAUDE.md — Devlmer Ecosystem Engine v3.1
+# CLAUDE.md — Devlmer Ecosystem Engine v4.0.3
 
 This project is enhanced with the Devlmer Ecosystem Engine — an intelligent development assistant that gives Claude Code superpowers.
 
@@ -2354,7 +2354,7 @@ try:
                     "hooks": [
                         {
                             "type": "command",
-                            "command": "PROJ_DIR=$(pwd); PROFILE=\"$PROJ_DIR/.claude/PROJECT_PROFILE.json\"; SKILLS=$(find \"$PROJ_DIR/.claude/skills\" -name 'SKILL.md' 2>/dev/null | wc -l | tr -d ' '); AGENTS=$(find \"$PROJ_DIR/.claude/agents\" -name '*.md' 2>/dev/null | wc -l | tr -d ' '); CMDS=$(find \"$PROJ_DIR/.claude/commands\" -name '*.md' 2>/dev/null | wc -l | tr -d ' '); MCPS=0; if [ -f \"$PROJ_DIR/.claude/settings.json\" ]; then MCPS=$(python3 -c \"import json; s=json.load(open('$PROJ_DIR/.claude/settings.json')); print(len(s.get('mcpServers',{})))\" 2>/dev/null || echo 0); fi; DOMAIN='unknown'; if [ -f \"$PROFILE\" ]; then DOMAIN=$(python3 -c \"import json; p=json.load(open('$PROFILE')); print(p.get('fingerprint',{}).get('domain','unknown').replace('_',' ').title())\" 2>/dev/null || echo unknown); fi; echo ''; echo '🧠 DEVLMER ECOSYSTEM ENGINE v3.1'; echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'; echo \"📊 Project: $(basename $PROJ_DIR) | Domain: $DOMAIN\"; echo \"⚡ $SKILLS skills | $CMDS commands | $AGENTS agents | $MCPS MCPs\"; echo ''; echo '💡 Quick start: /dee-demo (tour) | /dee-status (dashboard) | /dee-doctor (health)'; echo '   Type / to see all available commands'; echo ''"
+                            "command": "PROJ_DIR=$(pwd); PROFILE=\"$PROJ_DIR/.claude/PROJECT_PROFILE.json\"; SKILLS=$(find \"$PROJ_DIR/.claude/skills\" -name 'SKILL.md' 2>/dev/null | wc -l | tr -d ' '); AGENTS=$(find \"$PROJ_DIR/.claude/agents\" -name '*.md' 2>/dev/null | wc -l | tr -d ' '); CMDS=$(find \"$PROJ_DIR/.claude/commands\" -name '*.md' 2>/dev/null | wc -l | tr -d ' '); MCPS=0; if [ -f \"$PROJ_DIR/.claude/settings.json\" ]; then MCPS=$(python3 -c \"import json; s=json.load(open('$PROJ_DIR/.claude/settings.json')); print(len(s.get('mcpServers',{})))\" 2>/dev/null || echo 0); fi; DOMAIN='unknown'; if [ -f \"$PROFILE\" ]; then DOMAIN=$(python3 -c \"import json; p=json.load(open('$PROFILE')); print(p.get('fingerprint',{}).get('domain','unknown').replace('_',' ').title())\" 2>/dev/null || echo unknown); fi; echo ''; echo '🧠 DEVLMER ECOSYSTEM ENGINE v4.0.3'; echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'; echo \"📊 Project: $(basename $PROJ_DIR) | Domain: $DOMAIN\"; echo \"⚡ $SKILLS skills | $CMDS commands | $AGENTS agents | $MCPS MCPs\"; echo ''; echo '💡 Quick start: /dee-demo (tour) | /dee-status (dashboard) | /dee-doctor (health)'; echo '   Type / to see all available commands'; echo ''"
                         }
                     ]
                 }
@@ -2402,7 +2402,7 @@ MERGE_SETTINGS
         "hooks": [
           {
             "type": "command",
-            "command": "PROJ_DIR=$(pwd); PROFILE=\"$PROJ_DIR/.claude/PROJECT_PROFILE.json\"; SKILLS=$(find \"$PROJ_DIR/.claude/skills\" -name 'SKILL.md' 2>/dev/null | wc -l | tr -d ' '); AGENTS=$(find \"$PROJ_DIR/.claude/agents\" -name '*.md' 2>/dev/null | wc -l | tr -d ' '); CMDS=$(find \"$PROJ_DIR/.claude/commands\" -name '*.md' 2>/dev/null | wc -l | tr -d ' '); MCPS=0; if [ -f \"$PROJ_DIR/.claude/settings.json\" ]; then MCPS=$(python3 -c \"import json; s=json.load(open('$PROJ_DIR/.claude/settings.json')); print(len(s.get('mcpServers',{})))\" 2>/dev/null || echo 0); fi; DOMAIN='unknown'; if [ -f \"$PROFILE\" ]; then DOMAIN=$(python3 -c \"import json; p=json.load(open('$PROFILE')); print(p.get('fingerprint',{}).get('domain','unknown').replace('_',' ').title())\" 2>/dev/null || echo unknown); fi; echo ''; echo '🧠 DEVLMER ECOSYSTEM ENGINE v3.1'; echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'; echo \"📊 Project: $(basename $PROJ_DIR) | Domain: $DOMAIN\"; echo \"⚡ $SKILLS skills | $CMDS commands | $AGENTS agents | $MCPS MCPs\"; echo ''; echo '💡 Quick start: /dee-demo (tour) | /dee-status (dashboard) | /dee-doctor (health)'; echo '   Type / to see all available commands'; echo ''"
+            "command": "PROJ_DIR=$(pwd); PROFILE=\"$PROJ_DIR/.claude/PROJECT_PROFILE.json\"; SKILLS=$(find \"$PROJ_DIR/.claude/skills\" -name 'SKILL.md' 2>/dev/null | wc -l | tr -d ' '); AGENTS=$(find \"$PROJ_DIR/.claude/agents\" -name '*.md' 2>/dev/null | wc -l | tr -d ' '); CMDS=$(find \"$PROJ_DIR/.claude/commands\" -name '*.md' 2>/dev/null | wc -l | tr -d ' '); MCPS=0; if [ -f \"$PROJ_DIR/.claude/settings.json\" ]; then MCPS=$(python3 -c \"import json; s=json.load(open('$PROJ_DIR/.claude/settings.json')); print(len(s.get('mcpServers',{})))\" 2>/dev/null || echo 0); fi; DOMAIN='unknown'; if [ -f \"$PROFILE\" ]; then DOMAIN=$(python3 -c \"import json; p=json.load(open('$PROFILE')); print(p.get('fingerprint',{}).get('domain','unknown').replace('_',' ').title())\" 2>/dev/null || echo unknown); fi; echo ''; echo '🧠 DEVLMER ECOSYSTEM ENGINE v4.0.3'; echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'; echo \"📊 Project: $(basename $PROJ_DIR) | Domain: $DOMAIN\"; echo \"⚡ $SKILLS skills | $CMDS commands | $AGENTS agents | $MCPS MCPs\"; echo ''; echo '💡 Quick start: /dee-demo (tour) | /dee-status (dashboard) | /dee-doctor (health)'; echo '   Type / to see all available commands'; echo ''"
           }
         ]
       }
@@ -2927,7 +2927,7 @@ install_dee_cli() {
 show_product_info() {
     echo ""
     echo -e "${BOLD}${MAGENTA}═══════════════════════════════════════════════════════════${RESET}"
-    echo -e "${BOLD}${MAGENTA}  DEVLMER ECOSYSTEM ENGINE v3.1${RESET}"
+    echo -e "${BOLD}${MAGENTA}  DEVLMER ECOSYSTEM ENGINE v4.0.3${RESET}"
     echo -e "${BOLD}${MAGENTA}  by Pierre Solier (Devlmer)${RESET}"
     echo -e "${BOLD}${MAGENTA}  https://devlmer.com${RESET}"
     echo -e "${BOLD}${MAGENTA}═══════════════════════════════════════════════════════════${RESET}"
