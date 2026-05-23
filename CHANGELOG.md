@@ -17,13 +17,25 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
   - 5 custom skills to create (latam-payments-chile, firestore-custom-claims, retail-multirole-routing, clp-money-handling, chile-rut-validation)
   - 30 líneas de `claude_md_additions` cubriendo stack canónico, roles, 10 patrones de seguridad no negociables, 10 anti-patterns conocidos, convenciones UI
 - **Total ecosystems**: 22 → **23 blueprints**
+- **`install.sh` ahora armoniza el `.gitignore` del proyecto target** durante la instalación. Agrega idempotentemente `.claude/__pycache__/`, `.claude/logs/`, `.claude/settings.local.json` para que los usuarios no commiteen efímeros de DEE accidentalmente. Cero side effects si las líneas ya están presentes.
+- **Helper `_has_in_source(*keywords)` en `detect_project.py`**: escanea contenido de archivos fuente (.ts/.tsx/.py/.go/.rs hasta 200 archivos, 200 líneas c/u) en vez de solo nombres. Habilita detecciones que `_has()` no podía hacer (endpoints `/api/health`, middleware `rate-limit`, etc.).
+- **Helper `_has_package_script_with(*keywords)` en `detect_project.py`**: parsea `package.json` y revisa si algún script de npm contiene los keywords. Habilita detectar `tsc --noEmit` como evidencia de linting incluso sin `.eslintrc`.
 
-### Pendiente (follow-up)
-- Entrenar `detect_project.py` para reconocer este blueprint automáticamente. Señales sugeridas:
-  - `package.json` deps: `firebase-admin` + `mercadopago` + `express` + `firebase` → +0.4 confidence
-  - Existencia de `firestore.rules` + `functions/src/` → +0.3 confidence
-  - Strings en código: `Flow.cl`, `MercadoPago`, `CLP`, archivos `RUT.*` → +0.2 confidence
-  - Combinación de 3+ señales debería superar `devtools` (que típicamente tiene 0.7-0.9 cuando hay `.claude/` heavy)
+### Cambiado (mejoras al detector — v4.0.5)
+- **`engine_version` bump 4.0.3 → 4.0.5** en `scripts/detect_project.py`
+- **Demote de `devtools` cuando hay business domain fuerte**. Antes: proyectos con `.claude/` pesado se clasificaban como `devtools` con ~0.86 confidence aunque fueran retail/ecommerce/fintech. Ahora: si hay un dominio business (ecommerce, logistics, fintech, saas, healthcare, education, social, marketplace, retail_multirole_firebase, iot, gaming, media, real_estate, travel, hospitality) con >0.5 confidence, el primary cambia a ese.
+- **Maturity `linting` ahora detecta `tsc --noEmit` / eslint / biome / oxlint / ruff / prettier en `package.json:scripts`**, no solo archivos de config tipo `.eslintrc`. Muchos proyectos TS modernos usan solo `pnpm lint = tsc --noEmit`.
+- **Maturity `monitoring` ahora detecta endpoints `/api/health`, `/healthcheck`, `/health`, `healthz`** dentro del código fuente (vía `_has_in_source`), no solo paquetes APM SaaS (sentry/datadog).
+- **Maturity `security` ahora reconoce evidencia adicional**: `firestore.rules`, `storage.rules`, `helmet` / `express-rate-limit` / `firebase-admin` en deps. Antes solo `SECURITY.md` o `.snyk`.
+- **`security.has_auth` ahora reconoce Firebase Auth, Passport, iron-session, betterauth, supertokens, lucia-auth** además de los 8 providers originales. Antes el detector reportaba `has_auth: false` para todo proyecto Firebase.
+- **`security.auth_provider` ahora mapea a nombres canónicos**: `firebase` + `firebase-admin` → `firebase-auth` (sin dupes); `next-auth` + `nextauth` → `nextauth`; etc.
+- **`security.has_rate_limiting` ahora reconoce `express-rate-limit` en `detected_tech`** además de la búsqueda por substring.
+- **`security.has_cors` ahora también acepta `cors` en `detected_tech`**, no solo en filenames.
+- **`security.has_firestore_rules` + `security.has_storage_rules`**: nuevos campos booleanos para Firebase Security Rules.
+
+### Corregido
+- **Falsos negativos sistemáticos en proyectos Firebase + TS strict**: stockflow (78 archivos, Firebase + Express + payments) era reportado con maturity 3/12 ("mvp") cuando realmente está en 6/12 ("growth"). Tras los fixes: `linting: false → true`, `monitoring: false → true`, `security: false → true`, `has_auth: false → true`, `has_rate_limiting: false → true`.
+- **Devtools dominante en multi-domain projects**: stockflow se clasificaba `domain: devtools (0.86)` con `secondary: ecommerce(0.7), logistics(0.84)`. Tras los fixes: `domain: logistics (0.89)` (el demote eligió el business domain más fuerte).
 
 ---
 

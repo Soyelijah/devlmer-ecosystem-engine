@@ -417,12 +417,29 @@ class ProjectFingerprinter:
         tech_sorted = sorted(self.detected_tech.items(), key=lambda x: -x[1])
         domain_sorted = sorted(self.detected_domains.items(), key=lambda x: -x[1])
 
-        # Multi-domain: return all with >25% confidence
-        primary_domain = domain_sorted[0] if domain_sorted and domain_sorted[0][1] > 0.15 else ("generic", 0)
-        secondary = [d for d in domain_sorted[1:5] if d[1] > 0.15]
+        # Multi-domain: return all with >25% confidence.
+        # Devtools demotion: when a project has a heavy .claude/ (skills/scripts/agents),
+        # the devtools heuristic over-fires (~0.86 confidence) even when the underlying
+        # business is retail/ecommerce/fintech/etc. If a non-devtools business domain
+        # scores >0.5, promote it as primary and demote devtools to secondary.
+        # See blueprints/ecosystems.json for the full business domain set.
+        DEMOTE_DEVTOOLS_IF_BUSINESS = {
+            "ecommerce", "logistics", "fintech", "saas", "healthcare", "education",
+            "social", "marketplace", "retail_multirole_firebase", "iot", "gaming",
+            "media", "real_estate", "travel", "hospitality"
+        }
+        if (domain_sorted and domain_sorted[0][0] == "devtools" and
+            any(d[0] in DEMOTE_DEVTOOLS_IF_BUSINESS and d[1] > 0.5 for d in domain_sorted[1:])):
+            business_first = [d for d in domain_sorted if d[0] != "devtools"]
+            primary_domain = business_first[0] if business_first else domain_sorted[0]
+            secondary = [d for d in domain_sorted if d[0] != primary_domain[0]][:4]
+        else:
+            primary_domain = domain_sorted[0] if domain_sorted and domain_sorted[0][1] > 0.15 else ("generic", 0)
+            secondary = [d for d in domain_sorted[1:5] if d[1] > 0.15]
+        secondary = [d for d in secondary if d[1] > 0.15]
 
         return {
-            "engine_version": "4.0.3",
+            "engine_version": "4.0.5",
             "project_path": str(self.root),
             "project_name": self.root.name,
 
@@ -806,16 +823,38 @@ class ProjectFingerprinter:
     # MATURITY ASSESSMENT — 12 axes
     # ───────────────────────────────────────────────────────────────
     def _assess_maturity(self) -> dict:
+        # Each axis returns True if there's *concrete evidence* the practice is in place.
+        # Heuristics expanded in 4.0.5 to catch stacks the original rules missed:
+        #   - linting: now detects `tsc --noEmit` / eslint / biome / oxlint / prettier in package.json scripts
+        #   - monitoring: now counts /api/health endpoints + healthcheck routes (not just APM SaaS)
+        #   - security: now counts firestore.rules + helmet + express-rate-limit + firebase-admin
         axes = {
             "testing":        self._has("test", "spec", "conftest"),
             "ci_cd":          self._has_dir(".github/workflows") or self._has_file(".gitlab-ci.yml"),
             "containerized":  self._has_file("Dockerfile") or self._has_file("docker-compose.yml"),
-            "linting":        any(self._has_file(f) for f in [".eslintrc.js", ".eslintrc.json", "eslint.config.js", "biome.json", "ruff.toml", ".flake8", ".pylintrc"]),
+            "linting": (
+                any(self._has_file(f) for f in [
+                    ".eslintrc.js", ".eslintrc.json", "eslint.config.js", "biome.json",
+                    "ruff.toml", ".flake8", ".pylintrc", "oxlint.json",
+                    ".prettierrc", ".prettierrc.json", "dprint.json"
+                ])
+                or self._has_package_script_with("tsc", "eslint", "biome", "oxlint", "ruff", "prettier")
+            ),
             "type_safety":    self.file_stats.get("ts", 0) + self.file_stats.get("tsx", 0) > 0,
-            "monitoring":     any(t in self.detected_tech for t in ["sentry", "datadog", "prometheus", "opentelemetry"]),
+            "monitoring": (
+                any(t in self.detected_tech for t in ["sentry", "datadog", "prometheus", "opentelemetry", "newrelic"])
+                or self._has_in_source("/api/health", "/healthcheck", "/health", "healthcheck", "healthz")
+            ),
             "documentation":  self._has_dir("docs/") or self._has_file("README.md"),
             "env_management": self._has_file(".env.example") or self._has_file(".env.sample"),
-            "security":       self._has_file("SECURITY.md") or self._has_file(".snyk"),
+            "security": (
+                self._has_file("SECURITY.md")
+                or self._has_file(".snyk")
+                or self._has_file("firestore.rules")  # Firebase Security Rules
+                or self._has_file("storage.rules")
+                or self._has("rate_limit") or self._has("throttle")
+                or any(t in self.detected_tech for t in ["helmet", "express-rate-limit", "firebase-admin"])
+            ),
             "api_docs":       self._has_file("openapi.yaml") or self._has("swagger") or self._has("api/docs"),
             "migrations":     self._has_dir("migrations/") or self._has_file("alembic.ini") or self._has_dir("prisma/migrations"),
             "i18n":           self._has_dir("locales/") or self._has_dir("i18n/"),
@@ -864,24 +903,50 @@ class ProjectFingerprinter:
     # SECURITY POSTURE
     # ───────────────────────────────────────────────────────────────
     def _assess_security(self) -> dict:
-        has_auth = any(t in self.detected_tech for t in
-                      ["auth0", "clerk", "nextauth", "lucia", "jwt", "oauth", "keycloak", "supertokens"])
+        # 4.0.5: expanded auth provider list to include Firebase Auth, Passport, iron-session,
+        # next-auth (modern name), supertokens, betterauth — these were all false-negatives before.
+        # Also: has_rate_limiting now recognizes express-rate-limit as evidence.
+        AUTH_TECH = [
+            "auth0", "clerk", "nextauth", "next-auth", "lucia", "jwt", "oauth",
+            "keycloak", "supertokens", "firebase", "firebase-admin", "passport",
+            "iron-session", "betterauth", "lucia-auth"
+        ]
+        has_auth = any(t in self.detected_tech for t in AUTH_TECH)
         has_env_example = self._has_file(".env.example") or self._has_file(".env.sample")
         has_gitignore_env = False
         if self._has_file(".gitignore"):
             gi = self._read_head(".gitignore", 100)
             has_gitignore_env = ".env" in gi
 
+        # Map raw tech keys to canonical provider names so consumers don't see dupes
+        # like ["firebase","firebase-admin"] — both collapse to "firebase-auth".
+        PROVIDER_MAP = {
+            "auth0": "auth0", "clerk": "clerk",
+            "nextauth": "nextauth", "next-auth": "nextauth",
+            "lucia": "lucia", "lucia-auth": "lucia",
+            "jwt": "jwt", "oauth": "oauth", "keycloak": "keycloak",
+            "supertokens": "supertokens",
+            "firebase": "firebase-auth", "firebase-admin": "firebase-auth",
+            "passport": "passport", "iron-session": "iron-session", "betterauth": "betterauth"
+        }
+        auth_provider = sorted(set(
+            PROVIDER_MAP[t] for t in self.detected_tech if t in PROVIDER_MAP
+        ))
+
         return {
             "has_auth": has_auth,
-            "auth_provider": [t for t in ["auth0", "clerk", "nextauth", "lucia", "jwt", "oauth", "keycloak"]
-                            if t in self.detected_tech],
+            "auth_provider": auth_provider,
             "env_secured": has_gitignore_env,
             "has_env_example": has_env_example,
             "has_security_policy": self._has_file("SECURITY.md"),
-            "has_rate_limiting": self._has("rate_limit") or self._has("throttle"),
-            "has_cors": self._has("cors"),
+            "has_rate_limiting": (
+                self._has_in_source("ratelimit", "rate_limit", "rate-limit", "throttle", "express-rate-limit")
+                or "express-rate-limit" in self.detected_tech
+            ),
+            "has_cors": self._has("cors") or "cors" in self.detected_tech,
             "has_helmet": self._has_file("package.json") and "helmet" in self._read_head("package.json") if self._has_file("package.json") else False,
+            "has_firestore_rules": self._has_file("firestore.rules"),
+            "has_storage_rules": self._has_file("storage.rules"),
         }
 
     # ───────────────────────────────────────────────────────────────
@@ -895,6 +960,55 @@ class ProjectFingerprinter:
 
     def _has_dir(self, name: str) -> bool:
         return any(name.rstrip("/") in d for d in self.dirs)
+
+    def _has_package_script_with(self, *keywords) -> bool:
+        """Check if any npm script value in package.json contains any of the keywords.
+
+        Used by maturity assessment to detect `tsc --noEmit` as evidence of linting,
+        even when there's no explicit .eslintrc / biome.json config file. Many TS
+        projects use `pnpm lint = tsc --noEmit` as their only static check.
+        """
+        if not self._has_file("package.json"):
+            return False
+        try:
+            pkg_path = self.root / "package.json"
+            if not pkg_path.exists():
+                return False
+            with open(pkg_path, encoding="utf-8") as f:
+                pkg = json.load(f)
+            scripts = pkg.get("scripts", {})
+            return any(
+                any(kw in v for kw in keywords)
+                for v in scripts.values()
+                if isinstance(v, str)
+            )
+        except Exception:
+            return False
+
+    def _has_in_source(self, *keywords, extensions=("ts", "tsx", "js", "jsx", "py", "go", "rs")) -> bool:
+        """Search the *content* of source files for any keyword (case-insensitive).
+
+        Unlike _has() which only matches filenames, this opens each source file and
+        scans the first 200 lines. Used to detect runtime patterns like '/api/health'
+        endpoints, 'rate_limit' middleware calls, etc. that don't show up in file names.
+
+        Scans at most 200 source files; caches reads via _read_head.
+        """
+        kw_lower = tuple(k.lower() for k in keywords)
+        seen = 0
+        for f in self.files:
+            if seen >= 200:
+                break
+            if not any(f.endswith("." + ext) for ext in extensions):
+                continue
+            seen += 1
+            try:
+                content = self._read_head(f, 200).lower()
+                if any(kw in content for kw in kw_lower):
+                    return True
+            except Exception:
+                continue
+        return False
 
 
 def main():

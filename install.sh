@@ -2430,6 +2430,61 @@ SETTINGS_EOF
 }
 
 # ============================================================================
+# PROJECT .gitignore HARMONIZATION
+# ============================================================================
+# Ensures the target project's .gitignore covers the ephemera DEE generates
+# (Python __pycache__, log files, local-only settings) so the user doesn't
+# accidentally commit them. Idempotent: only adds lines that aren't there.
+
+update_project_gitignore() {
+    log_step "Harmonizing .gitignore for DEE ephemera..."
+
+    local gitignore="${TARGET_DIR}/.gitignore"
+    local lines_to_ensure=(
+        ".claude/__pycache__/"
+        ".claude/logs/"
+        ".claude/settings.local.json"
+    )
+
+    # Create .gitignore if absent
+    if [[ ! -f "${gitignore}" ]]; then
+        log_info "No .gitignore found — creating one with DEE ephemera ignored"
+        {
+            echo "# Devlmer Ecosystem Engine — ephemera (do not commit)"
+            for line in "${lines_to_ensure[@]}"; do
+                echo "${line}"
+            done
+        } > "${gitignore}"
+        CONFIG_FILES_CREATED=$((CONFIG_FILES_CREATED + 1))
+        log_success ".gitignore created with ${#lines_to_ensure[@]} DEE ignore entries"
+        return 0
+    fi
+
+    # .gitignore exists — append only the missing lines, idempotent
+    local added=0
+    local needs_header=1
+    for line in "${lines_to_ensure[@]}"; do
+        # grep -qxF: exact line match, fixed string (no regex)
+        if ! grep -qxF "${line}" "${gitignore}" 2>/dev/null; then
+            if [[ ${needs_header} -eq 1 ]]; then
+                # Add a section separator if there's content
+                [[ -s "${gitignore}" ]] && echo "" >> "${gitignore}"
+                echo "# Devlmer Ecosystem Engine — ephemera (auto-added by install.sh)" >> "${gitignore}"
+                needs_header=0
+            fi
+            echo "${line}" >> "${gitignore}"
+            added=$((added + 1))
+        fi
+    done
+
+    if [[ ${added} -gt 0 ]]; then
+        log_success "Added ${added} DEE entr$([ ${added} -eq 1 ] && echo "y" || echo "ies") to existing .gitignore"
+    else
+        log_info ".gitignore already covers all DEE ephemera — no changes"
+    fi
+}
+
+# ============================================================================
 # PROJECT FINGERPRINTING
 # ============================================================================
 
@@ -3178,6 +3233,7 @@ main() {
         run_step "Slash commands" generate_slash_commands
         run_step "CLAUDE.md" create_global_claude_md
         run_step "settings.json" create_settings_json
+        run_step ".gitignore harmony" update_project_gitignore
 
         echo ""
     fi
