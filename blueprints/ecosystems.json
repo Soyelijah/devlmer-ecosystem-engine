@@ -3,30 +3,126 @@
     "label": "AI Chatbot / Conversational Agent",
     "description": "Full chatbot system with NLP, multi-channel, analytics, and deployment",
     "skills": {
-      "core": ["mcp-builder", "web-artifacts-builder", "docx", "pdf"],
-      "domain": ["design:ux-writing", "design:accessibility-review", "marketing:content-creation", "product-management:feature-spec"],
-      "operations": ["operations:runbook", "operations:change-management", "operations:risk-assessment"]
+      "core": [
+        "mcp-builder",
+        "web-artifacts-builder",
+        "docx",
+        "pdf"
+      ],
+      "domain": [
+        "design:ux-writing",
+        "design:accessibility-review",
+        "marketing:content-creation",
+        "product-management:feature-spec"
+      ],
+      "operations": [
+        "operations:runbook",
+        "operations:change-management",
+        "operations:risk-assessment"
+      ]
     },
     "mcps": {
       "required": [
-        {"name": "playwright", "reason": "Testing conversational UI flows"},
-        {"name": "context7", "reason": "Library documentation lookup"},
-        {"name": "github", "reason": "Version control integration"}
+        {
+          "name": "playwright",
+          "reason": "Testing conversational UI flows"
+        },
+        {
+          "name": "context7",
+          "reason": "Library documentation lookup"
+        },
+        {
+          "name": "github",
+          "reason": "Version control integration"
+        }
       ],
       "recommended": [
-        {"name": "slack", "search_terms": ["slack", "messaging"], "reason": "Deploy bot to Slack"},
-        {"name": "discord", "search_terms": ["discord", "bot"], "reason": "Deploy bot to Discord"},
-        {"name": "telegram", "search_terms": ["telegram", "bot"], "reason": "Deploy bot to Telegram"},
-        {"name": "whatsapp", "search_terms": ["whatsapp", "twilio"], "reason": "WhatsApp integration"},
-        {"name": "langchain", "search_terms": ["langchain", "llm"], "reason": "LLM orchestration"},
-        {"name": "pinecone", "search_terms": ["pinecone", "vector"], "reason": "Vector store for RAG"},
-        {"name": "supabase", "search_terms": ["supabase", "database"], "reason": "Conversation storage"},
-        {"name": "redis", "search_terms": ["redis", "cache"], "reason": "Session state and caching"},
-        {"name": "sentry", "search_terms": ["sentry", "monitoring"], "reason": "Error tracking"},
-        {"name": "posthog", "search_terms": ["posthog", "analytics"], "reason": "Conversation analytics"}
+        {
+          "name": "slack",
+          "search_terms": [
+            "slack",
+            "messaging"
+          ],
+          "reason": "Deploy bot to Slack"
+        },
+        {
+          "name": "discord",
+          "search_terms": [
+            "discord",
+            "bot"
+          ],
+          "reason": "Deploy bot to Discord"
+        },
+        {
+          "name": "telegram",
+          "search_terms": [
+            "telegram",
+            "bot"
+          ],
+          "reason": "Deploy bot to Telegram"
+        },
+        {
+          "name": "whatsapp",
+          "search_terms": [
+            "whatsapp",
+            "twilio"
+          ],
+          "reason": "WhatsApp integration"
+        },
+        {
+          "name": "langchain",
+          "search_terms": [
+            "langchain",
+            "llm"
+          ],
+          "reason": "LLM orchestration"
+        },
+        {
+          "name": "pinecone",
+          "search_terms": [
+            "pinecone",
+            "vector"
+          ],
+          "reason": "Vector store for RAG"
+        },
+        {
+          "name": "supabase",
+          "search_terms": [
+            "supabase",
+            "database"
+          ],
+          "reason": "Conversation storage"
+        },
+        {
+          "name": "redis",
+          "search_terms": [
+            "redis",
+            "cache"
+          ],
+          "reason": "Session state and caching"
+        },
+        {
+          "name": "sentry",
+          "search_terms": [
+            "sentry",
+            "monitoring"
+          ],
+          "reason": "Error tracking"
+        },
+        {
+          "name": "posthog",
+          "search_terms": [
+            "posthog",
+            "analytics"
+          ],
+          "reason": "Conversation analytics"
+        }
       ]
     },
-    "plugins": ["playwright@claude-plugins-official", "frontend-design@claude-plugins-official"],
+    "plugins": [
+      "playwright@claude-plugins-official",
+      "frontend-design@claude-plugins-official"
+    ],
     "agents": {
       "prompt_engineer": "Specialized in crafting system prompts, few-shot examples, and guardrails for chatbot responses",
       "test_agent": "Automated conversation testing — happy paths, edge cases, adversarial inputs, hallucination detection",
@@ -37,17 +133,33 @@
       {
         "name": "chatbot-prompt-engineering",
         "description": "Design system prompts, guardrails, tone guidelines, and few-shot examples for conversational AI",
-        "triggers": ["system prompt", "chatbot personality", "guardrails", "few-shot", "conversation design"]
+        "triggers": [
+          "system prompt",
+          "chatbot personality",
+          "guardrails",
+          "few-shot",
+          "conversation design"
+        ]
       },
       {
         "name": "chatbot-testing",
         "description": "Generate test conversation scripts, adversarial inputs, edge cases, and regression suites for chatbots",
-        "triggers": ["test chatbot", "conversation test", "adversarial test", "chatbot QA"]
+        "triggers": [
+          "test chatbot",
+          "conversation test",
+          "adversarial test",
+          "chatbot QA"
+        ]
       },
       {
         "name": "chatbot-analytics",
         "description": "Track and analyze chatbot KPIs: resolution rate, CSAT, escalation %, intent gaps, conversation length",
-        "triggers": ["chatbot metrics", "conversation analytics", "bot performance", "intent coverage"]
+        "triggers": [
+          "chatbot metrics",
+          "conversation analytics",
+          "bot performance",
+          "intent coverage"
+        ]
       }
     ],
     "hooks": {
@@ -62,28 +174,93 @@
       "- Analytics: Track resolution rate, CSAT, escalation %, avg conversation length, intent coverage"
     ]
   },
-
   "ai_agent": {
     "label": "AI Agent / Autonomous System",
     "description": "LLM-powered agent with tool use, RAG, memory, and evaluation pipeline",
     "skills": {
-      "core": ["mcp-builder", "skill-creator", "web-artifacts-builder"],
-      "domain": ["product-management:feature-spec", "operations:runbook", "design:ux-writing"],
-      "operations": ["operations:risk-assessment", "operations:change-management"]
+      "core": [
+        "mcp-builder",
+        "skill-creator",
+        "web-artifacts-builder"
+      ],
+      "domain": [
+        "product-management:feature-spec",
+        "operations:runbook",
+        "design:ux-writing"
+      ],
+      "operations": [
+        "operations:risk-assessment",
+        "operations:change-management"
+      ]
     },
     "mcps": {
       "required": [
-        {"name": "github", "reason": "Code management"},
-        {"name": "context7", "reason": "Library docs"}
+        {
+          "name": "github",
+          "reason": "Code management"
+        },
+        {
+          "name": "context7",
+          "reason": "Library docs"
+        }
       ],
       "recommended": [
-        {"name": "langchain", "search_terms": ["langchain", "agent"], "reason": "Agent framework"},
-        {"name": "anthropic", "search_terms": ["anthropic", "claude"], "reason": "Claude API"},
-        {"name": "openai", "search_terms": ["openai", "gpt"], "reason": "OpenAI API"},
-        {"name": "pinecone", "search_terms": ["pinecone", "vector"], "reason": "Vector store"},
-        {"name": "chromadb", "search_terms": ["chroma", "embedding"], "reason": "Local vector DB"},
-        {"name": "browserbase", "search_terms": ["browserbase", "browser"], "reason": "Web browsing for agents"},
-        {"name": "e2b", "search_terms": ["e2b", "sandbox"], "reason": "Code execution sandbox"}
+        {
+          "name": "langchain",
+          "search_terms": [
+            "langchain",
+            "agent"
+          ],
+          "reason": "Agent framework"
+        },
+        {
+          "name": "anthropic",
+          "search_terms": [
+            "anthropic",
+            "claude"
+          ],
+          "reason": "Claude API"
+        },
+        {
+          "name": "openai",
+          "search_terms": [
+            "openai",
+            "gpt"
+          ],
+          "reason": "OpenAI API"
+        },
+        {
+          "name": "pinecone",
+          "search_terms": [
+            "pinecone",
+            "vector"
+          ],
+          "reason": "Vector store"
+        },
+        {
+          "name": "chromadb",
+          "search_terms": [
+            "chroma",
+            "embedding"
+          ],
+          "reason": "Local vector DB"
+        },
+        {
+          "name": "browserbase",
+          "search_terms": [
+            "browserbase",
+            "browser"
+          ],
+          "reason": "Web browsing for agents"
+        },
+        {
+          "name": "e2b",
+          "search_terms": [
+            "e2b",
+            "sandbox"
+          ],
+          "reason": "Code execution sandbox"
+        }
       ]
     },
     "agents": {
@@ -95,37 +272,120 @@
       {
         "name": "agent-evaluation",
         "description": "Design eval suites for AI agents: accuracy benchmarks, tool-use correctness, hallucination detection, cost tracking",
-        "triggers": ["eval agent", "benchmark", "agent testing", "hallucination check"]
+        "triggers": [
+          "eval agent",
+          "benchmark",
+          "agent testing",
+          "hallucination check"
+        ]
       },
       {
         "name": "agent-tool-design",
         "description": "Design MCP tools and function schemas for AI agents following best practices for reliability",
-        "triggers": ["design tool", "function schema", "tool spec", "MCP tool"]
+        "triggers": [
+          "design tool",
+          "function schema",
+          "tool spec",
+          "MCP tool"
+        ]
       }
     ]
   },
-
   "ecommerce": {
     "label": "E-Commerce Platform",
     "description": "Full e-commerce with catalog, cart, checkout, payments, and analytics",
     "skills": {
-      "core": ["xlsx", "pdf", "docx", "web-artifacts-builder"],
-      "domain": ["finance:financial-statements", "finance:reconciliation", "marketing:campaign-planning", "marketing:seo-audit", "marketing:performance-analytics"],
-      "operations": ["operations:vendor-management", "operations:compliance-tracking", "legal:compliance"]
+      "core": [
+        "xlsx",
+        "pdf",
+        "docx",
+        "web-artifacts-builder"
+      ],
+      "domain": [
+        "finance:financial-statements",
+        "finance:reconciliation",
+        "marketing:campaign-planning",
+        "marketing:seo-audit",
+        "marketing:performance-analytics"
+      ],
+      "operations": [
+        "operations:vendor-management",
+        "operations:compliance-tracking",
+        "legal:compliance"
+      ]
     },
     "mcps": {
       "required": [
-        {"name": "stripe", "search_terms": ["stripe", "payment"], "reason": "Payment processing"},
-        {"name": "github", "reason": "Version control"}
+        {
+          "name": "stripe",
+          "search_terms": [
+            "stripe",
+            "payment"
+          ],
+          "reason": "Payment processing"
+        },
+        {
+          "name": "github",
+          "reason": "Version control"
+        }
       ],
       "recommended": [
-        {"name": "shopify", "search_terms": ["shopify", "store"], "reason": "Shopify integration"},
-        {"name": "algolia", "search_terms": ["algolia", "search"], "reason": "Product search"},
-        {"name": "sendgrid", "search_terms": ["sendgrid", "email"], "reason": "Transactional emails"},
-        {"name": "cloudinary", "search_terms": ["cloudinary", "image"], "reason": "Product images"},
-        {"name": "google-analytics", "search_terms": ["analytics", "google"], "reason": "Traffic analytics"},
-        {"name": "shippo", "search_terms": ["shippo", "shipping"], "reason": "Shipping rates"},
-        {"name": "taxjar", "search_terms": ["taxjar", "tax"], "reason": "Tax calculation"}
+        {
+          "name": "shopify",
+          "search_terms": [
+            "shopify",
+            "store"
+          ],
+          "reason": "Shopify integration"
+        },
+        {
+          "name": "algolia",
+          "search_terms": [
+            "algolia",
+            "search"
+          ],
+          "reason": "Product search"
+        },
+        {
+          "name": "sendgrid",
+          "search_terms": [
+            "sendgrid",
+            "email"
+          ],
+          "reason": "Transactional emails"
+        },
+        {
+          "name": "cloudinary",
+          "search_terms": [
+            "cloudinary",
+            "image"
+          ],
+          "reason": "Product images"
+        },
+        {
+          "name": "google-analytics",
+          "search_terms": [
+            "analytics",
+            "google"
+          ],
+          "reason": "Traffic analytics"
+        },
+        {
+          "name": "shippo",
+          "search_terms": [
+            "shippo",
+            "shipping"
+          ],
+          "reason": "Shipping rates"
+        },
+        {
+          "name": "taxjar",
+          "search_terms": [
+            "taxjar",
+            "tax"
+          ],
+          "reason": "Tax calculation"
+        }
       ]
     },
     "agents": {
@@ -137,38 +397,129 @@
       {
         "name": "ecommerce-catalog",
         "description": "Generate and optimize product listings, descriptions, SEO metadata, and structured data for e-commerce catalogs",
-        "triggers": ["product listing", "catalog", "product description", "SEO product"]
+        "triggers": [
+          "product listing",
+          "catalog",
+          "product description",
+          "SEO product"
+        ]
       },
       {
         "name": "ecommerce-analytics",
         "description": "Analyze conversion funnels, cart abandonment, AOV, CLV, and generate actionable insights",
-        "triggers": ["conversion rate", "cart abandonment", "AOV", "customer lifetime value"]
+        "triggers": [
+          "conversion rate",
+          "cart abandonment",
+          "AOV",
+          "customer lifetime value"
+        ]
       }
     ]
   },
-
   "saas": {
     "label": "SaaS Platform",
     "description": "Multi-tenant SaaS with auth, billing, dashboards, and API",
     "skills": {
-      "core": ["web-artifacts-builder", "docx", "xlsx", "pdf"],
-      "domain": ["product-management:feature-spec", "product-management:roadmap-management", "product-management:metrics-tracking", "marketing:campaign-planning", "design:design-system-management"],
-      "operations": ["operations:change-management", "operations:compliance-tracking", "legal:compliance", "finance:financial-statements"]
+      "core": [
+        "web-artifacts-builder",
+        "docx",
+        "xlsx",
+        "pdf"
+      ],
+      "domain": [
+        "product-management:feature-spec",
+        "product-management:roadmap-management",
+        "product-management:metrics-tracking",
+        "marketing:campaign-planning",
+        "design:design-system-management"
+      ],
+      "operations": [
+        "operations:change-management",
+        "operations:compliance-tracking",
+        "legal:compliance",
+        "finance:financial-statements"
+      ]
     },
     "mcps": {
       "required": [
-        {"name": "stripe", "search_terms": ["stripe", "billing"], "reason": "Subscription billing"},
-        {"name": "github", "reason": "Code management"},
-        {"name": "sentry", "search_terms": ["sentry", "error"], "reason": "Error monitoring"}
+        {
+          "name": "stripe",
+          "search_terms": [
+            "stripe",
+            "billing"
+          ],
+          "reason": "Subscription billing"
+        },
+        {
+          "name": "github",
+          "reason": "Code management"
+        },
+        {
+          "name": "sentry",
+          "search_terms": [
+            "sentry",
+            "error"
+          ],
+          "reason": "Error monitoring"
+        }
       ],
       "recommended": [
-        {"name": "auth0", "search_terms": ["auth0", "authentication"], "reason": "Multi-tenant auth"},
-        {"name": "posthog", "search_terms": ["posthog", "product analytics"], "reason": "Feature flags & analytics"},
-        {"name": "intercom", "search_terms": ["intercom", "support"], "reason": "Customer support"},
-        {"name": "linear", "search_terms": ["linear", "issue"], "reason": "Issue tracking"},
-        {"name": "resend", "search_terms": ["resend", "email"], "reason": "Transactional email"},
-        {"name": "upstash", "search_terms": ["upstash", "redis"], "reason": "Rate limiting & caching"},
-        {"name": "neon", "search_terms": ["neon", "postgres"], "reason": "Serverless Postgres"}
+        {
+          "name": "auth0",
+          "search_terms": [
+            "auth0",
+            "authentication"
+          ],
+          "reason": "Multi-tenant auth"
+        },
+        {
+          "name": "posthog",
+          "search_terms": [
+            "posthog",
+            "product analytics"
+          ],
+          "reason": "Feature flags & analytics"
+        },
+        {
+          "name": "intercom",
+          "search_terms": [
+            "intercom",
+            "support"
+          ],
+          "reason": "Customer support"
+        },
+        {
+          "name": "linear",
+          "search_terms": [
+            "linear",
+            "issue"
+          ],
+          "reason": "Issue tracking"
+        },
+        {
+          "name": "resend",
+          "search_terms": [
+            "resend",
+            "email"
+          ],
+          "reason": "Transactional email"
+        },
+        {
+          "name": "upstash",
+          "search_terms": [
+            "upstash",
+            "redis"
+          ],
+          "reason": "Rate limiting & caching"
+        },
+        {
+          "name": "neon",
+          "search_terms": [
+            "neon",
+            "postgres"
+          ],
+          "reason": "Serverless Postgres"
+        }
       ]
     },
     "agents": {
@@ -180,36 +531,115 @@
       {
         "name": "saas-metrics",
         "description": "Track and analyze SaaS KPIs: MRR, ARR, churn rate, LTV, CAC, NRR, expansion revenue",
-        "triggers": ["MRR", "churn", "ARR", "SaaS metrics", "retention"]
+        "triggers": [
+          "MRR",
+          "churn",
+          "ARR",
+          "SaaS metrics",
+          "retention"
+        ]
       },
       {
         "name": "saas-onboarding",
         "description": "Design onboarding flows, activation checklists, and time-to-value optimization",
-        "triggers": ["onboarding", "activation", "time to value", "user journey"]
+        "triggers": [
+          "onboarding",
+          "activation",
+          "time to value",
+          "user journey"
+        ]
       }
     ]
   },
-
   "fintech": {
     "label": "Fintech / Trading Platform",
     "description": "Financial platform with trading, portfolio management, risk, and compliance",
     "skills": {
-      "core": ["xlsx", "pdf", "web-artifacts-builder"],
-      "domain": ["finance:financial-statements", "finance:reconciliation", "finance:variance-analysis", "finance:journal-entry-prep", "finance:audit-support", "finance:close-management"],
-      "operations": ["operations:compliance-tracking", "operations:risk-assessment", "legal:compliance", "legal:legal-risk-assessment"]
+      "core": [
+        "xlsx",
+        "pdf",
+        "web-artifacts-builder"
+      ],
+      "domain": [
+        "finance:financial-statements",
+        "finance:reconciliation",
+        "finance:variance-analysis",
+        "finance:journal-entry-prep",
+        "finance:audit-support",
+        "finance:close-management"
+      ],
+      "operations": [
+        "operations:compliance-tracking",
+        "operations:risk-assessment",
+        "legal:compliance",
+        "legal:legal-risk-assessment"
+      ]
     },
     "mcps": {
       "required": [
-        {"name": "github", "reason": "Code management with audit trail"}
+        {
+          "name": "github",
+          "reason": "Code management with audit trail"
+        }
       ],
       "recommended": [
-        {"name": "binance", "search_terms": ["binance", "crypto", "exchange"], "reason": "Crypto exchange API"},
-        {"name": "alpaca", "search_terms": ["alpaca", "trading"], "reason": "Stock trading API"},
-        {"name": "plaid", "search_terms": ["plaid", "banking"], "reason": "Banking integration"},
-        {"name": "stripe", "search_terms": ["stripe", "payment"], "reason": "Fiat payments"},
-        {"name": "coingecko", "search_terms": ["coingecko", "crypto price"], "reason": "Market data"},
-        {"name": "datadog", "search_terms": ["datadog", "monitoring"], "reason": "Real-time monitoring"},
-        {"name": "pagerduty", "search_terms": ["pagerduty", "alert"], "reason": "Incident response"}
+        {
+          "name": "binance",
+          "search_terms": [
+            "binance",
+            "crypto",
+            "exchange"
+          ],
+          "reason": "Crypto exchange API"
+        },
+        {
+          "name": "alpaca",
+          "search_terms": [
+            "alpaca",
+            "trading"
+          ],
+          "reason": "Stock trading API"
+        },
+        {
+          "name": "plaid",
+          "search_terms": [
+            "plaid",
+            "banking"
+          ],
+          "reason": "Banking integration"
+        },
+        {
+          "name": "stripe",
+          "search_terms": [
+            "stripe",
+            "payment"
+          ],
+          "reason": "Fiat payments"
+        },
+        {
+          "name": "coingecko",
+          "search_terms": [
+            "coingecko",
+            "crypto price"
+          ],
+          "reason": "Market data"
+        },
+        {
+          "name": "datadog",
+          "search_terms": [
+            "datadog",
+            "monitoring"
+          ],
+          "reason": "Real-time monitoring"
+        },
+        {
+          "name": "pagerduty",
+          "search_terms": [
+            "pagerduty",
+            "alert"
+          ],
+          "reason": "Incident response"
+        }
       ]
     },
     "agents": {
@@ -221,31 +651,91 @@
       {
         "name": "fintech-risk-management",
         "description": "Design and implement risk controls: position sizing, stop-loss, circuit breakers, VaR calculations",
-        "triggers": ["risk management", "position sizing", "stop loss", "circuit breaker", "VaR"]
+        "triggers": [
+          "risk management",
+          "position sizing",
+          "stop loss",
+          "circuit breaker",
+          "VaR"
+        ]
       },
       {
         "name": "fintech-compliance",
         "description": "KYC/AML workflows, regulatory reporting templates, audit trail design",
-        "triggers": ["KYC", "AML", "compliance", "regulatory", "audit"]
+        "triggers": [
+          "KYC",
+          "AML",
+          "compliance",
+          "regulatory",
+          "audit"
+        ]
       }
     ]
   },
-
   "marketplace": {
     "label": "Two-Sided Marketplace",
     "description": "Marketplace connecting buyers and sellers with search, payments, and trust",
     "skills": {
-      "core": ["web-artifacts-builder", "xlsx", "docx"],
-      "domain": ["marketing:seo-audit", "marketing:campaign-planning", "product-management:metrics-tracking", "design:ux-writing"],
-      "operations": ["operations:vendor-management", "legal:contract-review", "legal:compliance"]
+      "core": [
+        "web-artifacts-builder",
+        "xlsx",
+        "docx"
+      ],
+      "domain": [
+        "marketing:seo-audit",
+        "marketing:campaign-planning",
+        "product-management:metrics-tracking",
+        "design:ux-writing"
+      ],
+      "operations": [
+        "operations:vendor-management",
+        "legal:contract-review",
+        "legal:compliance"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "stripe-connect", "search_terms": ["stripe", "connect", "marketplace"], "reason": "Split payments"},
-        {"name": "algolia", "search_terms": ["algolia", "search"], "reason": "Listing search"},
-        {"name": "mapbox", "search_terms": ["mapbox", "geocoding"], "reason": "Location-based search"},
-        {"name": "twilio", "search_terms": ["twilio", "messaging"], "reason": "Buyer-seller messaging"},
-        {"name": "cloudinary", "search_terms": ["cloudinary", "image"], "reason": "Listing images"}
+        {
+          "name": "stripe-connect",
+          "search_terms": [
+            "stripe",
+            "connect",
+            "marketplace"
+          ],
+          "reason": "Split payments"
+        },
+        {
+          "name": "algolia",
+          "search_terms": [
+            "algolia",
+            "search"
+          ],
+          "reason": "Listing search"
+        },
+        {
+          "name": "mapbox",
+          "search_terms": [
+            "mapbox",
+            "geocoding"
+          ],
+          "reason": "Location-based search"
+        },
+        {
+          "name": "twilio",
+          "search_terms": [
+            "twilio",
+            "messaging"
+          ],
+          "reason": "Buyer-seller messaging"
+        },
+        {
+          "name": "cloudinary",
+          "search_terms": [
+            "cloudinary",
+            "image"
+          ],
+          "reason": "Listing images"
+        }
       ]
     },
     "agents": {
@@ -257,25 +747,70 @@
       {
         "name": "marketplace-dynamics",
         "description": "Analyze supply/demand balance, take rates, GMV, liquidity metrics for two-sided marketplaces",
-        "triggers": ["GMV", "take rate", "supply demand", "marketplace metrics", "liquidity"]
+        "triggers": [
+          "GMV",
+          "take rate",
+          "supply demand",
+          "marketplace metrics",
+          "liquidity"
+        ]
       }
     ]
   },
-
   "content_platform": {
     "label": "Content / CMS Platform",
     "description": "Content management with publishing, media, SEO, and analytics",
     "skills": {
-      "core": ["docx", "pdf", "web-artifacts-builder"],
-      "domain": ["marketing:content-creation", "marketing:seo-audit", "marketing:brand-voice", "marketing:performance-analytics", "design:ux-writing"],
-      "operations": ["operations:process-optimization"]
+      "core": [
+        "docx",
+        "pdf",
+        "web-artifacts-builder"
+      ],
+      "domain": [
+        "marketing:content-creation",
+        "marketing:seo-audit",
+        "marketing:brand-voice",
+        "marketing:performance-analytics",
+        "design:ux-writing"
+      ],
+      "operations": [
+        "operations:process-optimization"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "sanity", "search_terms": ["sanity", "cms"], "reason": "Headless CMS"},
-        {"name": "cloudinary", "search_terms": ["cloudinary", "media"], "reason": "Media management"},
-        {"name": "google-analytics", "search_terms": ["analytics", "google"], "reason": "Content analytics"},
-        {"name": "mailchimp", "search_terms": ["mailchimp", "newsletter"], "reason": "Newsletter integration"}
+        {
+          "name": "sanity",
+          "search_terms": [
+            "sanity",
+            "cms"
+          ],
+          "reason": "Headless CMS"
+        },
+        {
+          "name": "cloudinary",
+          "search_terms": [
+            "cloudinary",
+            "media"
+          ],
+          "reason": "Media management"
+        },
+        {
+          "name": "google-analytics",
+          "search_terms": [
+            "analytics",
+            "google"
+          ],
+          "reason": "Content analytics"
+        },
+        {
+          "name": "mailchimp",
+          "search_terms": [
+            "mailchimp",
+            "newsletter"
+          ],
+          "reason": "Newsletter integration"
+        }
       ]
     },
     "agents": {
@@ -287,27 +822,86 @@
       {
         "name": "content-seo",
         "description": "SEO optimization for content: keyword research, on-page optimization, meta tags, structured data, internal linking strategy",
-        "triggers": ["SEO", "keywords", "meta tags", "structured data", "search optimization"]
+        "triggers": [
+          "SEO",
+          "keywords",
+          "meta tags",
+          "structured data",
+          "search optimization"
+        ]
       }
     ]
   },
-
   "mobile_app": {
     "label": "Mobile Application",
     "description": "Native or cross-platform mobile app with backend, push notifications, and analytics",
     "skills": {
-      "core": ["web-artifacts-builder", "docx", "pptx"],
-      "domain": ["design:design-system-management", "design:accessibility-review", "design:ux-writing", "product-management:feature-spec", "marketing:campaign-planning"],
-      "operations": ["operations:change-management"]
+      "core": [
+        "web-artifacts-builder",
+        "docx",
+        "pptx"
+      ],
+      "domain": [
+        "design:design-system-management",
+        "design:accessibility-review",
+        "design:ux-writing",
+        "product-management:feature-spec",
+        "marketing:campaign-planning"
+      ],
+      "operations": [
+        "operations:change-management"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "firebase", "search_terms": ["firebase", "mobile"], "reason": "Push notifications, analytics, auth"},
-        {"name": "expo", "search_terms": ["expo", "react-native"], "reason": "React Native tooling"},
-        {"name": "onesignal", "search_terms": ["onesignal", "push"], "reason": "Push notifications"},
-        {"name": "fastlane", "search_terms": ["fastlane", "deploy"], "reason": "App store deployment"},
-        {"name": "sentry", "search_terms": ["sentry", "mobile"], "reason": "Crash reporting"},
-        {"name": "amplitude", "search_terms": ["amplitude", "analytics"], "reason": "Mobile analytics"}
+        {
+          "name": "firebase",
+          "search_terms": [
+            "firebase",
+            "mobile"
+          ],
+          "reason": "Push notifications, analytics, auth"
+        },
+        {
+          "name": "expo",
+          "search_terms": [
+            "expo",
+            "react-native"
+          ],
+          "reason": "React Native tooling"
+        },
+        {
+          "name": "onesignal",
+          "search_terms": [
+            "onesignal",
+            "push"
+          ],
+          "reason": "Push notifications"
+        },
+        {
+          "name": "fastlane",
+          "search_terms": [
+            "fastlane",
+            "deploy"
+          ],
+          "reason": "App store deployment"
+        },
+        {
+          "name": "sentry",
+          "search_terms": [
+            "sentry",
+            "mobile"
+          ],
+          "reason": "Crash reporting"
+        },
+        {
+          "name": "amplitude",
+          "search_terms": [
+            "amplitude",
+            "analytics"
+          ],
+          "reason": "Mobile analytics"
+        }
       ]
     },
     "agents": {
@@ -319,26 +913,77 @@
       {
         "name": "mobile-release",
         "description": "Manage app store releases: changelogs, screenshots, metadata, phased rollouts, hotfix procedures",
-        "triggers": ["app store", "release", "deploy mobile", "app submission", "changelog"]
+        "triggers": [
+          "app store",
+          "release",
+          "deploy mobile",
+          "app submission",
+          "changelog"
+        ]
       }
     ]
   },
-
   "analytics_platform": {
     "label": "Analytics / BI Platform",
     "description": "Data analytics with dashboards, ETL, visualizations, and reporting",
     "skills": {
-      "core": ["xlsx", "pdf", "web-artifacts-builder"],
-      "domain": ["finance:financial-statements", "finance:variance-analysis", "marketing:performance-analytics", "product-management:metrics-tracking"],
-      "operations": ["operations:process-optimization"]
+      "core": [
+        "xlsx",
+        "pdf",
+        "web-artifacts-builder"
+      ],
+      "domain": [
+        "finance:financial-statements",
+        "finance:variance-analysis",
+        "marketing:performance-analytics",
+        "product-management:metrics-tracking"
+      ],
+      "operations": [
+        "operations:process-optimization"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "bigquery", "search_terms": ["bigquery", "google cloud"], "reason": "Data warehouse"},
-        {"name": "snowflake", "search_terms": ["snowflake", "data"], "reason": "Data warehouse"},
-        {"name": "dbt", "search_terms": ["dbt", "transform"], "reason": "Data transformation"},
-        {"name": "metabase", "search_terms": ["metabase", "dashboard"], "reason": "BI dashboards"},
-        {"name": "fivetran", "search_terms": ["fivetran", "etl"], "reason": "Data ingestion"}
+        {
+          "name": "bigquery",
+          "search_terms": [
+            "bigquery",
+            "google cloud"
+          ],
+          "reason": "Data warehouse"
+        },
+        {
+          "name": "snowflake",
+          "search_terms": [
+            "snowflake",
+            "data"
+          ],
+          "reason": "Data warehouse"
+        },
+        {
+          "name": "dbt",
+          "search_terms": [
+            "dbt",
+            "transform"
+          ],
+          "reason": "Data transformation"
+        },
+        {
+          "name": "metabase",
+          "search_terms": [
+            "metabase",
+            "dashboard"
+          ],
+          "reason": "BI dashboards"
+        },
+        {
+          "name": "fivetran",
+          "search_terms": [
+            "fivetran",
+            "etl"
+          ],
+          "reason": "Data ingestion"
+        }
       ]
     },
     "agents": {
@@ -350,24 +995,57 @@
       {
         "name": "data-pipeline",
         "description": "Design ETL/ELT pipelines, data models, quality checks, and monitoring for analytics platforms",
-        "triggers": ["ETL", "data pipeline", "data model", "schema", "data quality"]
+        "triggers": [
+          "ETL",
+          "data pipeline",
+          "data model",
+          "schema",
+          "data quality"
+        ]
       }
     ]
   },
-
   "devtools": {
     "label": "Developer Tools / CLI / SDK",
     "description": "Developer-facing tools with CLI, API, documentation, and plugin system",
     "skills": {
-      "core": ["mcp-builder", "skill-creator", "docx"],
-      "domain": ["product-management:feature-spec", "design:ux-writing", "marketing:content-creation"],
-      "operations": ["operations:change-management", "operations:runbook"]
+      "core": [
+        "mcp-builder",
+        "skill-creator",
+        "docx"
+      ],
+      "domain": [
+        "product-management:feature-spec",
+        "design:ux-writing",
+        "marketing:content-creation"
+      ],
+      "operations": [
+        "operations:change-management",
+        "operations:runbook"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "github", "reason": "Source control and releases"},
-        {"name": "npm", "search_terms": ["npm", "registry"], "reason": "Package publishing"},
-        {"name": "homebrew", "search_terms": ["homebrew", "tap"], "reason": "CLI distribution"}
+        {
+          "name": "github",
+          "reason": "Source control and releases"
+        },
+        {
+          "name": "npm",
+          "search_terms": [
+            "npm",
+            "registry"
+          ],
+          "reason": "Package publishing"
+        },
+        {
+          "name": "homebrew",
+          "search_terms": [
+            "homebrew",
+            "tap"
+          ],
+          "reason": "CLI distribution"
+        }
       ]
     },
     "agents": {
@@ -379,25 +1057,68 @@
       {
         "name": "api-documentation",
         "description": "Generate OpenAPI specs, SDK examples, quickstart guides, and migration docs for developer tools",
-        "triggers": ["API docs", "OpenAPI", "SDK", "quickstart", "migration guide"]
+        "triggers": [
+          "API docs",
+          "OpenAPI",
+          "SDK",
+          "quickstart",
+          "migration guide"
+        ]
       }
     ]
   },
-
   "iot": {
     "label": "IoT / Hardware Platform",
     "description": "IoT system with device management, telemetry, edge computing, and dashboards",
     "skills": {
-      "core": ["web-artifacts-builder", "xlsx", "docx"],
-      "domain": ["operations:runbook", "operations:risk-assessment", "operations:compliance-tracking"],
-      "operations": ["operations:change-management"]
+      "core": [
+        "web-artifacts-builder",
+        "xlsx",
+        "docx"
+      ],
+      "domain": [
+        "operations:runbook",
+        "operations:risk-assessment",
+        "operations:compliance-tracking"
+      ],
+      "operations": [
+        "operations:change-management"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "aws-iot", "search_terms": ["aws iot", "mqtt"], "reason": "Device management"},
-        {"name": "influxdb", "search_terms": ["influxdb", "timeseries"], "reason": "Time-series data"},
-        {"name": "grafana", "search_terms": ["grafana", "dashboard"], "reason": "Real-time dashboards"},
-        {"name": "pagerduty", "search_terms": ["pagerduty", "alert"], "reason": "Device alerts"}
+        {
+          "name": "aws-iot",
+          "search_terms": [
+            "aws iot",
+            "mqtt"
+          ],
+          "reason": "Device management"
+        },
+        {
+          "name": "influxdb",
+          "search_terms": [
+            "influxdb",
+            "timeseries"
+          ],
+          "reason": "Time-series data"
+        },
+        {
+          "name": "grafana",
+          "search_terms": [
+            "grafana",
+            "dashboard"
+          ],
+          "reason": "Real-time dashboards"
+        },
+        {
+          "name": "pagerduty",
+          "search_terms": [
+            "pagerduty",
+            "alert"
+          ],
+          "reason": "Device alerts"
+        }
       ]
     },
     "agents": {
@@ -406,20 +1127,54 @@
       "ota_agent": "Manage over-the-air firmware updates with rollback capability"
     }
   },
-
   "healthcare": {
     "label": "Healthcare / HealthTech",
     "description": "Healthcare platform with HIPAA compliance, EHR integration, and patient management",
     "skills": {
-      "core": ["docx", "pdf", "xlsx"],
-      "domain": ["legal:compliance", "legal:legal-risk-assessment", "operations:compliance-tracking", "operations:risk-assessment", "operations:process-optimization"],
-      "operations": ["operations:change-management", "operations:runbook"]
+      "core": [
+        "docx",
+        "pdf",
+        "xlsx"
+      ],
+      "domain": [
+        "legal:compliance",
+        "legal:legal-risk-assessment",
+        "operations:compliance-tracking",
+        "operations:risk-assessment",
+        "operations:process-optimization"
+      ],
+      "operations": [
+        "operations:change-management",
+        "operations:runbook"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "epic-fhir", "search_terms": ["epic", "fhir", "ehr"], "reason": "EHR integration"},
-        {"name": "twilio", "search_terms": ["twilio", "telehealth"], "reason": "Telehealth / messaging"},
-        {"name": "stripe", "search_terms": ["stripe", "healthcare"], "reason": "Patient billing"}
+        {
+          "name": "epic-fhir",
+          "search_terms": [
+            "epic",
+            "fhir",
+            "ehr"
+          ],
+          "reason": "EHR integration"
+        },
+        {
+          "name": "twilio",
+          "search_terms": [
+            "twilio",
+            "telehealth"
+          ],
+          "reason": "Telehealth / messaging"
+        },
+        {
+          "name": "stripe",
+          "search_terms": [
+            "stripe",
+            "healthcare"
+          ],
+          "reason": "Patient billing"
+        }
       ]
     },
     "agents": {
@@ -431,24 +1186,62 @@
       {
         "name": "hipaa-compliance",
         "description": "HIPAA compliance checks, PHI handling rules, BAA review, security assessment, breach response",
-        "triggers": ["HIPAA", "PHI", "healthcare compliance", "BAA", "patient data"]
+        "triggers": [
+          "HIPAA",
+          "PHI",
+          "healthcare compliance",
+          "BAA",
+          "patient data"
+        ]
       }
     ]
   },
-
   "edtech": {
     "label": "EdTech / LMS",
     "description": "Educational platform with courses, assessments, progress tracking, and certificates",
     "skills": {
-      "core": ["pptx", "docx", "pdf", "web-artifacts-builder"],
-      "domain": ["design:ux-writing", "design:accessibility-review", "product-management:feature-spec", "marketing:content-creation"],
-      "operations": ["legal:compliance"]
+      "core": [
+        "pptx",
+        "docx",
+        "pdf",
+        "web-artifacts-builder"
+      ],
+      "domain": [
+        "design:ux-writing",
+        "design:accessibility-review",
+        "product-management:feature-spec",
+        "marketing:content-creation"
+      ],
+      "operations": [
+        "legal:compliance"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "stripe", "search_terms": ["stripe", "subscription"], "reason": "Course payments"},
-        {"name": "sendgrid", "search_terms": ["sendgrid", "email"], "reason": "Student notifications"},
-        {"name": "cloudinary", "search_terms": ["cloudinary", "media"], "reason": "Video & media management"}
+        {
+          "name": "stripe",
+          "search_terms": [
+            "stripe",
+            "subscription"
+          ],
+          "reason": "Course payments"
+        },
+        {
+          "name": "sendgrid",
+          "search_terms": [
+            "sendgrid",
+            "email"
+          ],
+          "reason": "Student notifications"
+        },
+        {
+          "name": "cloudinary",
+          "search_terms": [
+            "cloudinary",
+            "media"
+          ],
+          "reason": "Video & media management"
+        }
       ]
     },
     "agents": {
@@ -457,21 +1250,61 @@
       "engagement_agent": "Track learner engagement, predict dropout, suggest interventions"
     }
   },
-
   "hr_platform": {
     "label": "HR / People Platform",
     "description": "HR system with recruitment, onboarding, payroll, and performance management",
     "skills": {
-      "core": ["docx", "xlsx", "pdf", "pptx"],
-      "domain": ["legal:compliance", "legal:contract-review", "finance:journal-entry-prep", "operations:process-optimization", "operations:resource-planning"],
-      "operations": ["operations:change-management"]
+      "core": [
+        "docx",
+        "xlsx",
+        "pdf",
+        "pptx"
+      ],
+      "domain": [
+        "legal:compliance",
+        "legal:contract-review",
+        "finance:journal-entry-prep",
+        "operations:process-optimization",
+        "operations:resource-planning"
+      ],
+      "operations": [
+        "operations:change-management"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "greenhouse", "search_terms": ["greenhouse", "ats", "recruiting"], "reason": "Applicant tracking"},
-        {"name": "gusto", "search_terms": ["gusto", "payroll"], "reason": "Payroll processing"},
-        {"name": "slack", "search_terms": ["slack"], "reason": "Team communication"},
-        {"name": "docusign", "search_terms": ["docusign", "signature"], "reason": "Offer letters and contracts"}
+        {
+          "name": "greenhouse",
+          "search_terms": [
+            "greenhouse",
+            "ats",
+            "recruiting"
+          ],
+          "reason": "Applicant tracking"
+        },
+        {
+          "name": "gusto",
+          "search_terms": [
+            "gusto",
+            "payroll"
+          ],
+          "reason": "Payroll processing"
+        },
+        {
+          "name": "slack",
+          "search_terms": [
+            "slack"
+          ],
+          "reason": "Team communication"
+        },
+        {
+          "name": "docusign",
+          "search_terms": [
+            "docusign",
+            "signature"
+          ],
+          "reason": "Offer letters and contracts"
+        }
       ]
     },
     "agents": {
@@ -480,21 +1313,61 @@
       "compliance_agent": "Track labor law compliance, I-9 verification, benefits administration"
     }
   },
-
   "real_estate": {
     "label": "Real Estate Platform",
     "description": "Property management or listing platform with search, CRM, and documents",
     "skills": {
-      "core": ["docx", "pdf", "xlsx", "pptx"],
-      "domain": ["legal:contract-review", "legal:compliance", "finance:financial-statements", "marketing:seo-audit", "marketing:content-creation"],
-      "operations": ["operations:vendor-management"]
+      "core": [
+        "docx",
+        "pdf",
+        "xlsx",
+        "pptx"
+      ],
+      "domain": [
+        "legal:contract-review",
+        "legal:compliance",
+        "finance:financial-statements",
+        "marketing:seo-audit",
+        "marketing:content-creation"
+      ],
+      "operations": [
+        "operations:vendor-management"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "mapbox", "search_terms": ["mapbox", "maps"], "reason": "Property maps"},
-        {"name": "twilio", "search_terms": ["twilio", "sms"], "reason": "Agent-client messaging"},
-        {"name": "docusign", "search_terms": ["docusign", "signature"], "reason": "Lease/contract signing"},
-        {"name": "stripe", "search_terms": ["stripe", "rent"], "reason": "Rent payments"}
+        {
+          "name": "mapbox",
+          "search_terms": [
+            "mapbox",
+            "maps"
+          ],
+          "reason": "Property maps"
+        },
+        {
+          "name": "twilio",
+          "search_terms": [
+            "twilio",
+            "sms"
+          ],
+          "reason": "Agent-client messaging"
+        },
+        {
+          "name": "docusign",
+          "search_terms": [
+            "docusign",
+            "signature"
+          ],
+          "reason": "Lease/contract signing"
+        },
+        {
+          "name": "stripe",
+          "search_terms": [
+            "stripe",
+            "rent"
+          ],
+          "reason": "Rent payments"
+        }
       ]
     },
     "agents": {
@@ -503,21 +1376,56 @@
       "lease_agent": "Track lease terms, renewals, rent escalations, and maintenance requests"
     }
   },
-
   "api_platform": {
     "label": "API-First Platform",
     "description": "API product with developer portal, rate limiting, analytics, and monetization",
     "skills": {
-      "core": ["mcp-builder", "docx", "web-artifacts-builder"],
-      "domain": ["product-management:feature-spec", "design:ux-writing", "marketing:content-creation", "operations:runbook"],
-      "operations": ["operations:change-management", "operations:compliance-tracking"]
+      "core": [
+        "mcp-builder",
+        "docx",
+        "web-artifacts-builder"
+      ],
+      "domain": [
+        "product-management:feature-spec",
+        "design:ux-writing",
+        "marketing:content-creation",
+        "operations:runbook"
+      ],
+      "operations": [
+        "operations:change-management",
+        "operations:compliance-tracking"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "github", "reason": "API versioning"},
-        {"name": "stripe", "search_terms": ["stripe", "metered billing"], "reason": "API monetization"},
-        {"name": "kong", "search_terms": ["kong", "api gateway"], "reason": "API gateway"},
-        {"name": "datadog", "search_terms": ["datadog", "apm"], "reason": "API monitoring"}
+        {
+          "name": "github",
+          "reason": "API versioning"
+        },
+        {
+          "name": "stripe",
+          "search_terms": [
+            "stripe",
+            "metered billing"
+          ],
+          "reason": "API monetization"
+        },
+        {
+          "name": "kong",
+          "search_terms": [
+            "kong",
+            "api gateway"
+          ],
+          "reason": "API gateway"
+        },
+        {
+          "name": "datadog",
+          "search_terms": [
+            "datadog",
+            "apm"
+          ],
+          "reason": "API monitoring"
+        }
       ]
     },
     "agents": {
@@ -526,20 +1434,49 @@
       "changelog_agent": "Auto-generate changelogs, migration guides, and deprecation notices"
     }
   },
-
   "gaming": {
     "label": "Gaming Platform / Game Server",
     "description": "Game with matchmaking, leaderboards, in-app purchases, and real-time multiplayer",
     "skills": {
-      "core": ["web-artifacts-builder", "xlsx"],
-      "domain": ["product-management:metrics-tracking", "marketing:campaign-planning", "design:ux-writing"],
-      "operations": ["operations:runbook"]
+      "core": [
+        "web-artifacts-builder",
+        "xlsx"
+      ],
+      "domain": [
+        "product-management:metrics-tracking",
+        "marketing:campaign-planning",
+        "design:ux-writing"
+      ],
+      "operations": [
+        "operations:runbook"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "playfab", "search_terms": ["playfab", "game backend"], "reason": "Game backend services"},
-        {"name": "unity", "search_terms": ["unity", "game"], "reason": "Unity integration"},
-        {"name": "discord", "search_terms": ["discord", "gaming"], "reason": "Community management"}
+        {
+          "name": "playfab",
+          "search_terms": [
+            "playfab",
+            "game backend"
+          ],
+          "reason": "Game backend services"
+        },
+        {
+          "name": "unity",
+          "search_terms": [
+            "unity",
+            "game"
+          ],
+          "reason": "Unity integration"
+        },
+        {
+          "name": "discord",
+          "search_terms": [
+            "discord",
+            "gaming"
+          ],
+          "reason": "Community management"
+        }
       ]
     },
     "agents": {
@@ -548,20 +1485,52 @@
       "antifraud_agent": "Detect cheating, botting, and account sharing"
     }
   },
-
   "logistics": {
     "label": "Logistics / Supply Chain",
     "description": "Logistics platform with routing, tracking, warehouse management, and fleet ops",
     "skills": {
-      "core": ["xlsx", "pdf", "docx"],
-      "domain": ["operations:process-optimization", "operations:vendor-management", "operations:resource-planning", "finance:variance-analysis"],
-      "operations": ["operations:risk-assessment", "operations:runbook"]
+      "core": [
+        "xlsx",
+        "pdf",
+        "docx"
+      ],
+      "domain": [
+        "operations:process-optimization",
+        "operations:vendor-management",
+        "operations:resource-planning",
+        "finance:variance-analysis"
+      ],
+      "operations": [
+        "operations:risk-assessment",
+        "operations:runbook"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "mapbox", "search_terms": ["mapbox", "routing"], "reason": "Route optimization"},
-        {"name": "twilio", "search_terms": ["twilio", "sms"], "reason": "Delivery notifications"},
-        {"name": "shippo", "search_terms": ["shippo", "shipping"], "reason": "Carrier integration"}
+        {
+          "name": "mapbox",
+          "search_terms": [
+            "mapbox",
+            "routing"
+          ],
+          "reason": "Route optimization"
+        },
+        {
+          "name": "twilio",
+          "search_terms": [
+            "twilio",
+            "sms"
+          ],
+          "reason": "Delivery notifications"
+        },
+        {
+          "name": "shippo",
+          "search_terms": [
+            "shippo",
+            "shipping"
+          ],
+          "reason": "Carrier integration"
+        }
       ]
     },
     "agents": {
@@ -570,28 +1539,80 @@
       "fleet_agent": "Monitor vehicle health, driver schedules, fuel efficiency"
     }
   },
-
   "legal": {
     "label": "Legal Tech / Contract & Compliance",
     "description": "Legal platform with contract management, document review, compliance tracking, and litigation support",
     "skills": {
-      "core": ["docx", "pdf", "xlsx"],
-      "domain": ["legal:contract-review", "legal:compliance", "legal:legal-risk-assessment", "legal:canned-responses", "operations:compliance-tracking"],
-      "operations": ["operations:risk-assessment", "operations:process-optimization"]
+      "core": [
+        "docx",
+        "pdf",
+        "xlsx"
+      ],
+      "domain": [
+        "legal:contract-review",
+        "legal:compliance",
+        "legal:legal-risk-assessment",
+        "legal:canned-responses",
+        "operations:compliance-tracking"
+      ],
+      "operations": [
+        "operations:risk-assessment",
+        "operations:process-optimization"
+      ]
     },
     "mcps": {
       "required": [
-        {"name": "github", "reason": "Document version control with audit trail"}
+        {
+          "name": "github",
+          "reason": "Document version control with audit trail"
+        }
       ],
       "recommended": [
-        {"name": "docusign", "search_terms": ["docusign", "signature"], "reason": "E-signature and contract execution"},
-        {"name": "slack", "search_terms": ["slack", "workflow"], "reason": "Legal team collaboration"},
-        {"name": "notion", "search_terms": ["notion", "database"], "reason": "Contract repository and knowledge base"},
-        {"name": "sendgrid", "search_terms": ["sendgrid", "email"], "reason": "Compliance notifications and alerts"},
-        {"name": "datadog", "search_terms": ["datadog", "monitoring"], "reason": "Compliance monitoring and auditing"}
+        {
+          "name": "docusign",
+          "search_terms": [
+            "docusign",
+            "signature"
+          ],
+          "reason": "E-signature and contract execution"
+        },
+        {
+          "name": "slack",
+          "search_terms": [
+            "slack",
+            "workflow"
+          ],
+          "reason": "Legal team collaboration"
+        },
+        {
+          "name": "notion",
+          "search_terms": [
+            "notion",
+            "database"
+          ],
+          "reason": "Contract repository and knowledge base"
+        },
+        {
+          "name": "sendgrid",
+          "search_terms": [
+            "sendgrid",
+            "email"
+          ],
+          "reason": "Compliance notifications and alerts"
+        },
+        {
+          "name": "datadog",
+          "search_terms": [
+            "datadog",
+            "monitoring"
+          ],
+          "reason": "Compliance monitoring and auditing"
+        }
       ]
     },
-    "plugins": ["frontend-design@claude-plugins-official"],
+    "plugins": [
+      "frontend-design@claude-plugins-official"
+    ],
     "agents": {
       "contract_review_agent": "Automatically review contracts for legal risks, missing clauses, and non-standard terms",
       "compliance_agent": "Monitor regulatory changes, track compliance obligations, and audit trail maintenance",
@@ -601,17 +1622,37 @@
       {
         "name": "legal-contract-analysis",
         "description": "Analyze contracts for risk, missing clauses, comparison against templates, and extraction of key terms",
-        "triggers": ["contract review", "contract analysis", "legal risk", "clause extraction", "nda", "terms review"]
+        "triggers": [
+          "contract review",
+          "contract analysis",
+          "legal risk",
+          "clause extraction",
+          "nda",
+          "terms review"
+        ]
       },
       {
         "name": "legal-compliance-framework",
         "description": "Design compliance programs, regulatory mapping, audit procedures, and policy documentation",
-        "triggers": ["compliance framework", "regulatory compliance", "audit trail", "policy", "gdpr", "ccpa"]
+        "triggers": [
+          "compliance framework",
+          "regulatory compliance",
+          "audit trail",
+          "policy",
+          "gdpr",
+          "ccpa"
+        ]
       },
       {
         "name": "legal-document-management",
         "description": "Organize and version-control legal documents with classification, retention policies, and access controls",
-        "triggers": ["document management", "legal filing", "discovery", "document retention", "edrm"]
+        "triggers": [
+          "document management",
+          "legal filing",
+          "discovery",
+          "document retention",
+          "edrm"
+        ]
       }
     ],
     "hooks": {
@@ -626,28 +1667,97 @@
       "- Document management: OCR, entity extraction, semantic search, version control with audit logs"
     ]
   },
-
   "marketing": {
     "label": "Marketing Platform / Campaign Management",
     "description": "Marketing platform with campaign management, audience segmentation, analytics, and content optimization",
     "skills": {
-      "core": ["docx", "xlsx", "web-artifacts-builder"],
-      "domain": ["marketing:campaign-planning", "marketing:content-creation", "marketing:seo-audit", "marketing:performance-analytics", "marketing:brand-voice"],
-      "operations": ["operations:process-optimization"]
+      "core": [
+        "docx",
+        "xlsx",
+        "web-artifacts-builder"
+      ],
+      "domain": [
+        "marketing:campaign-planning",
+        "marketing:content-creation",
+        "marketing:seo-audit",
+        "marketing:performance-analytics",
+        "marketing:brand-voice"
+      ],
+      "operations": [
+        "operations:process-optimization"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "google-analytics", "search_terms": ["analytics", "google"], "reason": "Web and campaign analytics"},
-        {"name": "mailchimp", "search_terms": ["mailchimp", "newsletter"], "reason": "Email campaign management"},
-        {"name": "facebook-ads", "search_terms": ["facebook", "ads"], "reason": "Social media advertising"},
-        {"name": "stripe", "search_terms": ["stripe", "billing"], "reason": "Marketing attribution and billing"},
-        {"name": "slack", "search_terms": ["slack", "messaging"], "reason": "Campaign team collaboration"},
-        {"name": "zapier", "search_terms": ["zapier", "automation"], "reason": "Marketing automation workflows"},
-        {"name": "segment", "search_terms": ["segment", "cdp"], "reason": "Customer data platform"},
-        {"name": "mixpanel", "search_terms": ["mixpanel", "analytics"], "reason": "Product and campaign analytics"}
+        {
+          "name": "google-analytics",
+          "search_terms": [
+            "analytics",
+            "google"
+          ],
+          "reason": "Web and campaign analytics"
+        },
+        {
+          "name": "mailchimp",
+          "search_terms": [
+            "mailchimp",
+            "newsletter"
+          ],
+          "reason": "Email campaign management"
+        },
+        {
+          "name": "facebook-ads",
+          "search_terms": [
+            "facebook",
+            "ads"
+          ],
+          "reason": "Social media advertising"
+        },
+        {
+          "name": "stripe",
+          "search_terms": [
+            "stripe",
+            "billing"
+          ],
+          "reason": "Marketing attribution and billing"
+        },
+        {
+          "name": "slack",
+          "search_terms": [
+            "slack",
+            "messaging"
+          ],
+          "reason": "Campaign team collaboration"
+        },
+        {
+          "name": "zapier",
+          "search_terms": [
+            "zapier",
+            "automation"
+          ],
+          "reason": "Marketing automation workflows"
+        },
+        {
+          "name": "segment",
+          "search_terms": [
+            "segment",
+            "cdp"
+          ],
+          "reason": "Customer data platform"
+        },
+        {
+          "name": "mixpanel",
+          "search_terms": [
+            "mixpanel",
+            "analytics"
+          ],
+          "reason": "Product and campaign analytics"
+        }
       ]
     },
-    "plugins": ["frontend-design@claude-plugins-official"],
+    "plugins": [
+      "frontend-design@claude-plugins-official"
+    ],
     "agents": {
       "campaign_agent": "Plan, execute, and optimize multi-channel marketing campaigns with A/B testing and scheduling",
       "analytics_agent": "Track campaign performance, attribution, conversion funnels, and ROI by channel",
@@ -658,17 +1768,36 @@
       {
         "name": "marketing-campaign-strategy",
         "description": "Design integrated marketing campaigns with messaging, targeting, channels, timeline, and success metrics",
-        "triggers": ["campaign strategy", "marketing plan", "campaign brief", "go-to-market", "launch strategy"]
+        "triggers": [
+          "campaign strategy",
+          "marketing plan",
+          "campaign brief",
+          "go-to-market",
+          "launch strategy"
+        ]
       },
       {
         "name": "marketing-audience-segmentation",
         "description": "Build audience segments, personas, and targeting strategies based on behavioral and demographic data",
-        "triggers": ["audience segmentation", "persona", "targeting", "audience analysis", "cohort"]
+        "triggers": [
+          "audience segmentation",
+          "persona",
+          "targeting",
+          "audience analysis",
+          "cohort"
+        ]
       },
       {
         "name": "marketing-performance-analysis",
         "description": "Analyze campaign performance, attribution, conversion funnels, CAC, LTV, and ROI by channel",
-        "triggers": ["campaign analytics", "conversion rate", "attribution", "CAC", "marketing ROI", "funnel analysis"]
+        "triggers": [
+          "campaign analytics",
+          "conversion rate",
+          "attribution",
+          "CAC",
+          "marketing ROI",
+          "funnel analysis"
+        ]
       }
     ],
     "hooks": {
@@ -683,25 +1812,90 @@
       "- Analytics: CTR, conversion rate, CAC, LTV, ROAS, engagement rate, segment performance"
     ]
   },
-
   "web3": {
     "label": "Web3 / Blockchain Platform",
     "description": "Web3 platform with smart contracts, DeFi protocols, NFT functionality, and wallet integration",
     "skills": {
-      "core": ["web-artifacts-builder", "xlsx"],
-      "domain": ["product-management:feature-spec", "security-guidance", "operations:risk-assessment"],
-      "operations": ["operations:compliance-tracking", "legal:compliance"]
+      "core": [
+        "web-artifacts-builder",
+        "xlsx"
+      ],
+      "domain": [
+        "product-management:feature-spec",
+        "security-guidance",
+        "operations:risk-assessment"
+      ],
+      "operations": [
+        "operations:compliance-tracking",
+        "legal:compliance"
+      ]
     },
     "mcps": {
       "recommended": [
-        {"name": "alchemy", "search_terms": ["alchemy", "rpc"], "reason": "Blockchain RPC and APIs"},
-        {"name": "ethers", "search_terms": ["ethers", "ethereum"], "reason": "Ethereum SDK"},
-        {"name": "hardhat", "search_terms": ["hardhat", "solidity"], "reason": "Smart contract development"},
-        {"name": "foundry", "search_terms": ["foundry", "forge"], "reason": "Rust-based smart contract framework"},
-        {"name": "ipfs", "search_terms": ["ipfs", "decentralized"], "reason": "Decentralized storage"},
-        {"name": "thegraph", "search_terms": ["thegraph", "graphql"], "reason": "Blockchain data indexing"},
-        {"name": "openzeppelin", "search_terms": ["openzeppelin", "contracts"], "reason": "Smart contract security standards"},
-        {"name": "metamask", "search_terms": ["metamask", "wallet"], "reason": "Wallet integration and signing"}
+        {
+          "name": "alchemy",
+          "search_terms": [
+            "alchemy",
+            "rpc"
+          ],
+          "reason": "Blockchain RPC and APIs"
+        },
+        {
+          "name": "ethers",
+          "search_terms": [
+            "ethers",
+            "ethereum"
+          ],
+          "reason": "Ethereum SDK"
+        },
+        {
+          "name": "hardhat",
+          "search_terms": [
+            "hardhat",
+            "solidity"
+          ],
+          "reason": "Smart contract development"
+        },
+        {
+          "name": "foundry",
+          "search_terms": [
+            "foundry",
+            "forge"
+          ],
+          "reason": "Rust-based smart contract framework"
+        },
+        {
+          "name": "ipfs",
+          "search_terms": [
+            "ipfs",
+            "decentralized"
+          ],
+          "reason": "Decentralized storage"
+        },
+        {
+          "name": "thegraph",
+          "search_terms": [
+            "thegraph",
+            "graphql"
+          ],
+          "reason": "Blockchain data indexing"
+        },
+        {
+          "name": "openzeppelin",
+          "search_terms": [
+            "openzeppelin",
+            "contracts"
+          ],
+          "reason": "Smart contract security standards"
+        },
+        {
+          "name": "metamask",
+          "search_terms": [
+            "metamask",
+            "wallet"
+          ],
+          "reason": "Wallet integration and signing"
+        }
       ]
     },
     "agents": {
@@ -714,22 +1908,50 @@
       {
         "name": "web3-smart-contract-design",
         "description": "Design and implement secure smart contracts with proper access controls, auditing, and gas optimization",
-        "triggers": ["smart contract", "solidity", "contract audit", "contract design", "evm", "gas optimization"]
+        "triggers": [
+          "smart contract",
+          "solidity",
+          "contract audit",
+          "contract design",
+          "evm",
+          "gas optimization"
+        ]
       },
       {
         "name": "web3-defi-protocol",
         "description": "Design DeFi protocols: AMM, lending, yield strategies, tokenomics, and economic modeling",
-        "triggers": ["defi", "liquidity", "yield", "amm", "dex", "lending protocol", "tokenomics"]
+        "triggers": [
+          "defi",
+          "liquidity",
+          "yield",
+          "amm",
+          "dex",
+          "lending protocol",
+          "tokenomics"
+        ]
       },
       {
         "name": "web3-nft-architecture",
         "description": "Design NFT systems: metadata standards, minting mechanisms, marketplaces, and royalty distribution",
-        "triggers": ["nft", "erc721", "erc1155", "nft marketplace", "metadata", "collection design"]
+        "triggers": [
+          "nft",
+          "erc721",
+          "erc1155",
+          "nft marketplace",
+          "metadata",
+          "collection design"
+        ]
       },
       {
         "name": "web3-security-audit",
         "description": "Audit smart contracts for vulnerabilities: reentrancy, overflow, access control, front-running",
-        "triggers": ["smart contract audit", "security audit", "vulnerability", "reentrancy", "slippage"]
+        "triggers": [
+          "smart contract audit",
+          "security audit",
+          "vulnerability",
+          "reentrancy",
+          "slippage"
+        ]
       }
     ],
     "hooks": {
@@ -745,31 +1967,102 @@
       "- Network economics: Gas optimization, MEV resistance, cross-chain bridges, liquidity incentives"
     ]
   },
-
   "social": {
     "label": "Social Platform / Feed & Community",
     "description": "Social platform with feeds, messaging, user profiles, notifications, and community features",
     "skills": {
-      "core": ["web-artifacts-builder", "docx"],
-      "domain": ["design:ux-writing", "design:design-system-management", "product-management:metrics-tracking", "marketing:campaign-planning"],
-      "operations": ["operations:process-optimization", "legal:compliance"]
+      "core": [
+        "web-artifacts-builder",
+        "docx"
+      ],
+      "domain": [
+        "design:ux-writing",
+        "design:design-system-management",
+        "product-management:metrics-tracking",
+        "marketing:campaign-planning"
+      ],
+      "operations": [
+        "operations:process-optimization",
+        "legal:compliance"
+      ]
     },
     "mcps": {
       "required": [
-        {"name": "github", "reason": "Version control"}
+        {
+          "name": "github",
+          "reason": "Version control"
+        }
       ],
       "recommended": [
-        {"name": "firebase", "search_terms": ["firebase", "realtime"], "reason": "Real-time messaging and notifications"},
-        {"name": "redis", "search_terms": ["redis", "cache"], "reason": "Feed caching and real-time activity"},
-        {"name": "elasticsearch", "search_terms": ["elasticsearch", "search"], "reason": "User and content search"},
-        {"name": "sendgrid", "search_terms": ["sendgrid", "email"], "reason": "Email notifications"},
-        {"name": "stripe", "search_terms": ["stripe", "billing"], "reason": "Premium features and creator payments"},
-        {"name": "slack", "search_terms": ["slack", "messaging"], "reason": "Team communication"},
-        {"name": "sentry", "search_terms": ["sentry", "monitoring"], "reason": "Error tracking and monitoring"},
-        {"name": "datadog", "search_terms": ["datadog", "apm"], "reason": "Real-time monitoring and APM"}
+        {
+          "name": "firebase",
+          "search_terms": [
+            "firebase",
+            "realtime"
+          ],
+          "reason": "Real-time messaging and notifications"
+        },
+        {
+          "name": "redis",
+          "search_terms": [
+            "redis",
+            "cache"
+          ],
+          "reason": "Feed caching and real-time activity"
+        },
+        {
+          "name": "elasticsearch",
+          "search_terms": [
+            "elasticsearch",
+            "search"
+          ],
+          "reason": "User and content search"
+        },
+        {
+          "name": "sendgrid",
+          "search_terms": [
+            "sendgrid",
+            "email"
+          ],
+          "reason": "Email notifications"
+        },
+        {
+          "name": "stripe",
+          "search_terms": [
+            "stripe",
+            "billing"
+          ],
+          "reason": "Premium features and creator payments"
+        },
+        {
+          "name": "slack",
+          "search_terms": [
+            "slack",
+            "messaging"
+          ],
+          "reason": "Team communication"
+        },
+        {
+          "name": "sentry",
+          "search_terms": [
+            "sentry",
+            "monitoring"
+          ],
+          "reason": "Error tracking and monitoring"
+        },
+        {
+          "name": "datadog",
+          "search_terms": [
+            "datadog",
+            "apm"
+          ],
+          "reason": "Real-time monitoring and APM"
+        }
       ]
     },
-    "plugins": ["frontend-design@claude-plugins-official"],
+    "plugins": [
+      "frontend-design@claude-plugins-official"
+    ],
     "agents": {
       "feed_agent": "Optimize feed algorithms, ranking, personalization, and content quality scoring",
       "moderation_agent": "Detect spam, harassment, abuse, and enforce community guidelines at scale",
@@ -780,17 +2073,34 @@
       {
         "name": "social-feed-algorithms",
         "description": "Design feed ranking algorithms with personalization, diversity, recency, and engagement optimization",
-        "triggers": ["feed algorithm", "recommendation", "personalization", "ranking", "social ranking"]
+        "triggers": [
+          "feed algorithm",
+          "recommendation",
+          "personalization",
+          "ranking",
+          "social ranking"
+        ]
       },
       {
         "name": "social-moderation-strategy",
         "description": "Build content moderation workflows: automated detection, human review queues, and appeal processes",
-        "triggers": ["moderation", "community guidelines", "content policy", "abuse detection", "safety"]
+        "triggers": [
+          "moderation",
+          "community guidelines",
+          "content policy",
+          "abuse detection",
+          "safety"
+        ]
       },
       {
         "name": "social-engagement-metrics",
         "description": "Define and track engagement metrics: CTR, shares, comments, retention, and virality coefficients",
-        "triggers": ["engagement metrics", "social analytics", "user engagement", "viral coefficient"]
+        "triggers": [
+          "engagement metrics",
+          "social analytics",
+          "user engagement",
+          "viral coefficient"
+        ]
       }
     ],
     "hooks": {
@@ -804,6 +2114,261 @@
       "- Moderation: ML detection (spam, abuse) → Human review queue → Appeals → Enforcement (shadow ban, suspension)",
       "- Engagement: Feed ranking, notifications, recommendations, creator incentives, gamification",
       "- Monetization: Premium features, creator payouts, ads, sponsored content, virtual gifts"
+    ]
+  },
+  "retail_multirole_firebase": {
+    "label": "Retail Multi-Role Firebase (Chile / LATAM)",
+    "description": "Multi-role retail platform (inventory + POS + delivery + customer portal) on Firebase + Express, with LATAM payment rails (Flow.cl, MercadoPago) and Custom Claims for RBAC. Built for SMB retail in Chile.",
+    "skills": {
+      "core": [
+        "security-audit",
+        "payment-validation",
+        "senior-backend",
+        "senior-security",
+        "senior-fullstack",
+        "senior-architect",
+        "code-reviewer",
+        "refactor",
+        "schema-management",
+        "db-migration",
+        "performance-optimization",
+        "real-time-testing"
+      ],
+      "domain": [
+        "operations:process-optimization",
+        "operations:vendor-management",
+        "operations:resource-planning",
+        "finance:reconciliation",
+        "finance:variance-analysis",
+        "product-management:feature-spec",
+        "design:ux-writing",
+        "design:design-system-management"
+      ],
+      "operations": [
+        "operations:runbook",
+        "operations:change-management",
+        "operations:risk-assessment",
+        "operations:compliance-tracking",
+        "legal:compliance"
+      ]
+    },
+    "mcps": {
+      "required": [
+        {
+          "name": "firebase",
+          "reason": "Firestore queries, Auth admin via serviceAccountKey, Custom Claims inspection"
+        },
+        {
+          "name": "context7",
+          "reason": "Up-to-date docs for Firebase, React 19, Vite 6, Tailwind 4"
+        },
+        {
+          "name": "github",
+          "reason": "PR/issues/CI inspection and code search"
+        }
+      ],
+      "recommended": [
+        {
+          "name": "sentry",
+          "search_terms": [
+            "sentry",
+            "monitoring",
+            "error tracking"
+          ],
+          "reason": "Production error tracking — critical for payment flows"
+        },
+        {
+          "name": "sendgrid",
+          "search_terms": [
+            "sendgrid",
+            "email",
+            "transactional email"
+          ],
+          "reason": "Digital receipt email delivery to customers"
+        },
+        {
+          "name": "twilio",
+          "search_terms": [
+            "twilio",
+            "sms"
+          ],
+          "reason": "SMS notifications to customers (delivery confirmation, claim resolution)"
+        },
+        {
+          "name": "slack",
+          "search_terms": [
+            "slack",
+            "team notifications"
+          ],
+          "reason": "Team alerts: low stock, claim resolution, payment failures"
+        },
+        {
+          "name": "mapbox",
+          "search_terms": [
+            "mapbox",
+            "geocoding",
+            "routing"
+          ],
+          "reason": "Delivery route geocoding (alternative to Google Maps)"
+        },
+        {
+          "name": "npm",
+          "search_terms": [
+            "npm"
+          ],
+          "reason": "Package metadata for dependency audits"
+        }
+      ],
+      "anti_recommend": [
+        {
+          "name": "shopify",
+          "reason": "Does not apply — this is a self-hosted retail platform, not Shopify-based"
+        },
+        {
+          "name": "stripe",
+          "reason": "LATAM uses Flow.cl + MercadoPago, not Stripe. Stripe Chile lacks local payment methods (Webpay, Khipu, etc.)"
+        },
+        {
+          "name": "elasticsearch",
+          "reason": "Firestore + composite indexes is sufficient at SMB scale; ES is overkill for < 1M records"
+        },
+        {
+          "name": "redis",
+          "reason": "No caching layer needed; Firestore real-time listeners + cloud Functions cover the use case"
+        }
+      ]
+    },
+    "plugins": [
+      "frontend-design@claude-plugins-official"
+    ],
+    "agents": {
+      "code_reviewer_stockflow": "Senior code reviewer with retail-multirole-firebase criteria: race conditions on stock, payment idempotency, cost-price leak detection, Spanish copy consistency, custom claims discipline, bundle size impact",
+      "firebase_architect": "Designs Firestore collections, custom claims, security boundaries, denormalization tradeoffs, composite indexes, read-cost economics for SMB retail data shapes (products, transactions, customers, orders, claims, shipments)",
+      "firestore_rules_auditor": "Audits firestore.rules vs client queries before merge — detects under-permissive rules (broken UX), over-permissive rules (data exfiltration), and rules with expensive lookups that explode read costs",
+      "react_component_builder": "Builds new screens following the dark+indigo+lucide+motion design system, Spanish chileno copy, role-aware UI, accessibility-first, motion animations between routes",
+      "payment_integrations_specialist": "Specialist in Flow.cl HMAC-SHA256 + MercadoPago x-signature HMAC, idempotency keys, sandbox/prod separation, audit logs, reconciliation flows for LATAM payment rails",
+      "performance_profiler": "Hunts unbounded Firestore listeners, missing pagination, missing composite indexes, render thrash, bundle bloat; quantifies findings in reads/day and ms",
+      "playwright_e2e_author": "End-to-end tests for retail flows: login by role, add product, scan barcode, process sale, place delivery order, accept route as driver, file claim, resolve claim",
+      "migration_planner": "Idempotent, resumable, dry-runnable runbooks for Firestore schema changes, multi-role restructures, renaming heavily-referenced symbols, dep major version migrations",
+      "inventory_agent": "Stock level thresholds, reorder point predictions, low-inventory alerts, Kardex movements",
+      "routing_agent": "Delivery route optimization with traffic, time windows, customer preferences",
+      "notification_agent": "Smart routing of notifications (low stock, claim resolved, delivery status) respecting user preferences and channel"
+    },
+    "custom_skills_to_create": [
+      {
+        "name": "latam-payments-chile",
+        "description": "Flow.cl + MercadoPago Chile integration patterns: HMAC-SHA256 signatures, x-signature header HMAC, idempotency via Firestore docs, sandbox/prod separation via FLOW_ENVIRONMENT env, webhook verification with timing-safe compare, audit log requirements per transaction",
+        "triggers": [
+          "flow.cl",
+          "mercadopago chile",
+          "webpay",
+          "khipu",
+          "chilean payment",
+          "pago chile",
+          "transbank",
+          "FLOW_API_KEY",
+          "MERCADOPAGO_ACCESS_TOKEN"
+        ]
+      },
+      {
+        "name": "firestore-custom-claims",
+        "description": "Multi-role RBAC via Firebase Custom Claims: setUserRole Cloud Function with whitelist + audit, bootstrap-admin.ts one-shot script using applicationDefault credentials, /role_audit collection for compliance, claim is authoritative + Firestore mirror for UI only",
+        "triggers": [
+          "custom claims",
+          "setCustomUserClaims",
+          "firebase auth roles",
+          "RBAC firebase",
+          "bootstrap admin",
+          "role_audit",
+          "verifyIdToken"
+        ]
+      },
+      {
+        "name": "retail-multirole-routing",
+        "description": "Split apps by role (admin / store / delivery) with React Router + React.lazy per role AND per page. Profile-driven routing from custom claims (never from window.location.pathname). BrowserRouter wrapper in main.tsx, Suspense fallbacks at each lazy boundary",
+        "triggers": [
+          "multi-role app",
+          "role-based routing",
+          "react.lazy per role",
+          "code-splitting roles",
+          "BrowserRouter",
+          "AdminRoutes",
+          "DeliveryRoutes",
+          "StoreRoutes"
+        ]
+      },
+      {
+        "name": "clp-money-handling",
+        "description": "Chilean Peso (CLP) is integer-only — no decimals ever. Opaque type pattern (type CLP = number & {__brand:'CLP'}), integer-only arithmetic helpers, thousand separators with dots ($1.234.567), no Math.round mid-calc",
+        "triggers": [
+          "CLP",
+          "chilean peso",
+          "pesos chilenos",
+          "moneda integer",
+          "no decimals currency",
+          "Intl.NumberFormat es-CL"
+        ]
+      },
+      {
+        "name": "chile-rut-validation",
+        "description": "Chilean RUT (Rol Único Tributario) validation: módulo 11 check digit algorithm, format with/without dots (XX.XXX.XXX-Y or XXXXXXXX-Y), DV is 0-9 or K. Use chile-rut-mcp tools when available",
+        "triggers": [
+          "RUT chile",
+          "rol unico tributario",
+          "modulo 11",
+          "digito verificador",
+          "DV chile",
+          "cedula chilena"
+        ]
+      }
+    ],
+    "hooks": {
+      "SessionStart": "Read .claude/PROJECT_PROFILE.json business_domain section and show: market, payment rails, role tuple, currency, latest audit history entry",
+      "PostToolUse": "After editing .tsx/.ts/.rules: run pnpm lint; grep for hardcoded email backdoors (any 'if email === ...' pattern) and warn if found; verify serviceAccountKey.json still in .gitignore via git check-ignore"
+    },
+    "claude_md_additions": [
+      "## Stack canónico",
+      "- React 19 + Vite 6 + TypeScript strict + Tailwind 4",
+      "- Firebase 12 (client) + firebase-admin 13 (server) + Cloud Functions Node 18",
+      "- Express 4 modular en server/routes/{barcode,payments,comms,ai}.ts",
+      "- pnpm únicamente — package-lock.json forbidden",
+      "",
+      "## Roles canónicos (single source of truth: src/lib/roles.ts)",
+      "- ROLES = ['owner','admin','manager','seller','logistics','driver'] as const",
+      "- Custom Claim 'role' es authoritative — Firestore /users/{uid}.role es mirror UI",
+      "- Helpers: isOwner, isAdmin, isAdminOrManager, isLogistics, isSeller",
+      "",
+      "## Patrones críticos de seguridad (no negociables)",
+      "1. Custom Claims, never email-based privilege checks",
+      "2. costPrice never leaves the server — Firestore Admin reads only",
+      "3. runTransaction for stock decrements (race-condition safe)",
+      "4. HMAC-SHA256 signature verification on Flow.cl webhooks",
+      "5. x-signature HMAC verification on MercadoPago webhooks (use crypto.timingSafeEqual)",
+      "6. PII allowlist in logs (only {id, total} — never email/phone/RUT/address)",
+      "7. Rate limiting: AI 10/min, general 100/min",
+      "8. CORS allowlist in production (.run.app domains only)",
+      "9. Zod/Joi schema validation on every Express route — never trust req.body",
+      "10. helmet middleware for security headers (CSP, X-Frame-Options, HSTS)",
+      "",
+      "## Anti-patterns to never regress (learned in production)",
+      "1. Doble escritura src/components/ + src/apps/*/pages/ — single tree in src/shared/components/",
+      "2. Email-hardcoded privileges — bootstrap via scripts/bootstrap-admin.ts only",
+      "3. window.location.pathname routing — React Router only via profile?.role",
+      "4. Static imports of route sub-apps — React.lazy() + Suspense required",
+      "5. npm install / package-lock.json — pnpm only, single lockfile",
+      "6. serviceAccountKey.json outside .gitignore — always ignored",
+      "7. firebase-admin removed from package.json — silently breaks production",
+      "8. Bundle monolítico — per-page React.lazy required (admin/store/delivery split)",
+      "9. Skipping audit on configs in a merge — always git show --stat <commit>",
+      "10. PII in logs (email, RUT, address) — strict allowlist {id, total}",
+      "",
+      "## UI conventions",
+      "- Dark theme by default + indigo-600 accent",
+      "- lucide-react ONLY (no mixing icon libraries)",
+      "- motion/react animations with AnimatePresence on route transitions",
+      "- Spanish neutral chileno (avoid mexican/argentine slang)",
+      "- CLP integer formatting: $1.234.567 (dots as thousand sep)",
+      "- Every interactive element: aria-label + loading + error + empty states"
     ]
   }
 }

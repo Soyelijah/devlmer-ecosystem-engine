@@ -6,6 +6,27 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ---
 
+## [Unreleased]
+
+### Agregado
+- **Blueprint nuevo: `retail_multirole_firebase`** (`blueprints/ecosystems.json`): captura el patrón completo de plataformas retail multi-rol sobre Firebase + Express con payment rails LATAM (Flow.cl, MercadoPago Chile). Surge de la calibración real del proyecto StockFlow después de que el detector lo clasificó incorrectamente como `devtools`.
+  - 12 core skills (security-audit, payment-validation, senior-backend, senior-security, senior-fullstack, senior-architect, code-reviewer, refactor, schema-management, db-migration, performance-optimization, real-time-testing)
+  - 3 MCPs required (firebase, context7, github) + 6 recommended (sentry, sendgrid, twilio, slack, mapbox, npm)
+  - 4 MCPs explicitly `anti_recommend` (shopify, stripe, elasticsearch, redis — clarifica por qué no aplican)
+  - 11 agentes recommended (8 premium stockflow-style + 3 DEE generics filtrados)
+  - 5 custom skills to create (latam-payments-chile, firestore-custom-claims, retail-multirole-routing, clp-money-handling, chile-rut-validation)
+  - 30 líneas de `claude_md_additions` cubriendo stack canónico, roles, 10 patrones de seguridad no negociables, 10 anti-patterns conocidos, convenciones UI
+- **Total ecosystems**: 22 → **23 blueprints**
+
+### Pendiente (follow-up)
+- Entrenar `detect_project.py` para reconocer este blueprint automáticamente. Señales sugeridas:
+  - `package.json` deps: `firebase-admin` + `mercadopago` + `express` + `firebase` → +0.4 confidence
+  - Existencia de `firestore.rules` + `functions/src/` → +0.3 confidence
+  - Strings en código: `Flow.cl`, `MercadoPago`, `CLP`, archivos `RUT.*` → +0.2 confidence
+  - Combinación de 3+ señales debería superar `devtools` (que típicamente tiene 0.7-0.9 cuando hay `.claude/` heavy)
+
+---
+
 ## [4.0.0] - 2026-05-03
 
 ### 🚀 Enterprise Overhaul — Closes #12 #13 #14 #15 #16 #17 #18 #19 #20 #21 #22 #23
